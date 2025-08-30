@@ -24,10 +24,10 @@ public class Constants {
             .centripetalScaling(0.0005);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
-            //.leftFrontMotorName("motorLF")
-            //.leftRearMotorName("motorLB")
-            //.rightFrontMotorName("motorRF")
-            //.rightRearMotorName("motorRB")
+            .leftFrontMotorName("motorLF")
+            .leftRearMotorName("motorLB")
+            .rightFrontMotorName("motorRF")
+            .rightRearMotorName("motorRB")
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
@@ -44,8 +44,8 @@ public class Constants {
                     .rightPodY(-8)
                     .strafePodX(-3.5)
                     .leftEncoder_HardwareMapName("motorLB")
-                    //.rightEncoder_HardwareMapName("motorRB")
-                    //.strafeEncoder_HardwareMapName("motorLF")
+                    .rightEncoder_HardwareMapName("motorRB")
+                    .strafeEncoder_HardwareMapName("motorLF")
                     .leftEncoderDirection(Encoder.FORWARD)
                     .rightEncoderDirection(Encoder.FORWARD)
                     .strafeEncoderDirection(Encoder.FORWARD);
