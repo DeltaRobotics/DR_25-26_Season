@@ -34,26 +34,24 @@ public class PIDController {
     }
     public double Update (double sensorReading){
 
-        double deltaTime = elapsedTime.seconds();
-
         double error = setPoint - sensorReading;
-
-        totalError += error * deltaTime;
 
         double controlValue = 0;
 
         if(firstRun){
 
-            controlValue = P * error + I * totalError;
-
             firstRun = false;
         }
         else{
+            double deltaTime = elapsedTime.seconds();
+
+            totalError += error * deltaTime;
 
             controlValue = P * error + I * totalError + D * ((error - previousError) / deltaTime);
 
         }
 
+        elapsedTime.reset();
         previousError = error;
 
         return controlValue;
