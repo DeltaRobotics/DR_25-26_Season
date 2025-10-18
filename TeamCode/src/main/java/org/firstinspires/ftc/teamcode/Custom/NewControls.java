@@ -29,6 +29,7 @@ public class NewControls extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException {
         SoftwareTestBot robot = new SoftwareTestBot(hardwareMap);
+        robot.resetHeading();
 
         waitForStart();
 
@@ -37,6 +38,8 @@ public class NewControls extends LinearOpMode
             robot.mecanumDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, .75);
 
 
+            telemetry.addData("Heading", robot.getHeading());
+            telemetry.update();
 
         }
     }

@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 //@Config //We need this for Dashboard to change variables
 public class SoftwareTestBot {
@@ -20,6 +23,15 @@ public class SoftwareTestBot {
 
     public SoftwareTestBot(HardwareMap ahwMap) {
 
+        imu = ahwMap.get(IMU.class, "imu");
+
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -68,6 +80,19 @@ public class SoftwareTestBot {
         motorLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public double getHeading(){
+
+        YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
+
+        return angles.getYaw();
+    }
+
+    public void resetHeading(){
+
+        imu.resetYaw();
+
     }
 
 }
