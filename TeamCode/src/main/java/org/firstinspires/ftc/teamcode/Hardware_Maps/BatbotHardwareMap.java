@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Hardware_Maps;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,7 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Config //We need this for Dashboard to change variables
 public class BatbotHardwareMap {
 
     //FtcDashboard dashboard = FtcDashboard.getInstance();
