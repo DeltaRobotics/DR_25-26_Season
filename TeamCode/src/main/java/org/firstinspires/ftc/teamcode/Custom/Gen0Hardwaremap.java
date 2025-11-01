@@ -17,6 +17,10 @@ public class Gen0Hardwaremap {
     public DcMotor motorLF = null;
     public DcMotor motorRB = null;
     public DcMotor motorLB = null;
+    public DcMotor intake = null;
+    public DcMotor shooter = null;
+
+
 
     public IMU imu         = null;
 
@@ -38,17 +42,23 @@ public class Gen0Hardwaremap {
         motorLF = ahwMap.dcMotor.get("motorLF");
         motorRB = ahwMap.dcMotor.get("motorRB");
         motorLB = ahwMap.dcMotor.get("motorLB");
+        intake  = ahwMap.dcMotor.get("intake");
+        shooter = ahwMap.dcMotor.get("shooter");
 
         //drive motors and odometry encoders
         motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        motorLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -56,6 +66,8 @@ public class Gen0Hardwaremap {
         motorLF.setPower(0);
         motorRB.setPower(0);
         motorLB.setPower(0);
+        shooter.setPower(0);
+        intake.setPower(0);
 
 
     }
@@ -68,7 +80,7 @@ public class Gen0Hardwaremap {
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
     }
 
-    public void resetDriveEncoders()
+    /* public void resetDriveEncoders()
     {
         motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -79,7 +91,7 @@ public class Gen0Hardwaremap {
         motorLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
+    }*/
 
     public double getHeading(){
 
@@ -95,6 +107,3 @@ public class Gen0Hardwaremap {
     }
 
 }
-
-
-
