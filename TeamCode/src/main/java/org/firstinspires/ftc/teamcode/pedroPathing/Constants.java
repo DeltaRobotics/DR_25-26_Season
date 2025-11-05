@@ -14,12 +14,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(8.040)
+            .mass(9.2)
             .forwardZeroPowerAcceleration(-31.52450748547713)
             .lateralZeroPowerAcceleration(-96.3279)
             .centripetalScaling(0.0005);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
+            .maxPower(1)
             .leftFrontMotorName("motorLF")
             .leftRearMotorName("motorLB")
             .rightFrontMotorName("motorRF")
@@ -27,7 +28,7 @@ public class Constants {
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity(338.9431)
             .yVelocity(253.1578);
 
@@ -36,12 +37,12 @@ public class Constants {
                     .forwardTicksToInches(.003)
                     .strafeTicksToInches(.003)
                     .turnTicksToInches(.0036)
-                    .leftPodY(8)
-                    .rightPodY(-8)
-                    .strafePodX(-3.5)
-                    .leftEncoder_HardwareMapName("motorLB")
+                    .leftPodY(7)
+                    .rightPodY(-7)
+                    .strafePodX(-6)
+                    .leftEncoder_HardwareMapName("motorRF")
                     .rightEncoder_HardwareMapName("motorRB")
-                    .strafeEncoder_HardwareMapName("motorLF")
+                    .strafeEncoder_HardwareMapName("motorLB")
                     .leftEncoderDirection(Encoder.FORWARD)
                     .rightEncoderDirection(Encoder.FORWARD)
                     .strafeEncoderDirection(Encoder.FORWARD);
