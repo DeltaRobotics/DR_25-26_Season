@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @TeleOp(name = "Gen0Teleop")
@@ -49,9 +50,21 @@ public class Gen0Teleop extends LinearOpMode {
     public DcMotor intake = null;
     public DcMotor shooter = null;
 
+
+    double time = 0;
+    public boolean timerInitted = false;
+    public boolean timerInit = false;
+    public boolean timerInit3 = false;
+    public boolean timerInit4 = false;
+    public boolean timerInit5 = false;
+
+
+    ElapsedTime timer = new ElapsedTime();
+
     @Override
     public void runOpMode() throws InterruptedException {
         Gen0Hardwaremap robot = new Gen0Hardwaremap(hardwareMap);
+        Gen0MechanismHardwareMap mechanism = new Gen0MechanismHardwareMap(hardwareMap);
 
         kicker = hardwareMap.servo.get("kicker");
 
@@ -71,31 +84,36 @@ public class Gen0Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .75);
+            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
 
-            if (gamepad1.dpad_up && buttonDU) {
+            if (gamepad1.dpad_down && buttonDD) {
 
-                kicker.setPosition(kicker.getPosition() + 0.1);
+                mechanism.shooterOFF();
 
-                buttonDU = false;
+                buttonDD = false;
             }
 
-            if (!gamepad1.dpad_up && !buttonDU) {
+            if (!gamepad1.dpad_down && !buttonDD) {
 
-                buttonDU = true;
+                buttonDD = true;
             }
 
-            if (gamepad1.right_bumper && buttonRB) {
+            if (gamepad1.right_bumper && buttonRB || timerInitted) {
 
                 if (kicker.getPosition() == 0) {
 
                     kicker.setPosition(.6);
-                    robot.intake.setPower(0);
+                    mechanism.intake.setPower(0);
+                    time = timer.milliseconds() + 250;
+                    timerInitted=true;
+
                 }
-                else {
-                   kicker.setPosition(0);
-                    robot.intake.setPower(1);
+                if (time < timer.milliseconds() && timerInitted){
+                    kicker.setPosition(0);
+                    mechanism.intake.setPower(1);
+                    timerInitted=false;
                 }
+
 
                 buttonRB = false;
             }
@@ -108,7 +126,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonB = false;
 
-                robot.intake.setPower(robot.intake.getPower() * -1);
+                mechanism.intake.setPower(mechanism.intake.getPower() * -1);
             }
             else if (!gamepad1.b) {
                 buttonB = true;
@@ -118,11 +136,11 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonX = false;
 
-                if (robot.intake.getPower() == 0) {
-                    robot.intake.setPower(INTAKE_ON_POWER);
+                if (mechanism.intake.getPower() == 0) {
+                    mechanism.intake.setPower(INTAKE_ON_POWER);
                 }
                 else {
-                    robot.intake.setPower(0);
+                    mechanism.intake.setPower(0);
                 }
             }
             else if (!gamepad1.x) {
@@ -133,7 +151,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonB = false;
 
-                robot.intake.setPower(robot.intake.getPower() * -1);
+                mechanism.intake.setPower(mechanism.intake.getPower() * -1);
             }
             else if (!gamepad1.b) {
                 buttonB = true;
@@ -145,19 +163,20 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonLB = false;
 
-                if (robot.shooter.getPower() == SHOOTER_IDLE_POWER) {
-                    robot.shooter.setPower(SHOOTER_FULL_POWER);
+                if (!mechanism.onOff) {
+                    mechanism.shooterON();
                 }
                 else {
-                    robot.shooter.setPower(SHOOTER_IDLE_POWER);
+                    mechanism.shooterOFF();
                 }
             }
             else if (!gamepad1.left_bumper) {
                 buttonLB = true;
             }
-
+            telemetry.addData("shooterRPM", mechanism.shooterRPM());
             telemetry.addData("kickerPos", kicker.getPosition());
             telemetry.update();
+
 
         }
     }

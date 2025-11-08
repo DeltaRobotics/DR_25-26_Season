@@ -24,6 +24,12 @@ import com.pedropathing.util.*;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1177,7 +1183,6 @@ class Circle extends OpMode {
         }
     }
 }
-
 /**
  * This is the Drawing class. It handles the drawing of stuff on Panels Dashboard, like the robot.
  *
@@ -1189,10 +1194,10 @@ class Drawing {
     private static final FieldManager panelsField = PanelsField.INSTANCE.getField();
 
     private static final Style robotLook = new Style(
-            "", "#3F51B5", 0.75
+            "", "#3F51B5", 0.0
     );
     private static final Style historyLook = new Style(
-            "", "#4CAF50", 0.75
+            "", "#4CAF50", 0.0
     );
 
     /**
@@ -1204,7 +1209,7 @@ class Drawing {
 
     /**
      * This draws everything that will be used in the Follower's telemetryDebug() method. This takes
-     * a Follower as an input, so an instance of the DashbaordDrawingHandler class is not needed.
+     * a Follower as an input, so an instance of the DashboardDrawingHandler class is not needed.
      *
      * @param follower Pedro Follower instance.
      */
