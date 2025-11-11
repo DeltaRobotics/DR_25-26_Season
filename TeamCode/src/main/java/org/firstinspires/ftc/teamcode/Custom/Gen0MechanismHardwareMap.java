@@ -53,9 +53,13 @@ public class Gen0MechanismHardwareMap {
     }
 
     public void shooterON(){
+        shooterON(0.65);
+    }
+
+    public void shooterON(double power){
         timerS.reset();
         preSEncoder = shooter.getCurrentPosition();
-        shooter.setPower(0.65);
+        shooter.setPower(power);
         onOff = true;
 
     }

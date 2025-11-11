@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
@@ -9,6 +8,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -23,10 +23,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Gen0Auto")
-public class Gen0Auto extends OpMode {
+@Autonomous(name = "Gen0AutoBlue")
+public class Gen0AutoBlue extends OpMode {
 
-    Gen0MechanismHardwareMap mechanism = new Gen0MechanismHardwareMap(hardwareMap);
+    Gen0MechanismHardwareMap mechanism = null;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
@@ -48,7 +48,7 @@ public class Gen0Auto extends OpMode {
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(0, 49, Math.toRadians(0));
 
-    private final Pose Shooting = new Pose(76, 49, Math.toRadians(45));
+    private final Pose Shooting = new Pose(76, 49, Math.toRadians(47));
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
 
@@ -138,58 +138,49 @@ public class Gen0Auto extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(scorePreload, true);
-                    setPathState(-1);
+                    setPathState(1);
                 }
 
                 break;
             case 1:
 
-                /* You could check for
-                - Follower State: "if(!follower.isBusy() {}"
-                - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
-                - Robot Position: "if(follower.getPose().getX() > 36) {}"
-                */
-
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Score Preload */
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(move1,true);
-                    setPathState(2);
-                }
-                break;
-            case 2:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
-                if(!follower.isBusy()) {
-                    /* Grab Sample */
+                    mechanism.shooterON(0.6);
+                    mechanism.intake.setPower(1);
+                    blockingSleep(2500);
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    follower.followPath(move2,true);
-                    setPathState(3);
-                }
-                break;
-            case 3:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Score Sample */
+                    for (int i=0; i<4; ++i){
+                        mechanism.intake.setPower(0);
+                        mechanism.kicker.setPosition(.6);
+                        blockingSleep(500);
+                        mechanism.kicker.setPosition(0);
+                        mechanism.intake.setPower(1);
+                        blockingSleep(1000);
+                    }
+                    mechanism.shooterOFF();
+                    mechanism.intake.setPower(0);
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
-                    follower.followPath(park,true);
-                    setPathState(4);
-                }
-                break;
-            case 4:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Level 1 Ascent */
-
-                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
                 break;
+
         }
     }
+
+    public void blockingSleep(int milliseconds){
+        ElapsedTime timer = new ElapsedTime();
+
+        timer.reset();
+        int targetTime = (int)timer.milliseconds() + milliseconds;
+
+        while(timer.milliseconds() < targetTime){
+
+        }
+    }
+
 
     /** These change the states of the paths and actions
      * It will also reset the timers of the individual switches **/
@@ -220,6 +211,8 @@ public class Gen0Auto extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+
+        mechanism = new Gen0MechanismHardwareMap(hardwareMap);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

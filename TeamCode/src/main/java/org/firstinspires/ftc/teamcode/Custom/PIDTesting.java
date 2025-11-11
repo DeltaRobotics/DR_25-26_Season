@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @TeleOp(name="PIDTesting")
-//@Disabled
+@Disabled
 
 public class PIDTesting extends LinearOpMode
 {
