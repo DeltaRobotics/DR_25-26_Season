@@ -84,16 +84,16 @@ public class Gen0Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
+            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .8);
 
-            if (gamepad1.dpad_down && buttonDD) {
+            if (gamepad2.dpad_down && buttonDD) {
 
                 mechanism.shooterOFF();
 
                 buttonDD = false;
             }
 
-            if (!gamepad1.dpad_down && !buttonDD) {
+            if (!gamepad2.dpad_down && !buttonDD) {
 
                 buttonDD = true;
             }
@@ -110,7 +110,7 @@ public class Gen0Teleop extends LinearOpMode {
                 }
                 if (time < timer.milliseconds() && timerInitted){
                     kicker.setPosition(0);
-                    mechanism.intake.setPower(1);
+                    mechanism.intake.setPower(.9);
                     timerInitted=false;
                 }
 
@@ -173,6 +173,7 @@ public class Gen0Teleop extends LinearOpMode {
             else if (!gamepad1.left_bumper) {
                 buttonLB = true;
             }
+
             telemetry.addData("shooterRPM", mechanism.shooterRPM());
             telemetry.addData("kickerPos", kicker.getPosition());
             telemetry.update();
