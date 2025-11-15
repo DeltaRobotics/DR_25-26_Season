@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
 //two face teleop
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -39,25 +35,10 @@ public class Gen0Teleop extends LinearOpMode {
     public boolean button2DL = true;
     public boolean button2DU = true;
     public boolean button2DD = true;
-    private double intakePower = 0;
-
-    public final double INTAKE_ON_POWER = 0.75;
-    public final double SHOOTER_IDLE_POWER = 0.45;
-    public final double SHOOTER_FULL_POWER = 0.80;
-
-
-    public Servo kicker = null;
-    public DcMotor intake = null;
-    public DcMotor shooter = null;
 
 
     double time = 0;
     public boolean timerInitted = false;
-    public boolean timerInit = false;
-    public boolean timerInit3 = false;
-    public boolean timerInit4 = false;
-    public boolean timerInit5 = false;
-
 
     ElapsedTime timer = new ElapsedTime();
 
@@ -66,21 +47,9 @@ public class Gen0Teleop extends LinearOpMode {
         Gen0Hardwaremap robot = new Gen0Hardwaremap(hardwareMap);
         Gen0MechanismHardwareMap mechanism = new Gen0MechanismHardwareMap(hardwareMap);
 
-        kicker = hardwareMap.servo.get("kicker");
+        waitForStart();
 
-        while (!isStarted() && !isStopRequested()) {
 
-            kicker.setPosition(0);
-
-            //intake.setTargetPosition(0);
-            //intake.setPower(.2);
-            //intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            //shooter.setTargetPosition(0);
-            //shooter.setPower(.2);
-            //shooter.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
 
         while (opModeIsActive()) {
 
@@ -100,17 +69,18 @@ public class Gen0Teleop extends LinearOpMode {
 
             if (gamepad1.right_bumper && buttonRB || timerInitted) {
 
-                if (kicker.getPosition() == 0) {
+                if (mechanism.kicker.getPosition() == 0) {
 
-                    kicker.setPosition(.6);
-                    mechanism.intake.setPower(0);
+                    mechanism.kickerUP();
+                    mechanism.intakeOFF();
                     time = timer.milliseconds() + 250;
                     timerInitted=true;
 
                 }
                 if (time < timer.milliseconds() && timerInitted){
-                    kicker.setPosition(0);
-                    mechanism.intake.setPower(.9);
+                    mechanism.kickerDOWN();
+                    time = timer.milliseconds() + 100;
+                    mechanism.intakeON();
                     timerInitted=false;
                 }
 
@@ -126,7 +96,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonB = false;
 
-                mechanism.intake.setPower(mechanism.intake.getPower() * -1);
+                mechanism.intakeREVERSE();
             }
             else if (!gamepad1.b) {
                 buttonB = true;
@@ -137,10 +107,10 @@ public class Gen0Teleop extends LinearOpMode {
                 buttonX = false;
 
                 if (mechanism.intake.getPower() == 0) {
-                    mechanism.intake.setPower(INTAKE_ON_POWER);
+                    mechanism.intakeON();
                 }
                 else {
-                    mechanism.intake.setPower(0);
+                    mechanism.intakeOFF();
                 }
             }
             else if (!gamepad1.x) {
@@ -151,7 +121,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonB = false;
 
-                mechanism.intake.setPower(mechanism.intake.getPower() * -1);
+                mechanism.intakeREVERSE();
             }
             else if (!gamepad1.b) {
                 buttonB = true;
@@ -163,7 +133,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonLB = false;
 
-                if (!mechanism.onOff) {
+                if (!mechanism.shooterPose) {
                     mechanism.shooterON();
                 }
                 else {
@@ -175,7 +145,7 @@ public class Gen0Teleop extends LinearOpMode {
             }
 
             telemetry.addData("shooterRPM", mechanism.shooterRPM());
-            telemetry.addData("kickerPos", kicker.getPosition());
+            telemetry.addData("kickerPos", mechanism.kicker.getPosition());
             telemetry.update();
 
 

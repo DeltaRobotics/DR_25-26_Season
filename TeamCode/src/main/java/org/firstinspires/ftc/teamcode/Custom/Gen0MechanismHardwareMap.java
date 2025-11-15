@@ -19,7 +19,7 @@ public class Gen0MechanismHardwareMap {
     double timeS = 0;
     public boolean timerInittedS = false;
 
-    public boolean onOff = false;
+    public boolean shooterPose = false;
 
     ElapsedTime timerS = new ElapsedTime();
 
@@ -39,10 +39,12 @@ public class Gen0MechanismHardwareMap {
         shooter.setPower(0);
         intake.setPower(0);
 
+        kickerDOWN();
+
     }
 
     public int shooterRPM(){
-       if(onOff) {
+       if(shooterPose) {
            int countsPerSecond = (int)((shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
            preSEncoder = shooter.getCurrentPosition();
            timerS.reset();
@@ -54,24 +56,53 @@ public class Gen0MechanismHardwareMap {
 
     public void shooterON(){
         shooterON(0.65);
+
     }
 
     public void shooterON(double power){
         timerS.reset();
         preSEncoder = shooter.getCurrentPosition();
         shooter.setPower(power);
-        onOff = true;
+        shooterPose = true;
 
     }
 
     public void shooterOFF(){
         shooter.setPower(0);
-        onOff = false;
+        shooterPose = false;
 
     }
 
 
+    public void intakeON(){
 
+        intake.setPower(1);
+    }
+
+    public void intakeOFF(){
+
+        intake.setPower(0);
+    }
+
+    public void intakeREVERSE(){
+
+        intake.setPower(intake.getPower() * -1);
+
+    }
+
+    public void kickerUP(){
+
+        if(shooterPose){
+            kicker.setPosition(.6);
+        }
+
+    }
+
+    public void kickerDOWN(){
+
+        kicker.setPosition(0);
+
+    }
 
 
 

@@ -22,8 +22,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Gen0AutoBlue")
-public class Gen0AutoBlue extends OpMode {
+@Autonomous(name = "Gen0AutoBlue6")
+public class Gen0AutoBlue6 extends OpMode {
 
     Gen0MechanismHardwareMap mechanism = null;
     private Follower follower;
@@ -36,7 +36,8 @@ public class Gen0AutoBlue extends OpMode {
     private final Pose startPose = new Pose(49, 0, Math.toRadians(90));
 
     private final Pose Shooting = new Pose(49, 76, Math.toRadians(135));
-
+    private final Pose firstLineup = new Pose(38, 76, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(8, 76, Math.toRadians(180) );
     private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
 
@@ -45,7 +46,7 @@ public class Gen0AutoBlue extends OpMode {
 
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path scorePreload, movingBackPath;
+    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, movingBackPath;
 
 
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
@@ -56,6 +57,15 @@ public class Gen0AutoBlue extends OpMode {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, Shooting));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
+
+        firstLineupPath = new Path (new BezierLine(Shooting,firstLineup));
+        firstLineupPath.setConstantHeadingInterpolation(firstLineup.getHeading());
+
+        firstPickupPath = new Path (new BezierLine(firstLineup,firstPickup));
+        firstPickupPath.setConstantHeadingInterpolation(firstPickup.getHeading());
+
+        shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
+        shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
         movingBackPath = new Path(new BezierLine(Shooting, movingBack));
         movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
@@ -95,26 +105,76 @@ public class Gen0AutoBlue extends OpMode {
                     /* Score Preload */
 
                     mechanism.shooterON(0.6);
-                    mechanism.intake.setPower(1);
+                    mechanism.intakeON();
                     blockingSleep(2500);
 
-                    for (int i=0; i<6; ++i){
-                        mechanism.intake.setPower(0);
-                        mechanism.kicker.setPosition(.6);
+                    for (int i=0; i<4; ++i){
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
                         blockingSleep(500);
-                        mechanism.kicker.setPosition(0);
-                        mechanism.intake.setPower(1);
+                        mechanism.kickerDOWN();
+                        blockingSleep(100);
+                        mechanism.intakeON();
                         blockingSleep(1000);
                     }
                     mechanism.shooterOFF();
-                    mechanism.intake.setPower(0);
+                    mechanism.intakeOFF();
 
                     setPathState(3);
                 }
 
                 break;
-
             case 3:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    follower.followPath(firstLineupPath, true);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+
+                    follower.followPath(firstPickupPath, true);
+                    setPathState(5);
+                }
+                break;
+            case 5:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.followPath(shootFirstPickupPath, true);
+                    setPathState(6);
+                }
+                break;
+            case 6:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Shoot 2nd Time*/
+                    mechanism.shooterON(0.6);
+                    mechanism.intakeON();
+                    blockingSleep(2500);
+
+                    for (int i=0; i<4; ++i){
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
+                        blockingSleep(500);
+                        mechanism.kickerDOWN();
+                        blockingSleep(100);
+                        mechanism.intakeON();
+                        blockingSleep(1000);
+                    }
+                    mechanism.shooterOFF();
+                    mechanism.intakeOFF();
+                    setPathState(7);
+                }
+                break;
+            case 7:
 
                 if(!follower.isBusy()) {
 

@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -24,8 +22,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Gen0AutoRed")
-public class Gen0AutoRed extends OpMode {
+@Autonomous(name = "Gen0AutoRed3")
+public class Gen0AutoRed3 extends OpMode {
 
     Gen0MechanismHardwareMap mechanism = null;
     private Follower follower;
@@ -97,19 +95,22 @@ public class Gen0AutoRed extends OpMode {
                     /* Score Preload */
 
                     mechanism.shooterON(0.6);
-                    mechanism.intake.setPower(1);
+                    mechanism.intakeON();
                     blockingSleep(2500);
 
                     for (int i=0; i<6; ++i){
-                        mechanism.intake.setPower(0);
-                        mechanism.kicker.setPosition(.6);
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
+
                         blockingSleep(500);
-                        mechanism.kicker.setPosition(0);
-                        mechanism.intake.setPower(1);
+
+                        mechanism.kickerDOWN();
+                        mechanism.intakeON();
+
                         blockingSleep(1000);
                     }
                     mechanism.shooterOFF();
-                    mechanism.intake.setPower(0);
+                    mechanism.intakeOFF();
 
                     setPathState(3);
                 }
