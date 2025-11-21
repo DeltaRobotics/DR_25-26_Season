@@ -40,18 +40,18 @@ public class Constants {
 
     public static ThreeWheelConstants localizerConstants =
             new ThreeWheelConstants()
-                    .forwardTicksToInches(.000576695)
-                    .strafeTicksToInches(.0005795138)
-                    .turnTicksToInches(.000540243418)
+                    .forwardTicksToInches(.0029684281)
+                    .strafeTicksToInches(.0029684281)
+                    .turnTicksToInches(.0029684281)
                     .leftPodY(7)
                     .rightPodY(-7)
                     .strafePodX(-6)
                     .leftEncoder_HardwareMapName("motorRF")
                     .rightEncoder_HardwareMapName("motorRB")
                     .strafeEncoder_HardwareMapName("motorLB")
-                    .leftEncoderDirection(Encoder.REVERSE)
-                    .rightEncoderDirection(Encoder.FORWARD)
-                    .strafeEncoderDirection(Encoder.REVERSE);
+                    .leftEncoderDirection(Encoder.FORWARD)
+                    .rightEncoderDirection(Encoder.REVERSE)
+                    .strafeEncoderDirection(Encoder.FORWARD);
 
     public static PathConstraints pathConstraints = new PathConstraints(
             0.995,

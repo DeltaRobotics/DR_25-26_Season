@@ -35,9 +35,9 @@ public class Gen0AutoRed6 extends OpMode {
 
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 76, Math.toRadians(40));
-    private final Pose firstLineup = new Pose(89, 76, Math.toRadians(0) );
-    private final Pose firstPickup = new Pose(115, 76, Math.toRadians(0) );
+    private final Pose Shooting = new Pose(72, 70, Math.toRadians(50));
+    private final Pose firstLineup = new Pose(89, 72, Math.toRadians(0) );
+    private final Pose firstPickup = new Pose(115, 72, Math.toRadians(0) );
     private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
 
 

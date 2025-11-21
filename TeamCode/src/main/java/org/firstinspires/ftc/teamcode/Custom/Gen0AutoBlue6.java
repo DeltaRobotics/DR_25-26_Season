@@ -33,11 +33,10 @@ public class Gen0AutoBlue6 extends OpMode {
      * It is used by the pathUpdate method. */
     private int pathState;
 
-    private final Pose startPose = new Pose(49, 0, Math.toRadians(90));
-
-    private final Pose Shooting = new Pose(49, 76, Math.toRadians(135));
-    private final Pose firstLineup = new Pose(38, 76, Math.toRadians(180) );
-    private final Pose firstPickup = new Pose(8, 76, Math.toRadians(180) );
+    private final Pose startPose = new Pose(50, 0, Math.toRadians(90));
+    private final Pose Shooting = new Pose(55, 70, Math.toRadians(133));
+    private final Pose firstLineup = new Pose(45, 75, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(18, 75, Math.toRadians(180) );
     private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
 
