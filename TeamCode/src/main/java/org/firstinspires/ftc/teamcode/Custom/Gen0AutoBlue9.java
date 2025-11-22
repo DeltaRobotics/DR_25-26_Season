@@ -38,7 +38,7 @@ public class Gen0AutoBlue9 extends OpMode {
     private final Pose firstLineup = new Pose(45, 75, Math.toRadians(180) );
     private final Pose firstPickup = new Pose(16, 75, Math.toRadians(180) );
     private final Pose secondLineup = new Pose(38, 52, Math.toRadians(180));
-    private final Pose secondPickup = new Pose(11, 52, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(13, 52, Math.toRadians(180));
     private final Pose secondPickupBack = new Pose(20, 52, Math.toRadians(180));
     private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
