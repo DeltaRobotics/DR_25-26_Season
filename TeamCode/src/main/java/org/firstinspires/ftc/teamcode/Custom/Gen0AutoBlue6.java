@@ -34,9 +34,9 @@ public class Gen0AutoBlue6 extends OpMode {
     private int pathState;
 
     private final Pose startPose = new Pose(50, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(55, 70, Math.toRadians(133));
+    private final Pose Shooting = new Pose(48, 79, Math.toRadians(135));
     private final Pose firstLineup = new Pose(45, 75, Math.toRadians(180) );
-    private final Pose firstPickup = new Pose(18, 75, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(16, 75, Math.toRadians(180) );
     private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
 
@@ -136,7 +136,7 @@ public class Gen0AutoBlue6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
-
+                    follower.setMaxPower(0.75);
                     follower.followPath(firstPickupPath, true);
                     setPathState(5);
                 }
@@ -146,6 +146,7 @@ public class Gen0AutoBlue6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
+                    follower.setMaxPower(1);
                     follower.followPath(shootFirstPickupPath, true);
                     setPathState(6);
                 }

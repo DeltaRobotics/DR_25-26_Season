@@ -35,7 +35,7 @@ public class Gen0AutoRed6 extends OpMode {
 
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(72, 70, Math.toRadians(50));
+    private final Pose Shooting = new Pose(80, 76, Math.toRadians(45));
     private final Pose firstLineup = new Pose(89, 72, Math.toRadians(0) );
     private final Pose firstPickup = new Pose(115, 72, Math.toRadians(0) );
     private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
@@ -66,6 +66,7 @@ public class Gen0AutoRed6 extends OpMode {
 
         movingBackPath = new Path (new BezierLine(Shooting,movingBack));
         movingBackPath.setConstantHeadingInterpolation(movingBack.getHeading());
+
 
     }
 
@@ -130,6 +131,7 @@ public class Gen0AutoRed6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
+                    follower.setMaxPower(0.75);
 
                     follower.followPath(firstPickupPath, true);
                     setPathState(5);
@@ -140,6 +142,7 @@ public class Gen0AutoRed6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
+                    follower.setMaxPower(1);
                     follower.followPath(shootFirstPickupPath, true);
                     setPathState(6);
                 }

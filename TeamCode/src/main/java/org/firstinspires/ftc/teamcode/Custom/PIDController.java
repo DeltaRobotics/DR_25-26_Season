@@ -20,12 +20,15 @@ public class PIDController {
 
     private boolean firstRun = true;
 
-    public PIDController (double P, double I, double D, double setPoint){
+    private double minSampleTime;
+
+    public PIDController (double P, double I, double D, double setPoint, double minSampleTime){
 
         this.P = P;
         this.I = I;
         this.D = D;
         this.setPoint = setPoint;
+        this.minSampleTime = minSampleTime;
 
         elapsedTime = new ElapsedTime();
         totalError = 0;
@@ -56,5 +59,51 @@ public class PIDController {
 
         return controlValue;
 
+    }
+
+    // Getters and setters
+    public double getP()
+    {
+        return P;
+    }
+
+    public double getI()
+    {
+        return I;
+    }
+
+    public double getD()
+    {
+        return D;
+    }
+
+    public double getSetPoint()
+    {
+        return setPoint;
+    }
+
+    public double getTotalError()
+    {
+        return totalError;
+    }
+
+    public void setP(double P)
+    {
+        this.P = P;
+    }
+
+    public void setI(double I)
+    {
+        this.I = I;
+    }
+
+    public void setD(double D)
+    {
+        this.D = D;
+    }
+
+    public void setSetPoint(double setPoint)
+    {
+        this.setPoint = setPoint;
     }
 }

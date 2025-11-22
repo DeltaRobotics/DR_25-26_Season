@@ -78,19 +78,6 @@ public class Gen0Hardwaremap {
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
     }
 
-    /* public void resetDriveEncoders()
-    {
-        motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        motorLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorLB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }*/
-
     public double getHeading(){
 
         YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();

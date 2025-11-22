@@ -79,7 +79,7 @@ public class Gen0Teleop extends LinearOpMode {
                 }
                 if (time < timer.milliseconds() && timerInitted){
                     mechanism.kickerDOWN();
-                    time = timer.milliseconds() + 100;
+                    time = timer.milliseconds() + 250;
                     mechanism.intakeON();
                     timerInitted=false;
                 }
@@ -133,7 +133,7 @@ public class Gen0Teleop extends LinearOpMode {
 
                 buttonLB = false;
 
-                if (!mechanism.shooterPose) {
+                if (!mechanism.shooterOn) {
                     mechanism.shooterON();
                 }
                 else {

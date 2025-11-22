@@ -12,20 +12,28 @@ public class Gen0MechanismHardwareMap {
     public DcMotor shooter = null;
     public Servo kicker = null;
 
-    public final double INTAKE_ON_POWER = 0.75;
-    public final double SHOOTER_IDLE_POWER = 0.45;
-    public final double SHOOTER_FULL_POWER = 0.80;
+    // Constants
+    private static final double DEFAULT_INTAKE_POWER = 1;
+    private static final double DEFAULT_SHOOTER_POWER = 0.65;
+
+    // In seconds.
+
+    private static final double MIN_SAMPLE_TIME = 0.01;
+
+    // Instance variables.
+
     public int preSEncoder = 0;
+    private int prevShooterRPM = 0;
     double timeS = 0;
     public boolean timerInittedS = false;
 
-    public boolean shooterPose = false;
+    public boolean shooterOn = false;
 
     ElapsedTime timerS = new ElapsedTime();
 
     public Gen0MechanismHardwareMap(HardwareMap ahwMap) {
 
-        intake  = ahwMap.dcMotor.get("intake");
+        intake = ahwMap.dcMotor.get("intake");
         shooter = ahwMap.dcMotor.get("shooter");
 
         kicker = ahwMap.servo.get("kicker");
@@ -43,68 +51,78 @@ public class Gen0MechanismHardwareMap {
 
     }
 
-    public int shooterRPM(){
-       if(shooterPose) {
-           int countsPerSecond = (int)((shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
-           preSEncoder = shooter.getCurrentPosition();
-           timerS.reset();
-           return countsPerSecond * 60 / 28;
-       }
-      return 0;
+    public int shooterRPM() {
+
+        if (shooterOn) {
+
+            // If our min sample time has not passed yet, return the previous shooter RPM
+            if (timerS.seconds() < MIN_SAMPLE_TIME) {
+                return prevShooterRPM;
+            } else {
+                int countsPerSecond = (int) ((shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
+                preSEncoder = shooter.getCurrentPosition();
+                timerS.reset();
+
+                prevShooterRPM = countsPerSecond * 60 / 28;
+
+                return prevShooterRPM;
+            }
+        }
+
+        prevShooterRPM = 0;
+        return 0;
 
     }
 
-    public void shooterON(){
-        shooterON(0.65);
+    public void shooterON() {
+        shooterON(DEFAULT_SHOOTER_POWER);
 
     }
 
-    public void shooterON(double power){
+    public void shooterON(double power) {
         timerS.reset();
         preSEncoder = shooter.getCurrentPosition();
         shooter.setPower(power);
-        shooterPose = true;
+        shooterOn = true;
 
     }
 
-    public void shooterOFF(){
+    public void shooterOFF() {
         shooter.setPower(0);
-        shooterPose = false;
+        shooterOn = false;
 
     }
 
 
-    public void intakeON(){
+    public void intakeON() {
 
-        intake.setPower(1);
+        intake.setPower(DEFAULT_INTAKE_POWER);
     }
 
-    public void intakeOFF(){
+    public void intakeOFF() {
 
         intake.setPower(0);
     }
 
-    public void intakeREVERSE(){
+    public void intakeREVERSE() {
 
         intake.setPower(intake.getPower() * -1);
 
     }
 
-    public void kickerUP(){
+    public void kickerUP() {
 
-        if(shooterPose){
+        if (shooterOn) {
             kicker.setPosition(.6);
         }
 
     }
 
-    public void kickerDOWN(){
+    public void kickerDOWN() {
 
         kicker.setPosition(0);
 
     }
-
-
 
 
 }

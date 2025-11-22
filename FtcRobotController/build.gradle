@@ -17,13 +17,8 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
     compileSdk 34
-
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
     namespace = 'com.qualcomm.ftcrobotcontroller'
 }
 

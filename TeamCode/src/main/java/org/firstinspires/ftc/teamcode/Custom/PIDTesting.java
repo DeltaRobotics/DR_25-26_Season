@@ -31,7 +31,7 @@ public class PIDTesting extends LinearOpMode
 
         DcMotor shooter = hardwareMap.get(DcMotor.class, "shooter");
 
-        PIDController PIDShooter = new PIDController(1,0,0,0);
+        PIDController PIDShooter = new PIDController(1,0,0,0, 0.01);
 
         waitForStart();
 
