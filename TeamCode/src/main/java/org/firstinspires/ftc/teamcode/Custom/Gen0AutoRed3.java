@@ -36,7 +36,7 @@ public class Gen0AutoRed3 extends OpMode {
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
 
-    private final Pose Shooting = new Pose(80, 76, Math.toRadians(45));
+    private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
 
     private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
 
@@ -69,7 +69,7 @@ public class Gen0AutoRed3 extends OpMode {
 
                 if(!follower.isBusy()) {
                     /* Score Preload */
-
+                    mechanism.shooterON(0.6);
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(scorePreload, true);
                     setPathState(1);
@@ -93,10 +93,7 @@ public class Gen0AutoRed3 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Score Preload */
-
-                    mechanism.shooterON(0.6);
                     mechanism.intakeON();
-                    blockingSleep(2500);
 
                     for (int i=0; i<6; ++i){
                         mechanism.intakeOFF();

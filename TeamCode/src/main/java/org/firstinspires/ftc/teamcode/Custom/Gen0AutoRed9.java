@@ -22,8 +22,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Gen0AutoRed6")
-public class Gen0AutoRed6 extends OpMode {
+@Autonomous(name = "Gen0AutoRed9")
+public class Gen0AutoRed9 extends OpMode {
 
     Gen0MechanismHardwareMap mechanism = null;
     private Follower follower;
@@ -38,6 +38,9 @@ public class Gen0AutoRed6 extends OpMode {
     private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
     private final Pose firstLineup = new Pose(89, 72, Math.toRadians(0) );
     private final Pose firstPickup = new Pose(115, 72, Math.toRadians(0) );
+    private final Pose secondLineup = new Pose(110, 52, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(133, 52, Math.toRadians(180));
+    private final Pose secondPickupBack = new Pose(20, 52, Math.toRadians(180));
     private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
 
 
@@ -45,7 +48,7 @@ public class Gen0AutoRed6 extends OpMode {
 
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, movingBackPath ;
+    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath ;
 
 
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
@@ -63,6 +66,18 @@ public class Gen0AutoRed6 extends OpMode {
 
         shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
         shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
+
+        secondLineupPath = new Path (new BezierLine(Shooting,secondLineup));
+        secondLineupPath.setConstantHeadingInterpolation(secondLineup.getHeading());
+
+        secondPickupPath = new Path (new BezierLine(secondLineup,secondPickup));
+        secondPickupPath.setConstantHeadingInterpolation(secondPickup.getHeading());
+
+        secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
+        secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
+
+        shootSecondLineupPath = new Path (new BezierLine(secondPickup,Shooting));
+        shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
         movingBackPath = new Path (new BezierLine(Shooting,movingBack));
         movingBackPath.setConstantHeadingInterpolation(movingBack.getHeading());
@@ -94,7 +109,7 @@ public class Gen0AutoRed6 extends OpMode {
                     /* Shoot */
                     mechanism.intakeON();
 
-                    for (int i=0; i<4; ++i){
+                    for (int i=0; i<3; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
                         blockingSleep(500);
@@ -143,7 +158,7 @@ public class Gen0AutoRed6 extends OpMode {
                     /* Shoot 2nd Time*/
                     mechanism.intakeON();
 
-                    for (int i=0; i<4; ++i){
+                    for (int i=0; i<3; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
                         blockingSleep(500);
@@ -159,10 +174,66 @@ public class Gen0AutoRed6 extends OpMode {
                 break;
             case 7:
 
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.followPath(secondLineupPath, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
 
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(0.6);
+                    follower.followPath(secondPickupPath, true);
+                    setPathState(9);
+                }
+                break;
+            case 9:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(1);
+                    follower.followPath(secondPickupBackPath, true);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.followPath(shootSecondLineupPath, true);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Shoot 2nd Time*/
+                    mechanism.intakeON();
+
+                    for (int i=0; i<3; ++i){
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
+                        blockingSleep(500);
+                        mechanism.kickerDOWN();
+                        blockingSleep(100);
+                        mechanism.intakeON();
+                        blockingSleep(1000);
+                    }
+                    mechanism.intakeOFF();
+                    setPathState(12);
+                }
+                break;
+            case 12:
+
+                if(!follower.isBusy()) {
                     follower.followPath(movingBackPath, true);
-
                     setPathState(-1);
                 }
                 break;

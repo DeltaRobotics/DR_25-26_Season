@@ -80,33 +80,19 @@ public class Gen0AutoBlue6 extends OpMode {
 
                 if(!follower.isBusy()) {
                     /* Score Preload */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(scorePreload, true);
-                    setPathState(1);
-                }
-
-                break;
-            case 1:
-
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Score Preload */
+                    mechanism.shooterON(0.6);
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(scorePreload, true);
                     setPathState(2);
                 }
+
                 break;
             case 2:
 
                 if(!follower.isBusy()) {
                     /* Score Preload */
-
-                    mechanism.shooterON(0.6);
                     mechanism.intakeON();
-                    blockingSleep(2500);
-
                     for (int i=0; i<4; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
@@ -116,9 +102,7 @@ public class Gen0AutoBlue6 extends OpMode {
                         mechanism.intakeON();
                         blockingSleep(1000);
                     }
-                    mechanism.shooterOFF();
                     mechanism.intakeOFF();
-
                     setPathState(3);
                 }
 
@@ -136,7 +120,7 @@ public class Gen0AutoBlue6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
-                    follower.setMaxPower(0.75);
+                    follower.setMaxPower(0.6);
                     follower.followPath(firstPickupPath, true);
                     setPathState(5);
                 }
@@ -156,9 +140,8 @@ public class Gen0AutoBlue6 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Shoot 2nd Time*/
-                    mechanism.shooterON(0.6);
                     mechanism.intakeON();
-                    blockingSleep(2500);
+
 
                     for (int i=0; i<4; ++i){
                         mechanism.intakeOFF();
@@ -169,8 +152,9 @@ public class Gen0AutoBlue6 extends OpMode {
                         mechanism.intakeON();
                         blockingSleep(1000);
                     }
-                    mechanism.shooterOFF();
+
                     mechanism.intakeOFF();
+                    mechanism.shooterOFF();
                     setPathState(7);
                 }
                 break;
