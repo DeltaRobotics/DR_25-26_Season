@@ -38,9 +38,9 @@ public class Gen0AutoRed9 extends OpMode {
     private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
     private final Pose firstLineup = new Pose(89, 73, Math.toRadians(0) );
     private final Pose firstPickup = new Pose(115, 73, Math.toRadians(0) );
-    private final Pose secondLineup = new Pose(110, 52, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(131, 52, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(20, 52, Math.toRadians(0));
+    private final Pose secondLineup = new Pose(87, 50, Math.toRadians(0));
+    private final Pose secondPickup = new Pose(113, 50, Math.toRadians(0));
+    private final Pose secondPickupBack = new Pose(87, 50, Math.toRadians(0));
     private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
 
 

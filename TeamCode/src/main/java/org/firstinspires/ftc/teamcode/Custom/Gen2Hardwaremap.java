@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 //@Config //We need this for Dashboard to change variables
-public class Gen0Hardwaremap {
+public class Gen2Hardwaremap {
 
     //FtcDashboard dashboard = FtcDashboard.getInstance();
     //drive motors
@@ -20,22 +20,8 @@ public class Gen0Hardwaremap {
     public DcMotor motorRB = null;
     public DcMotor motorLB = null;
 
-    public IMU imu         = null;
 
-
-    public Gen0Hardwaremap(HardwareMap ahwMap) {
-
-        //Gen0MechanismHardwareMap robot = new Gen0MechanismHardwareMap(hardwareMap);
-
-        imu = ahwMap.get(IMU.class, "imu");
-
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        imu.resetYaw();
+    public Gen2Hardwaremap(HardwareMap ahwMap) {
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -55,6 +41,7 @@ public class Gen0Hardwaremap {
         motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -72,19 +59,6 @@ public class Gen0Hardwaremap {
         motorRB.setPower((((forward + strafe) * 1) - (heading * 1)) * speed);
         motorLB.setPower((((forward - strafe) * 1) + (heading * 1)) * speed);
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
-    }
-
-    public double getHeading(){
-
-        YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-
-        return angles.getYaw();
-    }
-
-    public void resetHeading(){
-
-        imu.resetYaw();
-
     }
 
 }

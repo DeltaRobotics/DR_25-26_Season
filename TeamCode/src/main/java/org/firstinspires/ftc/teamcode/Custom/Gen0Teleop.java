@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
 //two face teleop
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @TeleOp(name = "Gen0Teleop")
-//@Disabled
+@Disabled
 
 public class Gen0Teleop extends LinearOpMode {
     public boolean buttonY = true;
@@ -79,7 +80,7 @@ public class Gen0Teleop extends LinearOpMode {
                 }
                 if (time < timer.milliseconds() && timerInitted){
                     mechanism.kickerDOWN();
-                    time = timer.milliseconds() + 250;
+                    time = timer.milliseconds() + 400;
                     mechanism.intakeON();
                     timerInitted=false;
                 }
