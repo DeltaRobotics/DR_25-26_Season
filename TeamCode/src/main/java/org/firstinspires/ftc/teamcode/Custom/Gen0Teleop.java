@@ -54,7 +54,7 @@ public class Gen0Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .8);
+            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
 
             if (gamepad2.dpad_down && buttonDD) {
 
