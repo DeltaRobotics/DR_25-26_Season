@@ -52,6 +52,63 @@ public class Gen2Teleop extends LinearOpMode {
 
             robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .8);
 
+            if(gamepad1.left_bumper && buttonLB){
+
+                robot.intake();
+
+                buttonLB = false;
+
+            }
+
+            if(!gamepad1.left_bumper && !buttonLB){
+
+                buttonLB = true;
+
+            }
+
+            if(gamepad1.left_trigger > 0.5 && buttonLT ){
+
+                robot.outTake();
+
+                buttonLT = false;
+
+            }
+
+            if(gamepad1.left_trigger < 0.5 && !buttonLT){
+
+                buttonLT = true;
+
+            }
+
+            if(gamepad1.x && buttonX){
+
+                robot.L_swingythingy.setPosition( + 0.01);
+                robot.R_swingythingy.setPosition( - 0.01);
+
+                buttonX = false;
+
+            }
+
+            if(!gamepad1.x && !buttonX){
+
+                buttonX = true;
+
+            }
+
+            if(gamepad1.y && buttonY){
+
+                robot.L_swingythingy.setPosition( - 0.01);
+                robot.R_swingythingy.setPosition( + 0.01);
+
+                buttonY = false;
+
+            }
+
+            if(!gamepad1.y && !buttonY){
+
+                buttonY = true;
+
+            }
         }
     }
 }
