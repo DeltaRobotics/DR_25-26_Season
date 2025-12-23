@@ -61,9 +61,6 @@ public class Gen0Hardwaremap {
         motorRB.setPower(0);
         motorLB.setPower(0);
 
-
-
-
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed){

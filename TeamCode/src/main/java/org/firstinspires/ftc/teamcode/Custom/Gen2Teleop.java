@@ -46,11 +46,14 @@ public class Gen2Teleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Gen2Hardwaremap robot = new Gen2Hardwaremap(hardwareMap);
 
+        robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+        robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
+
         waitForStart();
 
         while (opModeIsActive()) {
 
-            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .8);
+            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
 
             if(gamepad1.left_bumper && buttonLB){
 
@@ -80,10 +83,25 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
+            if(gamepad1.b && buttonB){
+
+                robot.stopIntake();
+
+                buttonB = false;
+            }
+
+            if(!gamepad1.b && !buttonB){
+
+                buttonB = true;
+
+            }
+
+            /** fine adjust for swingythingys
+
             if(gamepad1.x && buttonX){
 
-                robot.L_swingythingy.setPosition( + 0.01);
-                robot.R_swingythingy.setPosition( - 0.01);
+                robot.L_swingythingy.setPosition(robot.L_swingythingy.getPosition() + 0.05);
+                robot.R_swingythingy.setPosition(robot.R_swingythingy.getPosition() - 0.05);
 
                 buttonX = false;
 
@@ -97,8 +115,8 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.y && buttonY){
 
-                robot.L_swingythingy.setPosition( - 0.01);
-                robot.R_swingythingy.setPosition( + 0.01);
+                robot.L_swingythingy.setPosition(robot.L_swingythingy.getPosition() - 0.05);
+                robot.R_swingythingy.setPosition(robot.R_swingythingy.getPosition() + 0.05);
 
                 buttonY = false;
 
@@ -109,6 +127,26 @@ public class Gen2Teleop extends LinearOpMode {
                 buttonY = true;
 
             }
+             **/
+
+            if(gamepad1.right_bumper && buttonRB){
+
+                robot.shoot();
+
+                buttonRB = false;
+
+            }
+
+            if(!gamepad1.right_bumper && !buttonRB){
+
+                buttonRB = true;
+
+            }
+
+            telemetry.addData("leftSwingy", robot.L_swingythingy.getPosition());
+            telemetry.addData("rightSwingy", robot.R_swingythingy.getPosition());
+            telemetry.update();
+
         }
     }
 }

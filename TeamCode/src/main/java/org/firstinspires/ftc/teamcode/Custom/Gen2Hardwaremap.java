@@ -1,16 +1,11 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 //@Config //We need this for Dashboard to change variables
 public class Gen2Hardwaremap {
@@ -22,6 +17,7 @@ public class Gen2Hardwaremap {
     public DcMotor motorRB = null;
     public DcMotor motorLB = null;
     public DcMotor intake = null;
+    public DcMotor shooter = null;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -32,7 +28,11 @@ public class Gen2Hardwaremap {
     public CRServo L_transfer = null;
     public CRServo R_transfer = null;
 
+    public final double L_swingy_Thingy_Open = 0;
+    public final double R_swingy_Thingy_Open = 1;
 
+    public final double L_swingy_Thingy_Close = 0.15;
+    public final double R_swingy_Thingy_Close = 0.85;
 
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
@@ -42,7 +42,9 @@ public class Gen2Hardwaremap {
         motorLF = ahwMap.dcMotor.get("motorLF");
         motorRB = ahwMap.dcMotor.get("motorRB");
         motorLB = ahwMap.dcMotor.get("motorLB");
+
         intake = ahwMap.dcMotor.get("intake");
+        shooter = ahwMap.dcMotor.get("shooter");
 
         L_feeder = ahwMap.crservo.get("L_feeder");
         R_feeder = ahwMap.crservo.get("R_feeder");
@@ -65,9 +67,11 @@ public class Gen2Hardwaremap {
         motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -75,6 +79,7 @@ public class Gen2Hardwaremap {
         motorLB.setPower(0);
 
         intake.setPower(0);
+        shooter.setPower(0);
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed) {
@@ -94,8 +99,8 @@ public class Gen2Hardwaremap {
         L_transfer.setPower(1);
         R_transfer.setPower(-1);
 
-        L_swingythingy.setPosition(0);
-        R_swingythingy.setPosition(1);
+        L_swingythingy.setPosition(L_swingy_Thingy_Open);
+        R_swingythingy.setPosition(R_swingy_Thingy_Open);
 
     }
 
@@ -108,13 +113,34 @@ public class Gen2Hardwaremap {
         L_transfer.setPower(-1);
         R_transfer.setPower(1);
 
-        L_swingythingy.setPosition(0);
-        R_swingythingy.setPosition(1);
+        L_swingythingy.setPosition(L_swingy_Thingy_Open);
+        R_swingythingy.setPosition(R_swingy_Thingy_Open);
 
     }
+
+    public void stopIntake(){
+
+        intake.setPower(0);
+
+        L_feeder.setPower(0);
+        R_feeder.setPower(0);
+
+        L_transfer.setPower(0);
+        R_transfer.setPower(0);
+
+        L_swingythingy.setPosition(L_swingy_Thingy_Open);
+        R_swingythingy.setPosition(R_swingy_Thingy_Open);
+
+        shooter.setPower(0);
+
+    }
+
     public void shoot (){
 
         intake.setPower(-1);
+
+        L_swingythingy.setPosition(L_swingy_Thingy_Close);
+        R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
         L_feeder.setPower(1);
         R_feeder.setPower(-1);
@@ -122,8 +148,7 @@ public class Gen2Hardwaremap {
         L_transfer.setPower(-1);
         R_transfer.setPower(1);
 
-        //L_swingythingy.setPosition();
-        //R_swingythingy.setPosition();
+        shooter.setPower(1);
 
     }
 
