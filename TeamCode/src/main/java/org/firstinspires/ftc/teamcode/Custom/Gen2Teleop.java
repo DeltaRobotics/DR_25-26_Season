@@ -49,6 +49,8 @@ public class Gen2Teleop extends LinearOpMode {
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
+        robot.hood.setPosition(1);
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -96,39 +98,6 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            /** fine adjust for swingythingys
-
-            if(gamepad1.x && buttonX){
-
-                robot.L_swingythingy.setPosition(robot.L_swingythingy.getPosition() + 0.05);
-                robot.R_swingythingy.setPosition(robot.R_swingythingy.getPosition() - 0.05);
-
-                buttonX = false;
-
-            }
-
-            if(!gamepad1.x && !buttonX){
-
-                buttonX = true;
-
-            }
-
-            if(gamepad1.y && buttonY){
-
-                robot.L_swingythingy.setPosition(robot.L_swingythingy.getPosition() - 0.05);
-                robot.R_swingythingy.setPosition(robot.R_swingythingy.getPosition() + 0.05);
-
-                buttonY = false;
-
-            }
-
-            if(!gamepad1.y && !buttonY){
-
-                buttonY = true;
-
-            }
-             **/
-
             if(gamepad1.right_bumper && buttonRB){
 
                 robot.shoot();
@@ -143,8 +112,38 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            telemetry.addData("leftSwingy", robot.L_swingythingy.getPosition());
-            telemetry.addData("rightSwingy", robot.R_swingythingy.getPosition());
+            if(robot.timerInitted){
+                robot.shoot();
+            }
+
+            //Close range shooting
+            if(gamepad1.dpad_right && buttonDR){
+
+                robot.hoodDown();
+
+                buttonDR = false;
+            }
+
+            if(!gamepad1.dpad_right && !buttonDR){
+
+                buttonDR = true;
+            }
+
+            //Long range shooting
+            if(gamepad1.dpad_left && buttonDL){
+
+                robot.hoodUp();
+
+                buttonDL = false;
+            }
+
+            if(!gamepad1.dpad_left && !buttonDL){
+
+                buttonDL = true;
+            }
+
+            telemetry.addData("shooterRPM", robot.shooterRPM());
+            telemetry.addData("hood", robot.hood.getPosition());
             telemetry.update();
 
         }
