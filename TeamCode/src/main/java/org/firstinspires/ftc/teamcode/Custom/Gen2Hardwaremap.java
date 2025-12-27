@@ -28,13 +28,19 @@ public class Gen2Hardwaremap {
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
 
-    public Servo hood = null;
+    public CRServo L_turret = null;
+    public CRServo R_turret = null;
+
+    public Servo L_PTO = null;
+    public Servo R_PTO = null;
 
     public CRServo L_feeder = null;
     public CRServo R_feeder = null;
 
     public CRServo L_transfer = null;
     public CRServo R_transfer = null;
+
+    public Servo hood = null;
 
     public boolean shooterOn = false;
     public int preSEncoder = 0;
@@ -87,6 +93,7 @@ public class Gen2Hardwaremap {
 
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
+
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);

@@ -16,13 +16,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(9.2)
+            .mass(14.1)
             .forwardZeroPowerAcceleration(-45.33265128583838)
             .lateralZeroPowerAcceleration(-90.34636138484028)
             .centripetalScaling(0.0005)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.03, 0.0001, 0.0001, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(2, 0.8, 0.005, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.003,0.001,0.0005,0.8,0.0));
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.5, 0, .05, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.005, 0))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.0045,0.001,0.0008,0.6,0));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -34,19 +34,20 @@ public class Constants {
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity(338.9431)
             .yVelocity(253.1578);
 
+
     public static ThreeWheelConstants localizerConstants =
             new ThreeWheelConstants()
-                    .forwardTicksToInches(.0029684281)
-                    .strafeTicksToInches(.0029684281)
-                    .turnTicksToInches(.0029684281)
-                    .leftPodY(7)
-                    .rightPodY(-7)
-                    .strafePodX(-6)
-                    .leftEncoder_HardwareMapName("motorRF")
+                    .forwardTicksToInches(.0030099120761076918)
+                    .strafeTicksToInches(.0031341799797724655)
+                    .turnTicksToInches(.0013543171886686441)
+                    .leftPodY(4)
+                    .rightPodY(-4)
+                    .strafePodX(-4.25)
+                    .leftEncoder_HardwareMapName("motorLF")
                     .rightEncoder_HardwareMapName("motorRB")
                     .strafeEncoder_HardwareMapName("motorLB")
                     .leftEncoderDirection(Encoder.FORWARD)
