@@ -1013,7 +1013,6 @@ class Line extends OpMode {
 class CentripetalTuner extends OpMode {
     public static double DISTANCE = 20;
     private boolean forward = true;
-
     private Path forwards;
     private Path backwards;
 
@@ -1064,6 +1063,8 @@ class CentripetalTuner extends OpMode {
             }
         }
 
+
+        //telemetryM.debug("LeftOdo" + follower.constants);
         telemetryM.debug("Driving away from the origin along the curve?: " + forward);
         telemetryM.update(telemetry);
     }

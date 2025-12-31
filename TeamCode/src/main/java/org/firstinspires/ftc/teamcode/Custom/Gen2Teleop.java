@@ -57,6 +57,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
 
+
             if(gamepad1.left_bumper && buttonLB){
 
                 robot.intake();
@@ -144,6 +145,10 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("shooterRPM", robot.shooterRPM());
             telemetry.addData("hood", robot.hood.getPosition());
+            telemetry.addData("heading", robot.hood.getPosition());
+            telemetry.addData("leftOdo", robot.motorLF.getCurrentPosition());
+            telemetry.addData("rightOdo", robot.motorRB.getCurrentPosition());
+            telemetry.addData("strafeOdo", robot.motorLB.getCurrentPosition());
             telemetry.update();
 
         }

@@ -1,43 +1,37 @@
 package org.firstinspires.ftc.teamcode.Custom;
 
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-/**
- * This is an example auto that showcases movement and control of two servos autonomously.
- * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
- * There are examples of different ways to build paths.
- * A path progression method has been created and can advance based on time, position, or other factors.
- *
- * @author Baron Henderson - 20077 The Indubitables
- * @version 2.0, 11/28/2024
- */
-@Disabled
-@Autonomous(name = "Gen0AutoBlue3")
-public class Gen0AutoBlue3 extends OpMode {
+@Autonomous(name = "AutoRed3Close")
+//@Disabled
+public class AutoRed3Close extends OpMode {
 
-    Gen0MechanismHardwareMap mechanism = null;
     private Follower follower;
-    private Timer pathTimer,  opmodeTimer;
+    private Timer pathTimer, actionTimer, opmodeTimer;
+
+    Gen2Hardwaremap robot = null;
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
     private int pathState;
 
-    private final Pose startPose = new Pose(50, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(48, 79, Math.toRadians(135));
-    private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
+    /** Start Pose of our robot */
+    private final Pose startPose = new Pose(120, 110, Math.toRadians(45));
 
+    private final Pose Shooting = new Pose(100, 90, Math.toRadians(45));
+
+    private final Pose movingOffLine = new Pose(90, 102, Math.toRadians(45) );
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
 
@@ -51,12 +45,10 @@ public class Gen0AutoBlue3 extends OpMode {
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
 
-
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, Shooting));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
 
-        movingBackPath = new Path(new BezierLine(Shooting, movingBack));
+        movingBackPath = new Path (new BezierLine(Shooting, movingOffLine));
         movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
     }
@@ -69,38 +61,19 @@ public class Gen0AutoBlue3 extends OpMode {
             case 0:
 
                 if(!follower.isBusy()) {
-                    /* Score Preload */
-                    mechanism.shooterON(0.6);
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(scorePreload, true);
-                    setPathState(2);
-                }
+                    robot.closeShooting();
 
-                break;
-            case 2:
-
-                if(!follower.isBusy()) {
-                    /* Score Preload */
-                    mechanism.intakeON();
-
-                    for (int i=0; i<6; ++i){
-                        mechanism.intakeOFF();
-                        mechanism.kickerUP();
-                        blockingSleep(500);
-                        mechanism.kickerDOWN();
-                        blockingSleep(100);
-                        mechanism.intakeON();
-                        blockingSleep(1000);
+                    if(robot.waiting){
+                        setPathState(1);
                     }
-                    mechanism.shooterOFF();
-                    mechanism.intakeOFF();
 
-                    setPathState(3);
+                    follower.followPath(scorePreload, true);
+
                 }
 
                 break;
-            case 3:
+            case 1:
 
                 if(!follower.isBusy()) {
 
@@ -140,6 +113,10 @@ public class Gen0AutoBlue3 extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
+        if(robot.timerInitted){
+            robot.closeShooting();
+        }
+
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
@@ -155,7 +132,7 @@ public class Gen0AutoBlue3 extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        mechanism = new Gen0MechanismHardwareMap(hardwareMap);
+        robot = new Gen2Hardwaremap(hardwareMap);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
