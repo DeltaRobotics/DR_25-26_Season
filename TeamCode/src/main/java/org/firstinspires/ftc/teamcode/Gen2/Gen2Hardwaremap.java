@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Custom;
+package org.firstinspires.ftc.teamcode.Gen2;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,8 +24,10 @@ public class Gen2Hardwaremap {
     public DcMotor motorLB = null;
     public DcMotor intake = null;
     public DcMotor shooter = null;
+    public DcMotor transfer = null;
 
     public boolean waiting = false;
+    public double shooterP = 0.01;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -38,9 +40,6 @@ public class Gen2Hardwaremap {
 
     public CRServo L_feeder = null;
     public CRServo R_feeder = null;
-
-    public CRServo L_transfer = null;
-    public CRServo R_transfer = null;
 
     public Servo hood = null;
 
@@ -67,12 +66,10 @@ public class Gen2Hardwaremap {
 
         intake = ahwMap.dcMotor.get("intake");
         shooter = ahwMap.dcMotor.get("shooter");
+        transfer = ahwMap.dcMotor.get("transfer");
 
         L_feeder = ahwMap.crservo.get("L_feeder");
         R_feeder = ahwMap.crservo.get("R_feeder");
-
-        L_transfer = ahwMap.crservo.get("L_transfer");
-        R_transfer = ahwMap.crservo.get("R_transfer");
 
         L_swingythingy = ahwMap.servo.get("L_swingythingy");
         R_swingythingy = ahwMap.servo.get("R_swingythingy");
@@ -105,6 +102,7 @@ public class Gen2Hardwaremap {
 
         intake.setPower(0);
         shooter.setPower(0);
+        transfer.setPower(0);
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed) {
@@ -135,8 +133,7 @@ public class Gen2Hardwaremap {
         L_feeder.setPower(-1);
         R_feeder.setPower(1);
 
-        L_transfer.setPower(1);
-        R_transfer.setPower(-1);
+        transfer.setPower(-1);
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
@@ -151,8 +148,7 @@ public class Gen2Hardwaremap {
         L_feeder.setPower(1);
         R_feeder.setPower(-1);
 
-        L_transfer.setPower(-1);
-        R_transfer.setPower(1);
+        transfer.setPower(1);
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
@@ -167,8 +163,7 @@ public class Gen2Hardwaremap {
         L_feeder.setPower(0);
         R_feeder.setPower(0);
 
-        L_transfer.setPower(0);
-        R_transfer.setPower(0);
+        transfer.setPower(0);
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
@@ -185,8 +180,7 @@ public class Gen2Hardwaremap {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
-            L_transfer.setPower(-1);
-            R_transfer.setPower(1);
+            transfer.setPower(1);
 
             timerInitted = false;
         }
@@ -209,18 +203,18 @@ public class Gen2Hardwaremap {
             timerInitted = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[1] + 10000) {//last thing to happen
+        if (currentTime.milliseconds() > timeArray[1] + 15000) {//last thing to happen
 
-            waiting = true;
             timerInitted = false;
+            waiting = true;
         }
 
-        else if (currentTime.milliseconds() > timeArray[1] + 8000) {
+        else if (currentTime.milliseconds() > timeArray[1] + 10000) {//third thing to happen
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
-            L_transfer.setPower(-1);
-            R_transfer.setPower(1);
+
+           transfer.setPower(1);
 
         }
 
@@ -248,8 +242,7 @@ public class Gen2Hardwaremap {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
-            L_transfer.setPower(-1);
-            R_transfer.setPower(1);
+            transfer.setPower(1);
 
             timerInitted = false;
         }
@@ -275,12 +268,16 @@ public class Gen2Hardwaremap {
 
         if (currentTime.milliseconds() > timeArray[3] + 8000) {
 
+            waiting = true;
+            timerInitted = false;
+        }
+        else if (currentTime.milliseconds() > timeArray[1] + 10000){
+
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
-            L_transfer.setPower(-1);
-            R_transfer.setPower(1);
 
-            timerInitted = false;
+            transfer.setPower(1);
+
         }
         else {//first thing to happen
 
@@ -302,7 +299,8 @@ public class Gen2Hardwaremap {
             // If our min sample time has not passed yet, return the previous shooter RPM
             if (timerS.seconds() < MIN_SAMPLE_TIME) {
                 return prevShooterRPM;
-            } else {
+            }
+            else {
                 int countsPerSecond = (int) ((shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
                 preSEncoder = shooter.getCurrentPosition();
                 timerS.reset();
@@ -316,6 +314,14 @@ public class Gen2Hardwaremap {
         prevShooterRPM = 0;
         return 0;
 
+    }
+
+    public void settingShooterRPM(int targetRPM){
+
+        int error = targetRPM - shooterRPM();
+        double power = error * shooterP;
+
+        shooter.setPower(power);
     }
 
     public void hoodUp(){

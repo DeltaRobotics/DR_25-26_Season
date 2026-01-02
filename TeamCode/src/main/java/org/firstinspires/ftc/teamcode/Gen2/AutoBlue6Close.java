@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Custom;
+package org.firstinspires.ftc.teamcode.Gen0;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
@@ -23,10 +24,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 @Disabled
-@Autonomous(name = "Gen0AutoBlue3")
-public class Gen0AutoBlue3 extends OpMode {
+@Autonomous(name = "AutoBlue6Close")
+public class AutoBlue6Close extends OpMode {
 
-    Gen0MechanismHardwareMap mechanism = null;
+    Gen2Hardwaremap robot = null;
     private Follower follower;
     private Timer pathTimer,  opmodeTimer;
 
@@ -36,6 +37,8 @@ public class Gen0AutoBlue3 extends OpMode {
 
     private final Pose startPose = new Pose(50, 0, Math.toRadians(90));
     private final Pose Shooting = new Pose(48, 79, Math.toRadians(135));
+    private final Pose firstLineup = new Pose(45, 75, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(16, 75, Math.toRadians(180) );
     private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
 
@@ -44,7 +47,7 @@ public class Gen0AutoBlue3 extends OpMode {
 
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path scorePreload, movingBackPath;
+    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, movingBackPath;
 
 
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
@@ -55,6 +58,15 @@ public class Gen0AutoBlue3 extends OpMode {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, Shooting));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
+
+        firstLineupPath = new Path (new BezierLine(Shooting,firstLineup));
+        firstLineupPath.setConstantHeadingInterpolation(firstLineup.getHeading());
+
+        firstPickupPath = new Path (new BezierLine(firstLineup,firstPickup));
+        firstPickupPath.setConstantHeadingInterpolation(firstPickup.getHeading());
+
+        shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
+        shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
         movingBackPath = new Path(new BezierLine(Shooting, movingBack));
         movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
@@ -83,8 +95,7 @@ public class Gen0AutoBlue3 extends OpMode {
                 if(!follower.isBusy()) {
                     /* Score Preload */
                     mechanism.intakeON();
-
-                    for (int i=0; i<6; ++i){
+                    for (int i=0; i<4; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
                         blockingSleep(500);
@@ -93,14 +104,63 @@ public class Gen0AutoBlue3 extends OpMode {
                         mechanism.intakeON();
                         blockingSleep(1000);
                     }
-                    mechanism.shooterOFF();
                     mechanism.intakeOFF();
-
                     setPathState(3);
                 }
 
                 break;
             case 3:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    follower.followPath(firstLineupPath, true);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(0.6);
+                    follower.followPath(firstPickupPath, true);
+                    setPathState(5);
+                }
+                break;
+            case 5:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(1);
+                    follower.followPath(shootFirstPickupPath, true);
+                    setPathState(6);
+                }
+                break;
+            case 6:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Shoot 2nd Time*/
+                    mechanism.intakeON();
+
+
+                    for (int i=0; i<4; ++i){
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
+                        blockingSleep(500);
+                        mechanism.kickerDOWN();
+                        blockingSleep(100);
+                        mechanism.intakeON();
+                        blockingSleep(1000);
+                    }
+
+                    mechanism.intakeOFF();
+                    mechanism.shooterOFF();
+                    setPathState(7);
+                }
+                break;
+            case 7:
 
                 if(!follower.isBusy()) {
 
@@ -155,7 +215,7 @@ public class Gen0AutoBlue3 extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        mechanism = new Gen0MechanismHardwareMap(hardwareMap);
+        robot = new Gen2Hardwaremap(hardwareMap);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

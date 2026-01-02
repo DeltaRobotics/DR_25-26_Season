@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Custom;
+package org.firstinspires.ftc.teamcode.Gen2;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -10,9 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Gen0.Gen0MechanismHardwareMap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-
-
 /**
  * This is an example auto that showcases movement and control of two servos autonomously.
  * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
@@ -23,36 +22,40 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 @Disabled
-@Autonomous(name = "Gen0AutoRed6")
-public class Gen0AutoRed6 extends OpMode {
+@Autonomous(name = "AutoBlue9Far")
+public class AutoBlue9Far extends OpMode {
 
-    Gen0MechanismHardwareMap mechanism = null;
+    Gen2Hardwaremap robot = null;
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
+    private Timer pathTimer,  opmodeTimer;
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
     private int pathState;
 
-    /** Start Pose of our robot */
-    private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
-    private final Pose firstLineup = new Pose(89, 72, Math.toRadians(0) );
-    private final Pose firstPickup = new Pose(115, 72, Math.toRadians(0) );
-    private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
+    private final Pose startPose = new Pose(50, 0, Math.toRadians(90));
+    private final Pose Shooting = new Pose(48, 79, Math.toRadians(135));
+    private final Pose firstLineup = new Pose(45, 75, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(16, 75, Math.toRadians(180) );
+    private final Pose secondLineup = new Pose(38, 52, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(13, 52, Math.toRadians(180));
+    private final Pose secondPickupBack = new Pose(20, 52, Math.toRadians(180));
+    private final Pose movingBack = new Pose(39, 66, Math.toRadians(135));
 
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
 
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, movingBackPath ;
+    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath;
 
 
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
 
+
+        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, Shooting));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
 
@@ -65,9 +68,20 @@ public class Gen0AutoRed6 extends OpMode {
         shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
         shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
-        movingBackPath = new Path (new BezierLine(Shooting,movingBack));
-        movingBackPath.setConstantHeadingInterpolation(movingBack.getHeading());
+        secondLineupPath = new Path (new BezierLine(Shooting,secondLineup));
+        secondLineupPath.setConstantHeadingInterpolation(secondLineup.getHeading());
 
+        secondPickupPath = new Path (new BezierLine(secondLineup,secondPickup));
+        secondPickupPath.setConstantHeadingInterpolation(secondPickup.getHeading());
+
+        secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
+        secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
+
+        shootSecondLineupPath = new Path (new BezierLine(secondPickupBack,Shooting));
+        shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
+
+        movingBackPath = new Path(new BezierLine(Shooting, movingBack));
+        movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
     }
 
@@ -87,15 +101,12 @@ public class Gen0AutoRed6 extends OpMode {
                 }
 
                 break;
-
             case 2:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    /* Shoot */
+                    /* Score Preload */
                     mechanism.intakeON();
-
-                    for (int i=0; i<4; ++i){
+                    for (int i=0; i<3; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
                         blockingSleep(500);
@@ -122,7 +133,6 @@ public class Gen0AutoRed6 extends OpMode {
                 if(!follower.isBusy()) {
                     mechanism.intakeON();
                     follower.setMaxPower(0.6);
-
                     follower.followPath(firstPickupPath, true);
                     setPathState(5);
                 }
@@ -144,7 +154,8 @@ public class Gen0AutoRed6 extends OpMode {
                     /* Shoot 2nd Time*/
                     mechanism.intakeON();
 
-                    for (int i=0; i<4; ++i){
+
+                    for (int i=0; i<3; ++i){
                         mechanism.intakeOFF();
                         mechanism.kickerUP();
                         blockingSleep(500);
@@ -153,17 +164,73 @@ public class Gen0AutoRed6 extends OpMode {
                         mechanism.intakeON();
                         blockingSleep(1000);
                     }
-                    mechanism.shooterOFF();
+
                     mechanism.intakeOFF();
                     setPathState(7);
                 }
                 break;
             case 7:
 
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.followPath(secondLineupPath, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
 
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(0.6);
+                    follower.followPath(secondPickupPath, true);
+                    setPathState(9);
+                }
+                break;
+            case 9:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.setMaxPower(1);
+                    follower.followPath(secondPickupBackPath, true);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    mechanism.intakeON();
+                    follower.followPath(shootSecondLineupPath, true);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Shoot 2nd Time*/
+                    mechanism.intakeON();
+
+                    for (int i=0; i<3; ++i){
+                        mechanism.intakeOFF();
+                        mechanism.kickerUP();
+                        blockingSleep(500);
+                        mechanism.kickerDOWN();
+                        blockingSleep(100);
+                        mechanism.intakeON();
+                        blockingSleep(1000);
+                    }
+                    mechanism.intakeOFF();
+                    setPathState(12);
+                }
+                break;
+            case 12:
+
+                if(!follower.isBusy()) {
                     follower.followPath(movingBackPath, true);
-
                     setPathState(-1);
                 }
                 break;
@@ -213,7 +280,7 @@ public class Gen0AutoRed6 extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        mechanism = new Gen0MechanismHardwareMap(hardwareMap);
+        robot = new Gen2Hardwaremap(hardwareMap);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Custom;
+package org.firstinspires.ftc.teamcode.Gen0;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
@@ -23,10 +24,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
  * @version 2.0, 11/28/2024
  */
 @Disabled
-@Autonomous(name = "Gen0AutoRed9")
-public class Gen0AutoRed9 extends OpMode {
+@Autonomous(name = "AutoRed9Far")
+public class AutoRed9Far extends OpMode {
 
-    Gen0MechanismHardwareMap mechanism = null;
+    Gen2Hardwaremap robot = null;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
@@ -284,7 +285,7 @@ public class Gen0AutoRed9 extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        mechanism = new Gen0MechanismHardwareMap(hardwareMap);
+        robot = new Gen2Hardwaremap(hardwareMap);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
