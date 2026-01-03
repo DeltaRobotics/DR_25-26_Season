@@ -23,7 +23,8 @@ public class Gen2Hardwaremap {
     public DcMotor motorRB = null;
     public DcMotor motorLB = null;
     public DcMotor intake = null;
-    public DcMotor shooter = null;
+    public DcMotor R_shooter = null;
+    public DcMotor L_shooter = null;
     public DcMotor transfer = null;
 
     public boolean waiting = false;
@@ -65,8 +66,10 @@ public class Gen2Hardwaremap {
         motorLB = ahwMap.dcMotor.get("motorLB");
 
         intake = ahwMap.dcMotor.get("intake");
-        shooter = ahwMap.dcMotor.get("shooter");
         transfer = ahwMap.dcMotor.get("transfer");
+
+        R_shooter = ahwMap.dcMotor.get("R_shooter");
+        L_shooter = ahwMap.dcMotor.get("L_shooter");
 
         L_feeder = ahwMap.crservo.get("L_feeder");
         R_feeder = ahwMap.crservo.get("R_feeder");
@@ -88,12 +91,13 @@ public class Gen2Hardwaremap {
         motorRB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        R_shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        L_shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        R_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -101,7 +105,8 @@ public class Gen2Hardwaremap {
         motorLB.setPower(0);
 
         intake.setPower(0);
-        shooter.setPower(0);
+        R_shooter.setPower(0);
+        L_shooter.setPower(0);
         transfer.setPower(0);
     }
 
@@ -127,7 +132,8 @@ public class Gen2Hardwaremap {
     }
 
     public void intake (){
-        shooter.setPower(0);
+        R_shooter.setPower(0);
+        L_shooter.setPower(0);
         intake.setPower(1);
 
         L_feeder.setPower(-1);
@@ -142,7 +148,8 @@ public class Gen2Hardwaremap {
 
     public void outTake (){
 
-        shooter.setPower(0);
+        R_shooter.setPower(0);
+        L_shooter.setPower(0);
         intake.setPower(-1);
 
         L_feeder.setPower(1);
@@ -157,7 +164,8 @@ public class Gen2Hardwaremap {
 
     public void stopIntake(){
 
-        shooter.setPower(0);
+        R_shooter.setPower(0);
+        L_shooter.setPower(0);
         intake.setPower(0);
 
         L_feeder.setPower(0);
@@ -180,6 +188,7 @@ public class Gen2Hardwaremap {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
+
             transfer.setPower(1);
 
             timerInitted = false;
@@ -187,9 +196,12 @@ public class Gen2Hardwaremap {
         else {//first thing to happen
 
             intake.setPower(-1);
+
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
-            shooter.setPower(.5);
+
+            R_shooter.setPower(1);
+            L_shooter.setPower(1);
         }
 
         shooterOn = true;
@@ -220,7 +232,6 @@ public class Gen2Hardwaremap {
 
         else {//second thing to happen
 
-            shooter.setPower(.7);
             intake.setPower(-1);
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
@@ -248,7 +259,6 @@ public class Gen2Hardwaremap {
         }
         else {//first thing to happen
 
-            shooter.setPower(.6);
             intake.setPower(-1);
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
@@ -271,20 +281,20 @@ public class Gen2Hardwaremap {
             waiting = true;
             timerInitted = false;
         }
-        else if (currentTime.milliseconds() > timeArray[1] + 10000){
+        else if (currentTime.milliseconds() > timeArray[3] + 10000){
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
 
             transfer.setPower(1);
-
         }
         else {//first thing to happen
 
-            shooter.setPower(.8);
             intake.setPower(-1);
+
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
+
             hoodUp();
         }
 
@@ -292,7 +302,7 @@ public class Gen2Hardwaremap {
 
     }
 
-    public int shooterRPM() {
+    public int R_shooterRPM() {
 
         if (shooterOn) {
 
@@ -301,8 +311,8 @@ public class Gen2Hardwaremap {
                 return prevShooterRPM;
             }
             else {
-                int countsPerSecond = (int) ((shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
-                preSEncoder = shooter.getCurrentPosition();
+                int countsPerSecond = (int) ((R_shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
+                preSEncoder = R_shooter.getCurrentPosition();
                 timerS.reset();
 
                 prevShooterRPM = countsPerSecond * 60 / 28;
@@ -316,15 +326,18 @@ public class Gen2Hardwaremap {
 
     }
 
-    public void settingShooterRPM(int targetRPM){
+    public void settingR_ShooterRPM(int targetRPM){
 
-        int error = targetRPM - shooterRPM();
+        int error = targetRPM - R_shooterRPM();
         double power = error * shooterP;
 
-        shooter.setPower(power);
+        R_shooter.setPower(power);
     }
 
     public void hoodUp(){
+
+        R_shooter.setPower(1);
+        L_shooter.setPower(1);
 
         hood.setPosition(.3);
     }
@@ -332,11 +345,17 @@ public class Gen2Hardwaremap {
     public void hoodMid(){
 
         hood.setPosition(.65);
+
+        R_shooter.setPower(.8);
+        L_shooter.setPower(.8);
     }
 
     public void hoodDown(){
 
         hood.setPosition(1);
+
+        R_shooter.setPower(.65);
+        L_shooter.setPower(.65);
     }
 
 }

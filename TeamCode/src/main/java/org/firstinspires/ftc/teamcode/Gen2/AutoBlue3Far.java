@@ -70,10 +70,7 @@ public class AutoBlue3Far extends OpMode {
             case 0:
 
                 if(!follower.isBusy()) {
-                    /* Score Preload */
-                    mechanism.shooterON(0.6);
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(scorePreload, true);
                     setPathState(2);
                 }
@@ -82,20 +79,6 @@ public class AutoBlue3Far extends OpMode {
             case 2:
 
                 if(!follower.isBusy()) {
-                    /* Score Preload */
-                    mechanism.intakeON();
-
-                    for (int i=0; i<6; ++i){
-                        mechanism.intakeOFF();
-                        mechanism.kickerUP();
-                        blockingSleep(500);
-                        mechanism.kickerDOWN();
-                        blockingSleep(100);
-                        mechanism.intakeON();
-                        blockingSleep(1000);
-                    }
-                    mechanism.shooterOFF();
-                    mechanism.intakeOFF();
 
                     setPathState(3);
                 }

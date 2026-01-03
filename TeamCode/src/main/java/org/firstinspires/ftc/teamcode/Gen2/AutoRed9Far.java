@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Gen0;
+package org.firstinspires.ftc.teamcode.Gen2;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -14,16 +14,7 @@ import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-/**
- * This is an example auto that showcases movement and control of two servos autonomously.
- * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
- * There are examples of different ways to build paths.
- * A path progression method has been created and can advance based on time, position, or other factors.
- *
- * @author Baron Henderson - 20077 The Indubitables
- * @version 2.0, 11/28/2024
- */
-@Disabled
+//@Disabled
 @Autonomous(name = "AutoRed9Far")
 public class AutoRed9Far extends OpMode {
 
@@ -31,30 +22,19 @@ public class AutoRed9Far extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
-    /** This is the variable where we store the state of our auto.
-     * It is used by the pathUpdate method. */
     private int pathState;
 
-    /** Start Pose of our robot */
-    private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
-    private final Pose firstLineup = new Pose(89, 73, Math.toRadians(0) );
-    private final Pose firstPickup = new Pose(115, 73, Math.toRadians(0) );
-    private final Pose secondLineup = new Pose(87, 50, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(113, 50, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(87, 50, Math.toRadians(0));
-    private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
+    private final Pose startPose = new Pose(80, 0, Math.toRadians(90));
+    private final Pose Shooting = new Pose(100, 90, Math.toRadians(45));
+    private final Pose firstLineup = new Pose(85, 79, Math.toRadians(0));
+    private final Pose firstPickup = new Pose(110, 80, Math.toRadians(0));
+    private final Pose secondLineup = new Pose(85, 54, Math.toRadians(0));
+    private final Pose secondPickup = new Pose(120, 55, Math.toRadians(0));
+    private final Pose secondPickupBack = new Pose(90, 55, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(90, 102, Math.toRadians(45));
 
-
-    /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-
-
-    /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath ;
 
-
-    /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
-     * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
 
         scorePreload = new Path(new BezierLine(startPose, Shooting));
@@ -81,23 +61,18 @@ public class AutoRed9Far extends OpMode {
         shootSecondLineupPath = new Path (new BezierLine(secondPickup,Shooting));
         shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
-        movingBackPath = new Path (new BezierLine(Shooting,movingBack));
-        movingBackPath.setConstantHeadingInterpolation(movingBack.getHeading());
+        movingBackPath = new Path (new BezierLine(Shooting,movingOffLine));
+        movingBackPath.setConstantHeadingInterpolation(movingOffLine.getHeading());
 
 
     }
 
-    /** This switch is called continuously and runs the pathing, at certain points, it triggers the action state.
-     * Everytime the switch changes case, it will reset the timer. (This is because of the setPathState() method)
-     * The followPath() function sets the follower to run the specific path, but does NOT wait for it to finish before moving on. */
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
 
                 if(!follower.isBusy()) {
-                    /* Score Preload */
-                    mechanism.shooterON(0.6);
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+
                     follower.followPath(scorePreload, true);
                     setPathState(2);
                 }
@@ -106,27 +81,14 @@ public class AutoRed9Far extends OpMode {
 
             case 2:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    /* Shoot */
-                    mechanism.intakeON();
 
-                    for (int i=0; i<3; ++i){
-                        mechanism.intakeOFF();
-                        mechanism.kickerUP();
-                        blockingSleep(500);
-                        mechanism.kickerDOWN();
-                        blockingSleep(100);
-                        mechanism.intakeON();
-                        blockingSleep(1000);
-                    }
-                    mechanism.intakeOFF();
                     setPathState(3);
                 }
                 break;
             case 3:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+
                 if(!follower.isBusy()) {
                     follower.followPath(firstLineupPath, true);
                     setPathState(4);
@@ -134,101 +96,66 @@ public class AutoRed9Far extends OpMode {
                 break;
             case 4:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    mechanism.intakeON();
-                    follower.setMaxPower(0.6);
 
+                if(!follower.isBusy()) {
                     follower.followPath(firstPickupPath, true);
                     setPathState(5);
                 }
                 break;
             case 5:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+
                 if(!follower.isBusy()) {
-                    mechanism.intakeON();
-                    follower.setMaxPower(1);
+
                     follower.followPath(shootFirstPickupPath, true);
                     setPathState(6);
                 }
                 break;
             case 6:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Shoot 2nd Time*/
-                    mechanism.intakeON();
 
-                    for (int i=0; i<3; ++i){
-                        mechanism.intakeOFF();
-                        mechanism.kickerUP();
-                        blockingSleep(500);
-                        mechanism.kickerDOWN();
-                        blockingSleep(100);
-                        mechanism.intakeON();
-                        blockingSleep(1000);
-                    }
-                    mechanism.shooterOFF();
-                    mechanism.intakeOFF();
+                if(!follower.isBusy()) {
+
                     setPathState(7);
                 }
                 break;
             case 7:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+
                 if(!follower.isBusy()) {
-                    mechanism.intakeON();
+
                     follower.followPath(secondLineupPath, true);
                     setPathState(8);
                 }
                 break;
             case 8:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    mechanism.intakeON();
-                    follower.setMaxPower(0.6);
+
                     follower.followPath(secondPickupPath, true);
                     setPathState(9);
                 }
                 break;
             case 9:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    mechanism.intakeON();
-                    follower.setMaxPower(1);
+
                     follower.followPath(secondPickupBackPath, true);
                     setPathState(10);
                 }
                 break;
             case 10:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    mechanism.intakeON();
+
                     follower.followPath(shootSecondLineupPath, true);
                     setPathState(11);
                 }
                 break;
             case 11:
 
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    /* Shoot 2nd Time*/
-                    mechanism.intakeON();
 
-                    for (int i=0; i<3; ++i){
-                        mechanism.intakeOFF();
-                        mechanism.kickerUP();
-                        blockingSleep(500);
-                        mechanism.kickerDOWN();
-                        blockingSleep(100);
-                        mechanism.intakeON();
-                        blockingSleep(1000);
-                    }
-                    mechanism.intakeOFF();
                     setPathState(12);
                 }
                 break;
@@ -254,15 +181,11 @@ public class AutoRed9Far extends OpMode {
         }
     }
 
-
-    /** These change the states of the paths and actions
-     * It will also reset the timers of the individual switches **/
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();
     }
 
-    /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @Override
     public void loop() {
 
@@ -278,7 +201,6 @@ public class AutoRed9Far extends OpMode {
         telemetry.update();
     }
 
-    /** This method is called once at the init of the OpMode. **/
     @Override
     public void init() {
         pathTimer = new Timer();
@@ -292,19 +214,15 @@ public class AutoRed9Far extends OpMode {
         buildPaths();
     }
 
-    /** This method is called continuously after Init while waiting for "play". **/
     @Override
     public void init_loop() {}
 
-    /** This method is called once at the start of the OpMode.
-     * It runs all the setup actions, including building paths and starting the path system **/
     @Override
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
     }
 
-    /** We do not use this because everything should automatically disable **/
     @Override
     public void stop() {
     }

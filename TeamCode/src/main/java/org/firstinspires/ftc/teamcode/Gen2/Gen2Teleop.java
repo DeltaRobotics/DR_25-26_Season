@@ -143,7 +143,20 @@ public class Gen2Teleop extends LinearOpMode {
                 buttonDL = true;
             }
 
-            telemetry.addData("shooterRPM", robot.shooterRPM());
+            if(gamepad1.dpad_down && buttonDD){
+
+                robot.hoodMid();
+
+                buttonDD = false;
+            }
+
+            if(!gamepad1.dpad_down && !buttonDD){
+
+                buttonDD = true;
+            }
+
+
+            telemetry.addData("shooterRPM", robot.R_shooterRPM());
             telemetry.addData("hood", robot.hood.getPosition());
             telemetry.addData("heading", robot.hood.getPosition());
             telemetry.addData("leftOdo", robot.motorLF.getCurrentPosition());
