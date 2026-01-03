@@ -22,14 +22,14 @@ public class AutoRed9Close extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
-    private final Pose startPose = new Pose(120, 110, Math.toRadians(45));
-    private final Pose Shooting = new Pose(100, 90, Math.toRadians(45));
-    private final Pose firstLineup = new Pose(85, 79, Math.toRadians(0));
-    private final Pose firstPickup = new Pose(110, 79, Math.toRadians(0));
-    private final Pose secondLineup = new Pose(85, 54, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(120, 55, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(90, 55, Math.toRadians(0));
-    private final Pose movingOffLine = new Pose(90, 102, Math.toRadians(45));
+    private final Pose startPose = new Pose(113, 114, Math.toRadians(45));
+    private final Pose Shooting = new Pose(90, 92, Math.toRadians(45));
+    private final Pose firstLineup = new Pose(84, 77, Math.toRadians(0));
+    private final Pose firstPickup = new Pose(110, 77, Math.toRadians(0));
+    private final Pose secondLineup = new Pose(84, 53, Math.toRadians(0));
+    private final Pose secondPickup = new Pose(120, 52, Math.toRadians(0));
+    private final Pose secondPickupBack = new Pose(90, 52, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(84, 108, Math.toRadians(45));
 
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath ;
 
@@ -56,7 +56,7 @@ public class AutoRed9Close extends OpMode {
         secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
         secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
 
-        shootSecondLineupPath = new Path (new BezierLine(secondPickup,Shooting));
+        shootSecondLineupPath = new Path (new BezierLine(secondPickupBack,Shooting));
         shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
         movingBackPath = new Path (new BezierLine(Shooting, movingOffLine));
@@ -73,23 +73,36 @@ public class AutoRed9Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     follower.followPath(scorePreload, true);
-                    setPathState(2);
+                    setPathState(1);
                 }
 
                 break;
 
-            case 2:
-
+            case 1:
 
                 if(!follower.isBusy()) {
 
+                    robot.hoodDown();
+                    robot.shoot();
+                    robot.shoot();
+                    robot.shoot();
+                    setPathState(2);
+                }
+                break;
+            case 2:
+
+                if(!follower.isBusy()) {
+
+                    robot.intake();
+                    follower.followPath(firstLineupPath, true);
                     setPathState(3);
                 }
                 break;
             case 3:
 
                 if(!follower.isBusy()) {
-                    follower.followPath(firstLineupPath, true);
+
+                    follower.followPath(firstPickupPath, true);
                     setPathState(4);
                 }
                 break;
@@ -97,7 +110,7 @@ public class AutoRed9Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    follower.followPath(firstPickupPath, true);
+                    follower.followPath(shootFirstPickupPath, true);
                     setPathState(5);
                 }
                 break;
@@ -105,56 +118,57 @@ public class AutoRed9Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    follower.followPath(shootFirstPickupPath, true);
+                    robot.hoodDown();
+                    robot.shoot();
+                    robot.shoot();
+                    robot.shoot();
                     setPathState(6);
                 }
                 break;
             case 6:
 
                 if(!follower.isBusy()) {
-
+                    robot.intake();
+                    follower.followPath(secondLineupPath, true);
                     setPathState(7);
                 }
                 break;
             case 7:
 
                 if(!follower.isBusy()) {
-                    follower.followPath(secondLineupPath, true);
+                    follower.followPath(secondPickupPath, true);
                     setPathState(8);
                 }
                 break;
             case 8:
 
                 if(!follower.isBusy()) {
-                    follower.followPath(secondPickupPath, true);
+
+                    follower.followPath(secondPickupBackPath, true);
                     setPathState(9);
                 }
                 break;
             case 9:
 
                 if(!follower.isBusy()) {
-
-                    follower.followPath(secondPickupBackPath, true);
+                    follower.followPath(shootSecondLineupPath, true);
                     setPathState(10);
                 }
                 break;
             case 10:
 
                 if(!follower.isBusy()) {
-                    follower.followPath(shootSecondLineupPath, true);
+                    robot.hoodDown();
+                    robot.shoot();
+                    robot.shoot();
+                    robot.shoot();
                     setPathState(11);
                 }
                 break;
             case 11:
 
                 if(!follower.isBusy()) {
-
-                    setPathState(12);
-                }
-                break;
-            case 12:
-
-                if(!follower.isBusy()) {
+                    robot.stopIntake();
                     follower.followPath(movingBackPath, true);
                     setPathState(-1);
                 }

@@ -49,7 +49,12 @@ public class Gen2Teleop extends LinearOpMode {
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
-        robot.hood.setPosition(1);
+        robot.transfer.setPower(0);
+
+        robot.R_feeder.setPower(0);
+        robot.L_feeder.setPower(0);
+
+        robot.hoodDown();
 
         waitForStart();
 
@@ -57,27 +62,25 @@ public class Gen2Teleop extends LinearOpMode {
 
             robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
 
-
             if(gamepad1.left_bumper && buttonLB){
 
                 robot.intake();
 
                 buttonLB = false;
-
             }
 
             if(!gamepad1.left_bumper && !buttonLB){
 
                 buttonLB = true;
-
             }
 
             if(gamepad1.left_trigger > 0.5 && buttonLT ){
 
                 robot.outTake();
 
-                buttonLT = false;
+                telemetry.addData("transfer", robot.transfer.getPower());
 
+                buttonLT = false;
             }
 
             if(gamepad1.left_trigger < 0.5 && !buttonLT){
@@ -103,6 +106,8 @@ public class Gen2Teleop extends LinearOpMode {
 
                 robot.shoot();
 
+                telemetry.addData("transfer", robot.transfer.getPower());
+
                 buttonRB = false;
 
             }
@@ -113,7 +118,8 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            if(robot.timerInitted){
+            if(robot.timerInitted[0]){
+
                 robot.shoot();
             }
 
@@ -121,6 +127,8 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad1.dpad_right && buttonDR){
 
                 robot.hoodDown();
+
+                telemetry.addData("transfer", robot.transfer.getPower());
 
                 buttonDR = false;
             }
@@ -135,6 +143,8 @@ public class Gen2Teleop extends LinearOpMode {
 
                 robot.hoodUp();
 
+                telemetry.addData("transfer", robot.transfer.getPower());
+
                 buttonDL = false;
             }
 
@@ -147,6 +157,8 @@ public class Gen2Teleop extends LinearOpMode {
 
                 robot.hoodMid();
 
+                telemetry.addData("transfer", robot.transfer.getPower());
+
                 buttonDD = false;
             }
 
@@ -156,7 +168,9 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
-            telemetry.addData("shooterRPM", robot.R_shooterRPM());
+            telemetry.addData("error", robot.error);
+            telemetry.addData("power", robot.setting_ShooterRPM());
+            telemetry.addData("shooterRPM", robot.shooterRPM());
             telemetry.addData("hood", robot.hood.getPosition());
             telemetry.addData("heading", robot.hood.getPosition());
             telemetry.addData("leftOdo", robot.motorLF.getCurrentPosition());

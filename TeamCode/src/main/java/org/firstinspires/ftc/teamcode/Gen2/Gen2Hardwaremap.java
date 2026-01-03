@@ -13,11 +13,11 @@ public class Gen2Hardwaremap {
     //FtcDashboard dashboard = FtcDashboard.getInstance();
     //drive motors
 
-    public boolean timerInitted = false;
-
     public ElapsedTime currentTime = new ElapsedTime();
 
     double[] timeArray = new double[20];
+
+    boolean[] timerInitted = new boolean[20];
     public DcMotor motorRF = null;
     public DcMotor motorLF = null;
     public DcMotor motorRB = null;
@@ -28,7 +28,7 @@ public class Gen2Hardwaremap {
     public DcMotor transfer = null;
 
     public boolean waiting = false;
-    public double shooterP = 0.01;
+    public double shooterP = 0.0025;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -45,8 +45,10 @@ public class Gen2Hardwaremap {
     public Servo hood = null;
 
     public boolean shooterOn = false;
-    public int preSEncoder = 0;
+    public int previousShooterEncoder = 0;
     private int prevShooterRPM = 0;
+
+    public int error;
     ElapsedTime timerS = new ElapsedTime();
     private static final double MIN_SAMPLE_TIME = 0.01;
 
@@ -55,6 +57,10 @@ public class Gen2Hardwaremap {
 
     public final double L_swingy_Thingy_Close = 0.15;
     public final double R_swingy_Thingy_Close = 0.85;
+
+    public int targetRPM = 3500;
+
+    public double hood_pose = 1;
 
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
@@ -134,6 +140,7 @@ public class Gen2Hardwaremap {
     public void intake (){
         R_shooter.setPower(0);
         L_shooter.setPower(0);
+
         intake.setPower(1);
 
         L_feeder.setPower(-1);
@@ -166,6 +173,7 @@ public class Gen2Hardwaremap {
 
         R_shooter.setPower(0);
         L_shooter.setPower(0);
+
         intake.setPower(0);
 
         L_feeder.setPower(0);
@@ -177,132 +185,101 @@ public class Gen2Hardwaremap {
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
     }
 
+
     public void shoot (){
 
-        if(!timerInitted) {
+        if(!timerInitted[0]) {//very very first thing to happen
             timeArray[0] = currentTime.milliseconds();
-            timerInitted = true;
+            timerInitted[0] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[0] + 1000) {
+        if (currentTime.milliseconds() > timeArray[0] + 2500) {//Last thing to happen
+
+            L_feeder.setPower(0);
+            R_feeder.setPower(0);
+
+            transfer.setPower(0);
+
+            timerInitted[0] = false;
+        }
+
+        else if (currentTime.milliseconds() > timeArray[0] + 750) {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
 
             transfer.setPower(1);
-
-            timerInitted = false;
         }
-        else {//first thing to happen
 
+        else {//Second thing to happen
+
+            transfer.setPower(0);
             intake.setPower(-1);
 
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-            R_shooter.setPower(1);
-            L_shooter.setPower(1);
+            hood.setPosition(hood_pose);
+
+            R_shooter.setPower(setting_ShooterRPM());
+            L_shooter.setPower(setting_ShooterRPM());
         }
 
         shooterOn = true;
 
     }
 
-    public void closeShooting (){
+    public void hoodUp(){
 
-        if(!timerInitted) {//very very first thing
+        targetRPM = 4500;
+        hood_pose = .3;
+
+        if(!timerInitted[1]) {//very very first thing
             timeArray[1] = currentTime.milliseconds();
-            timerInitted = true;
+            timerInitted[1] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[1] + 15000) {//last thing to happen
+        while(hood.getPosition() > 0.3){
 
-            timerInitted = false;
-            waiting = true;
+            hood.setPosition(hood.getPosition() - 0.01);
+
+            if (currentTime.milliseconds() > timeArray[1] + 200) {//last thing to happen
+
+                timerInitted[1] = false;
+            }
         }
-
-        else if (currentTime.milliseconds() > timeArray[1] + 10000) {//third thing to happen
-
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-
-           transfer.setPower(1);
-
-        }
-
-        else {//second thing to happen
-
-            intake.setPower(-1);
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-            hoodDown();
-        }
-
-        shooterOn = true;
-
     }
 
-    public void midShooting (){
+    public void hoodMid(){
 
-        if(!timerInitted) {
+        if(!timerInitted[2]) {//very very first thing
             timeArray[2] = currentTime.milliseconds();
-            timerInitted = true;
+            timerInitted[2] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[2] + 6000) {
+        while(hood.getPosition() > 0.65){
 
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-            transfer.setPower(1);
+            hood.setPosition(hood.getPosition() - 0.01);
 
-            timerInitted = false;
-        }
-        else {//first thing to happen
+            if (currentTime.milliseconds() > timeArray[2] + 200) {//last thing to happen
 
-            intake.setPower(-1);
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-            hoodMid();
+                timerInitted[2] = false;
+            }
         }
 
-        shooterOn = true;
-
+        hood_pose = .65;
+        targetRPM = 4000;
     }
 
-    public void farShooting (){
+    public void hoodDown(){
 
-        if(!timerInitted) {
-            timeArray[3] = currentTime.milliseconds();
-            timerInitted = true;
-        }
+        hood.setPosition(1);
 
-        if (currentTime.milliseconds() > timeArray[3] + 8000) {
-
-            waiting = true;
-            timerInitted = false;
-        }
-        else if (currentTime.milliseconds() > timeArray[3] + 10000){
-
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-
-            transfer.setPower(1);
-        }
-        else {//first thing to happen
-
-            intake.setPower(-1);
-
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-
-            hoodUp();
-        }
-
-        shooterOn = true;
-
+        hood_pose = 1;
+        targetRPM = 3500;
     }
 
-    public int R_shooterRPM() {
+    public int shooterRPM() {
 
         if (shooterOn) {
 
@@ -311,8 +288,8 @@ public class Gen2Hardwaremap {
                 return prevShooterRPM;
             }
             else {
-                int countsPerSecond = (int) ((R_shooter.getCurrentPosition() - preSEncoder) / timerS.seconds());
-                preSEncoder = R_shooter.getCurrentPosition();
+                int countsPerSecond = (int) ((R_shooter.getCurrentPosition() - previousShooterEncoder) / timerS.seconds());
+                previousShooterEncoder = R_shooter.getCurrentPosition();
                 timerS.reset();
 
                 prevShooterRPM = countsPerSecond * 60 / 28;
@@ -326,36 +303,12 @@ public class Gen2Hardwaremap {
 
     }
 
-    public void settingR_ShooterRPM(int targetRPM){
+    public double setting_ShooterRPM(){
 
-        int error = targetRPM - R_shooterRPM();
+        error = targetRPM - shooterRPM();
         double power = error * shooterP;
 
-        R_shooter.setPower(power);
-    }
-
-    public void hoodUp(){
-
-        R_shooter.setPower(1);
-        L_shooter.setPower(1);
-
-        hood.setPosition(.3);
-    }
-
-    public void hoodMid(){
-
-        hood.setPosition(.65);
-
-        R_shooter.setPower(.8);
-        L_shooter.setPower(.8);
-    }
-
-    public void hoodDown(){
-
-        hood.setPosition(1);
-
-        R_shooter.setPower(.65);
-        L_shooter.setPower(.65);
+        return power;
     }
 
 }

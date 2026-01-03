@@ -7,6 +7,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
 @Autonomous(name = "AutoRed3Close")
-//@Disabled
+@Disabled
 public class AutoRed3Close extends OpMode {
 
     private Follower follower;
@@ -62,7 +63,8 @@ public class AutoRed3Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.closeShooting();
+                    robot.hoodDown();
+                    robot.shoot();
 
                     if(robot.waiting){
                         setPathState(1);
@@ -113,8 +115,9 @@ public class AutoRed3Close extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        if(robot.timerInitted){
-            robot.closeShooting();
+        if(robot.timerInitted[0]){
+            robot.hoodDown();
+            robot.shoot();
         }
 
         // Feedback to Driver Hub

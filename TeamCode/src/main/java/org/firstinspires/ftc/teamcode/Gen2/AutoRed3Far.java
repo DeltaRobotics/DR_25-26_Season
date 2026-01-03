@@ -47,7 +47,8 @@ public class AutoRed3Far extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.farShooting();
+                    robot.hoodUp();
+                    robot.shoot();
 
 
 
