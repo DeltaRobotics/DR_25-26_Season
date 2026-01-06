@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-//@Disabled
+@Disabled
 @Autonomous(name = "AutoRed9Far")
 public class AutoRed9Far extends OpMode {
 

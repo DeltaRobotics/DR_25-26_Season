@@ -123,6 +123,9 @@ public class Gen2Teleop extends LinearOpMode {
                 robot.shoot();
             }
 
+            robot.R_shooter.setPower(robot.setting_ShooterRPM());
+            robot.L_shooter.setPower(robot.setting_ShooterRPM());
+
             //Close range shooting
             if(gamepad1.dpad_right && buttonDR){
 
@@ -168,6 +171,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
+            telemetry.addData("real shooter power", robot.R_shooter.getPower());
             telemetry.addData("error", robot.error);
             telemetry.addData("power", robot.setting_ShooterRPM());
             telemetry.addData("shooterRPM", robot.shooterRPM());

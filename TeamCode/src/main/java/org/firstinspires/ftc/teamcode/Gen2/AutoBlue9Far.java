@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-//@Disabled
+@Disabled
 @Autonomous(name = "AutoBlue9Far")
 public class AutoBlue9Far extends OpMode {
 

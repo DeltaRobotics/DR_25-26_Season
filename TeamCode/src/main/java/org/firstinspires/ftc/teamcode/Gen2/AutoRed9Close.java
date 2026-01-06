@@ -27,8 +27,8 @@ public class AutoRed9Close extends OpMode {
     private final Pose firstLineup = new Pose(84, 77, Math.toRadians(0));
     private final Pose firstPickup = new Pose(110, 77, Math.toRadians(0));
     private final Pose secondLineup = new Pose(84, 53, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(120, 52, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(90, 52, Math.toRadians(0));
+    private final Pose secondPickup = new Pose(116, 52, Math.toRadians(0));
+    private final Pose secondPickupBack = new Pose(100, 52, Math.toRadians(0));
     private final Pose movingOffLine = new Pose(84, 108, Math.toRadians(45));
 
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath ;
@@ -62,15 +62,17 @@ public class AutoRed9Close extends OpMode {
         movingBackPath = new Path (new BezierLine(Shooting, movingOffLine));
         movingBackPath.setConstantHeadingInterpolation(movingOffLine.getHeading());
 
-
     }
-
 
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
 
                 if(!follower.isBusy()) {
+
+                    robot.intake.setPower(1);
+                    robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+                    robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
                     follower.followPath(scorePreload, true);
                     setPathState(1);
@@ -83,10 +85,32 @@ public class AutoRed9Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(2);
+
+                    if(!robot.timerInitted[4]) {//very very first thing to happen
+                        robot.timeArray[4] = robot.currentTime.milliseconds();
+                        robot.timerInitted[4] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6100) {//Last thing to happen
+                        setPathState(2);
+                        robot.timerInitted[4] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
+
+                        robot.autoShoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
+
+                        robot.autoShoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.autoShoot();
+
+                    }
                 }
                 break;
             case 2:
@@ -119,10 +143,34 @@ public class AutoRed9Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(6);
+
+                    if(!robot.timerInitted[5]) {//very very first thing to happen
+                        robot.timeArray[5] = robot.currentTime.milliseconds();
+                        robot.timerInitted[5] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5100) {//Last thing to happen
+                        setPathState(6);
+                        robot.timerInitted[5] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
+
+                        robot.autoShoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
+
+                        robot.autoShoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.autoShoot();
+
+                    }
+
+
                 }
                 break;
             case 6:
@@ -159,10 +207,32 @@ public class AutoRed9Close extends OpMode {
 
                 if(!follower.isBusy()) {
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(11);
+
+                    if(!robot.timerInitted[6]) {//very very first thing to happen
+                        robot.timeArray[6] = robot.currentTime.milliseconds();
+                        robot.timerInitted[6] = true;
+                    }
+
+                                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5100) {//Last thing to happen
+                                        setPathState(11);
+                                        robot.timerInitted[6] = false;
+                                    }
+
+                                else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
+
+                                    robot.autoShoot();
+                                }
+
+                            else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
+
+                                robot.autoShoot();
+                            }
+
+                        else {//Second thing to happen
+                            robot.targetRPM = 3500;
+                            robot.autoShoot();
+
+                        }
                 }
                 break;
             case 11:
@@ -198,6 +268,9 @@ public class AutoRed9Close extends OpMode {
 
         follower.update();
         autonomousPathUpdate();
+
+        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+        robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());

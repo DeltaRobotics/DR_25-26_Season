@@ -22,14 +22,14 @@ public class AutoBlue9Close extends OpMode {
 
     private int pathState;
 
-    private final Pose startPose = new Pose(16, 114, Math.toRadians(135));
-    private final Pose Shooting = new Pose(36, 93, Math.toRadians(135));
-    private final Pose firstLineup = new Pose(40, 75, Math.toRadians(180) );
-    private final Pose firstPickup = new Pose(11, 75, Math.toRadians(180) );
-    private final Pose secondLineup = new Pose(40, 50, Math.toRadians(180));
-    private final Pose secondPickup = new Pose(3, 53, Math.toRadians(180));
-    private final Pose secondPickupBack = new Pose(30, 53, Math.toRadians(180));
-    private final Pose movingOffLine = new Pose(90, 102, Math.toRadians(45) );
+    private final Pose startPose = new Pose(31, 114, Math.toRadians(135));
+    private final Pose Shooting = new Pose(54, 92, Math.toRadians(135));
+    private final Pose firstLineup = new Pose(60, 77, Math.toRadians(180) );
+    private final Pose firstPickup = new Pose(34, 77, Math.toRadians(180) );
+    private final Pose secondLineup = new Pose(60, 53, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(26, 52, Math.toRadians(180));
+    private final Pose secondPickupBack = new Pose(54, 52, Math.toRadians(180));
+    private final Pose movingOffLine = new Pose(60, 108, Math.toRadians(135));
 
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath;
 
@@ -70,6 +70,10 @@ public class AutoBlue9Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
+                    robot.intake.setPower(1);
+                    robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+                    robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
+
                     follower.followPath(scorePreload, true);
                     setPathState(1);
                 }
@@ -81,10 +85,32 @@ public class AutoBlue9Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(2);
+
+                    if(!robot.timerInitted[8]) {//very very first thing to happen
+                        robot.timeArray[8] = robot.currentTime.milliseconds();
+                        robot.timerInitted[8] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6100) {//Last thing to happen
+                        setPathState(2);
+                        robot.timerInitted[8] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
+
+                        robot.autoShoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
+
+                        robot.autoShoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.autoShoot();
+
+                    }
                 }
                 break;
             case 2:
@@ -117,10 +143,34 @@ public class AutoBlue9Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(6);
+
+                    if(!robot.timerInitted[9]) {//very very first thing to happen
+                        robot.timeArray[9] = robot.currentTime.milliseconds();
+                        robot.timerInitted[9] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5100) {//Last thing to happen
+                        setPathState(6);
+                        robot.timerInitted[9] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
+
+                        robot.autoShoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
+
+                        robot.autoShoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.autoShoot();
+
+                    }
+
+
                 }
                 break;
             case 6:
@@ -157,10 +207,32 @@ public class AutoBlue9Close extends OpMode {
 
                 if(!follower.isBusy()) {
                     robot.hoodDown();
-                    robot.shoot();
-                    robot.shoot();
-                    robot.shoot();
-                    setPathState(11);
+
+                    if(!robot.timerInitted[10]) {//very very first thing to happen
+                        robot.timeArray[10] = robot.currentTime.milliseconds();
+                        robot.timerInitted[10] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5100) {//Last thing to happen
+                        setPathState(11);
+                        robot.timerInitted[10] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5000) {//Last thing to happen
+
+                        robot.autoShoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 2500) {
+
+                        robot.autoShoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.autoShoot();
+
+                    }
                 }
                 break;
             case 11:
@@ -197,6 +269,9 @@ public class AutoBlue9Close extends OpMode {
         // These loop the movements of the robot
         follower.update();
         autonomousPathUpdate();
+
+        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+        robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
