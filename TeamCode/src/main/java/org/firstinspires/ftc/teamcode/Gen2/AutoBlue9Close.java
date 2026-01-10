@@ -26,10 +26,10 @@ public class AutoBlue9Close extends OpMode {
     private final Pose Shooting = new Pose(54, 92, Math.toRadians(135));
     private final Pose firstLineup = new Pose(60, 77, Math.toRadians(180) );
     private final Pose firstPickup = new Pose(34, 77, Math.toRadians(180) );
-    private final Pose secondLineup = new Pose(60, 53, Math.toRadians(180));
-    private final Pose secondPickup = new Pose(26, 52, Math.toRadians(180));
+    private final Pose secondLineup = new Pose(56, 53, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(26, 53, Math.toRadians(180));
     private final Pose secondPickupBack = new Pose(54, 52, Math.toRadians(180));
-    private final Pose movingOffLine = new Pose(60, 108, Math.toRadians(135));
+    private final Pose movingOffLine = new Pose(60, 108, Math.toRadians(150));
 
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingBackPath;
 
@@ -56,11 +56,11 @@ public class AutoBlue9Close extends OpMode {
         secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
         secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
 
-        shootSecondLineupPath = new Path (new BezierLine(secondPickupBack,Shooting));
-        shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
+        shootSecondLineupPath = new Path (new BezierLine(secondPickupBack,movingOffLine));
+        shootSecondLineupPath.setConstantHeadingInterpolation(movingOffLine.getHeading());
 
-        movingBackPath = new Path(new BezierLine(Shooting, movingOffLine));
-        movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
+        //movingBackPath = new Path(new BezierLine(Shooting, movingOffLine));
+        //movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
     }
 
@@ -98,17 +98,17 @@ public class AutoBlue9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.autoShoot();
+                        robot.shoot();
 
                     }
                 }
@@ -156,17 +156,17 @@ public class AutoBlue9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.autoShoot();
+                        robot.shoot();
 
                     }
 
@@ -214,23 +214,23 @@ public class AutoBlue9Close extends OpMode {
                     }
 
                     if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5100) {//Last thing to happen
-                        setPathState(11);
+                        setPathState(-1);
                         robot.timerInitted[10] = false;
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5000) {//Last thing to happen
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 2500) {
 
-                        robot.autoShoot();
+                        robot.shoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.autoShoot();
+                        robot.shoot();
 
                     }
                 }
@@ -288,6 +288,9 @@ public class AutoBlue9Close extends OpMode {
         opmodeTimer.resetTimer();
 
         robot = new Gen2Hardwaremap(hardwareMap);
+
+        robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+        robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

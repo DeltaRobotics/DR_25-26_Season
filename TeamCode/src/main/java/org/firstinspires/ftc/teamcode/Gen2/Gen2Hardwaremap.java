@@ -191,7 +191,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[0] + 2000) {//Last thing to happen
+        if (currentTime.milliseconds() > timeArray[0] + 1750) {//Last thing to happen
 
             L_feeder.setPower(0);
             R_feeder.setPower(0);
@@ -201,7 +201,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = false;
         }
 
-        else if (currentTime.milliseconds() > timeArray[0] + 750) {
+        else if (currentTime.milliseconds() > timeArray[0] + 500) {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
@@ -212,7 +212,7 @@ public class Gen2Hardwaremap {
         else {//Second thing to happen
 
             transfer.setPower(0);
-            intake.setPower(-1);
+            intake.setPower(-.75);
 
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
@@ -237,7 +237,7 @@ public class Gen2Hardwaremap {
             timerInitted[7] = false;
         }
 
-        if (currentTime.milliseconds() > timeArray[7] + 750) {
+        else if (currentTime.milliseconds() > timeArray[7] + 500) {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
@@ -264,14 +264,14 @@ public class Gen2Hardwaremap {
     public void hoodUp(){
 
         targetRPM = 3500;//Should be 4500
-        hood_pose = .3;
+        hood_pose = .5;
 
         if(!timerInitted[1]) {//very very first thing
             timeArray[1] = currentTime.milliseconds();
             timerInitted[1] = true;
         }
 
-        while(hood.getPosition() > 0.3){
+        while(hood.getPosition() > 0.5){
 
             hood.setPosition(hood.getPosition() - 0.01);
 
@@ -289,7 +289,7 @@ public class Gen2Hardwaremap {
             timerInitted[2] = true;
         }
 
-        while(hood.getPosition() > 0.65){
+        while(hood.getPosition() > 0.85){
 
             hood.setPosition(hood.getPosition() - 0.01);
 
@@ -299,7 +299,7 @@ public class Gen2Hardwaremap {
             }
         }
 
-        hood_pose = .65;
+        hood_pose = .85;
         targetRPM = 3500;//Should be 4000
     }
 
