@@ -36,11 +36,11 @@ public class AutoRed6Close extends OpMode {
     private int pathState;
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
-    private final Pose firstLineup = new Pose(89, 72, Math.toRadians(0) );
-    private final Pose firstPickup = new Pose(115, 72, Math.toRadians(0) );
-    private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
+    private final Pose startPose = new Pose(113, 114, Math.toRadians(45));
+    private final Pose Shooting = new Pose(90, 92, Math.toRadians(45));
+    private final Pose firstLineup = new Pose(84, 77, Math.toRadians(0));
+    private final Pose firstPickup = new Pose(110, 77, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(84, 108, Math.toRadians(30));
 
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
@@ -66,35 +66,68 @@ public class AutoRed6Close extends OpMode {
         shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
         shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
 
-        movingBackPath = new Path (new BezierLine(Shooting,movingBack));
-        movingBackPath.setConstantHeadingInterpolation(movingBack.getHeading());
+        movingBackPath = new Path (new BezierLine(Shooting,movingOffLine));
+        movingBackPath.setConstantHeadingInterpolation(movingOffLine.getHeading());
 
 
     }
 
-    /** This switch is called continuously and runs the pathing, at certain points, it triggers the action state.
-     * Everytime the switch changes case, it will reset the timer. (This is because of the setPathState() method)
-     * The followPath() function sets the follower to run the specific path, but does NOT wait for it to finish before moving on. */
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
 
                 if(!follower.isBusy()) {
+
+                    robot.intake.setPower(1);
+                    robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+                    robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
+
                     follower.followPath(scorePreload, true);
-                    setPathState(2);
+                    setPathState(1);
                 }
 
                 break;
 
-            case 2:
+            case 1:
 
                 if(!follower.isBusy()) {
+
+                    robot.hoodDown();
+
+                    if(!robot.timerInitted[11]) {//very very first thing to happen
+                        robot.timeArray[11] = robot.currentTime.milliseconds();
+                        robot.timerInitted[11] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[11] + 6100) {//Last thing to happen
+                        setPathState(2);
+                        robot.timerInitted[11] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 6000) {//Last thing to happen
+
+                        robot.shoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 3000) {
+
+                        robot.shoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.shoot();
+
+                    }
+
                     setPathState(3);
                 }
                 break;
             case 3:
 
                 if(!follower.isBusy()) {
+
+                    robot.intake();
                     follower.followPath(firstLineupPath, true);
                     setPathState(4);
                 }
@@ -117,7 +150,33 @@ public class AutoRed6Close extends OpMode {
             case 6:
 
                 if(!follower.isBusy()) {
+                    robot.hoodDown();
 
+                    if(!robot.timerInitted[12]) {//very very first thing to happen
+                        robot.timeArray[12] = robot.currentTime.milliseconds();
+                        robot.timerInitted[12] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[12] + 5100) {//Last thing to happen
+                        setPathState(6);
+                        robot.timerInitted[12] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 5000) {//Last thing to happen
+
+                        robot.shoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 2500) {
+
+                        robot.shoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.shoot();
+
+                    }
                     setPathState(7);
                 }
                 break;
@@ -126,7 +185,6 @@ public class AutoRed6Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     follower.followPath(movingBackPath, true);
-
                     setPathState(-1);
                 }
                 break;
@@ -146,14 +204,10 @@ public class AutoRed6Close extends OpMode {
     }
 
 
-    /** These change the states of the paths and actions
-     * It will also reset the timers of the individual switches **/
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();
     }
-
-    /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @Override
     public void loop() {
 
@@ -169,7 +223,6 @@ public class AutoRed6Close extends OpMode {
         telemetry.update();
     }
 
-    /** This method is called once at the init of the OpMode. **/
     @Override
     public void init() {
         pathTimer = new Timer();
@@ -183,19 +236,15 @@ public class AutoRed6Close extends OpMode {
         buildPaths();
     }
 
-    /** This method is called continuously after Init while waiting for "play". **/
     @Override
     public void init_loop() {}
 
-    /** This method is called once at the start of the OpMode.
-     * It runs all the setup actions, including building paths and starting the path system **/
     @Override
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
     }
 
-    /** We do not use this because everything should automatically disable **/
     @Override
     public void stop() {
     }

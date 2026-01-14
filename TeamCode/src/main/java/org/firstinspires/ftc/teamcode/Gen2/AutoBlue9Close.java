@@ -24,8 +24,8 @@ public class AutoBlue9Close extends OpMode {
 
     private final Pose startPose = new Pose(31, 114, Math.toRadians(135));
     private final Pose Shooting = new Pose(54, 92, Math.toRadians(135));
-    private final Pose firstLineup = new Pose(60, 77, Math.toRadians(180) );
-    private final Pose firstPickup = new Pose(34, 77, Math.toRadians(180) );
+    private final Pose firstLineup = new Pose(60, 77, Math.toRadians(180));
+    private final Pose firstPickup = new Pose(34, 77, Math.toRadians(180));
     private final Pose secondLineup = new Pose(56, 53, Math.toRadians(180));
     private final Pose secondPickup = new Pose(26, 53, Math.toRadians(180));
     private final Pose secondPickupBack = new Pose(54, 52, Math.toRadians(180));

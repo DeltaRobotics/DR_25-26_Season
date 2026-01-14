@@ -62,6 +62,10 @@ public class Gen2Hardwaremap {
 
     public double hood_pose = 1;
 
+    private double turretDegreeRatio = 0.003703703704;
+
+    private double turretCenterPosition = 147.3;
+
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
@@ -103,7 +107,7 @@ public class Gen2Hardwaremap {
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        R_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        L_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);

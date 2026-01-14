@@ -36,7 +36,6 @@ public class Gen2Teleop extends LinearOpMode {
     public boolean button2DU = true;
     public boolean button2DD = true;
 
-
     double time = 0;
     public boolean timerInitted = false;
 
@@ -102,7 +101,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            if(gamepad1.right_bumper && buttonRB){
+            if(gamepad1.right_bumper){
 
                 robot.shoot();
 
