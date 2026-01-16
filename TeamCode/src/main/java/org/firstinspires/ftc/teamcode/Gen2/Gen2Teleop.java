@@ -53,6 +53,8 @@ public class Gen2Teleop extends LinearOpMode {
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
 
+        robot.initAprilTag();
+
         robot.hoodDown();
 
         waitForStart();

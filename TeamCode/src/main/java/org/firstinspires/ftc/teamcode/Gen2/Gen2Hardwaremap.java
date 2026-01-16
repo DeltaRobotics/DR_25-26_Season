@@ -1,11 +1,22 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
+
 
 //@Config //We need this for Dashboard to change variables
 public class Gen2Hardwaremap {
@@ -14,6 +25,10 @@ public class Gen2Hardwaremap {
     //drive motors
 
     public ElapsedTime currentTime = new ElapsedTime();
+
+    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
 
     double[] timeArray = new double[20];
 
@@ -63,7 +78,10 @@ public class Gen2Hardwaremap {
     public double hood_pose = 1;
 
     private double turretDegreeRatio = 0.003703703704;
-
+    public DcMotor turretEncoder = null;
+    public double cameraDifferenceAngle = 0 ;
+    public double turretEncoderCounts = 0;
+    public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
 
 
@@ -88,6 +106,8 @@ public class Gen2Hardwaremap {
         R_swingythingy = ahwMap.servo.get("R_swingythingy");
 
         hood = ahwMap.servo.get("hood");
+
+        turretEncoder = motorRF;
 
         //drive motors and odometry encoders
         motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -126,6 +146,59 @@ public class Gen2Hardwaremap {
         motorRB.setPower((((forward + strafe) * 1) - (heading * 1)) * speed);
         motorLB.setPower((((forward - strafe) * 1) + (heading * 1)) * speed);
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
+    }
+
+    public void turret(){
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+
+        AprilTagDetection detection = currentDetections.get(0);
+        turretEncoderCounts = turretEncoder.getCurrentPosition();
+        turretAngle = ((turretEncoderCounts/360)*6.25); //6.25 is gear ratio
+
+        if (detection.metadata != null) {
+            cameraDifferenceAngle = detection.ftcPose.yaw;
+        }
+        else{
+            cameraDifferenceAngle = 1;
+        }
+
+
+
+    }
+
+    public void initAprilTag() {
+
+        // Create the AprilTag processor the easy way.
+        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+
+        // Create the vision portal the easy way.
+        if (USE_WEBCAM) {
+            visionPortal = VisionPortal.easyCreateWithDefaults(
+                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+        } else {
+            visionPortal = VisionPortal.easyCreateWithDefaults(
+                    BuiltinCameraDirection.BACK, aprilTag);
+        }
+
+    }   // end method initAprilTag()
+
+    public void telemetryAprilTag() {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            }
+        }   // end for() loop
     }
 
     public boolean boolTimer (double time){
