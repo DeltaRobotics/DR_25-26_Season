@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 //two face teleop
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -62,6 +63,7 @@ public class Gen2Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
+            robot.turret();
 
             if(gamepad1.left_bumper && buttonLB){
 
@@ -172,6 +174,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
+
             telemetry.addData("real shooter power", robot.R_shooter.getPower());
             telemetry.addData("error", robot.error);
             telemetry.addData("power", robot.setting_ShooterRPM());
@@ -184,5 +187,6 @@ public class Gen2Teleop extends LinearOpMode {
             telemetry.update();
 
         }
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }

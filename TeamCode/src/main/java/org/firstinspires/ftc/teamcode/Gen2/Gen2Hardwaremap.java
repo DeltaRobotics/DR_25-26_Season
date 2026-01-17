@@ -45,6 +45,8 @@ public class Gen2Hardwaremap {
     public boolean waiting = false;
     public double shooterP = 0.00255;
 
+    public double turretP = 0.01;
+
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
 
@@ -64,6 +66,8 @@ public class Gen2Hardwaremap {
     private int prevShooterRPM = 0;
 
     public int error;
+
+    public int angleError;
     ElapsedTime timerS = new ElapsedTime();
     private static final double MIN_SAMPLE_TIME = 0.01;
 
@@ -107,7 +111,7 @@ public class Gen2Hardwaremap {
 
         hood = ahwMap.servo.get("hood");
 
-        turretEncoder = motorRF;
+        turretEncoder = intake;
 
         //drive motors and odometry encoders
         motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -156,13 +160,22 @@ public class Gen2Hardwaremap {
         turretAngle = ((turretEncoderCounts/360)*6.25); //6.25 is gear ratio
 
         if (detection.metadata != null) {
-            cameraDifferenceAngle = detection.ftcPose.yaw;
+            cameraDifferenceAngle = detection.ftcPose.bearing;
         }
         else{
             cameraDifferenceAngle = 1;
         }
 
+        if(turretAngle < -90 || turretAngle > 90){
+            angleError = 0;
+        }
+        else{
+            angleError = (int)(cameraDifferenceAngle - turretAngle);
+        }
+        double turretPower = angleError * turretP;
 
+        R_turret.setPower(turretPower);
+        L_turret.setPower(turretPower);
 
     }
 
