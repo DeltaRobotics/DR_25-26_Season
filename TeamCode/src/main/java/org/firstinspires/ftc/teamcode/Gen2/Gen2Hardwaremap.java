@@ -27,7 +27,7 @@ public class Gen2Hardwaremap {
     public ElapsedTime currentTime = new ElapsedTime();
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-    private AprilTagProcessor aprilTag;
+    public AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
     double[] timeArray = new double[20];
@@ -43,7 +43,7 @@ public class Gen2Hardwaremap {
     public DcMotor transfer = null;
 
     public boolean waiting = false;
-    public double shooterP = 0.00255;
+    public double shooterP = 0.001;
 
     public double turretP = 0.01;
 
@@ -61,7 +61,6 @@ public class Gen2Hardwaremap {
 
     public Servo hood = null;
 
-    public boolean shooterOn = false;
     public int previousShooterEncoder = 0;
     private int prevShooterRPM = 0;
 
@@ -99,6 +98,9 @@ public class Gen2Hardwaremap {
 
         intake = ahwMap.dcMotor.get("intake");
         transfer = ahwMap.dcMotor.get("transfer");
+
+        L_turret = ahwMap.crservo.get("L_turret");
+        R_turret = ahwMap.crservo.get("R_turret");
 
         R_shooter = ahwMap.dcMotor.get("R_shooter");
         L_shooter = ahwMap.dcMotor.get("L_shooter");
@@ -155,31 +157,39 @@ public class Gen2Hardwaremap {
     public void turret(){
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
-        AprilTagDetection detection = currentDetections.get(0);
-        turretEncoderCounts = turretEncoder.getCurrentPosition();
-        turretAngle = ((turretEncoderCounts/360)*6.25); //6.25 is gear ratio
+        AprilTagDetection detection;
 
-        if (detection.metadata != null) {
+        if(!currentDetections.isEmpty()){
+
+           detection = currentDetections.get(0);
+        }
+        else{
+            detection = null;
+
+        }
+
+        turretEncoderCounts = turretEncoder.getCurrentPosition();
+        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
+
+        if (detection != null && detection.metadata != null) {
             cameraDifferenceAngle = detection.ftcPose.bearing;
         }
         else{
             cameraDifferenceAngle = 1;
         }
+        angleError = (int)cameraDifferenceAngle;
+        double turretPower = -angleError * turretP;
 
         if(turretAngle < -90 || turretAngle > 90){
-            angleError = 0;
+            turretPower = 0;
         }
-        else{
-            angleError = (int)(cameraDifferenceAngle - turretAngle);
-        }
-        double turretPower = angleError * turretP;
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
 
     }
 
-    public void initAprilTag() {
+    public void initAprilTag(HardwareMap ahwMap) {
 
         // Create the AprilTag processor the easy way.
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
@@ -187,7 +197,7 @@ public class Gen2Hardwaremap {
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
-                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+                    ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     BuiltinCameraDirection.BACK, aprilTag);
@@ -311,8 +321,6 @@ public class Gen2Hardwaremap {
 
             targetRPM = 3500;
         }
-
-        shooterOn = true;
     }
 
     public void autoShoot(){
@@ -347,8 +355,6 @@ public class Gen2Hardwaremap {
 
             targetRPM = 3500;
         }
-
-        shooterOn = true;
     }
 
     public void hoodUp(){
@@ -403,15 +409,15 @@ public class Gen2Hardwaremap {
 
     public int shooterRPM() {
 
-        if (shooterOn) {
+        if (R_shooter.getPower() != 0) {
 
             // If our min sample time has not passed yet, return the previous shooter RPM
             if (timerS.seconds() < MIN_SAMPLE_TIME) {
                 return prevShooterRPM;
             }
             else {
-                int countsPerSecond = (int) ((R_shooter.getCurrentPosition() - previousShooterEncoder) / timerS.seconds());
-                previousShooterEncoder = R_shooter.getCurrentPosition();
+                int countsPerSecond = (int) ((Math.abs(R_shooter.getCurrentPosition()) - previousShooterEncoder) / timerS.seconds());
+                previousShooterEncoder = Math.abs(R_shooter.getCurrentPosition());
                 timerS.reset();
 
                 prevShooterRPM = countsPerSecond * 60 / 28;

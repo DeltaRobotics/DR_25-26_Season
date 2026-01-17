@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 
 @TeleOp(name = "Gen2Teleop")
 //@Disabled
@@ -37,6 +39,8 @@ public class Gen2Teleop extends LinearOpMode {
     public boolean button2DU = true;
     public boolean button2DD = true;
 
+    public AprilTagDetection Detection = null;
+
     double time = 0;
     public boolean timerInitted = false;
 
@@ -54,7 +58,7 @@ public class Gen2Teleop extends LinearOpMode {
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
 
-        robot.initAprilTag();
+        robot.initAprilTag(hardwareMap);
 
         robot.hoodDown();
 
@@ -173,8 +177,17 @@ public class Gen2Teleop extends LinearOpMode {
                 buttonDD = true;
             }
 
+            if(robot.aprilTag.getDetections().size() > 0){
 
+                Detection = robot.aprilTag.getDetections().get(0);
 
+                if(Detection != null){
+                    telemetry.addData("bearing", Detection.ftcPose.bearing);
+                }
+            }
+
+            telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());
+            telemetry.addData("shooter Position left", robot.L_shooter.getCurrentPosition());
             telemetry.addData("real shooter power", robot.R_shooter.getPower());
             telemetry.addData("error", robot.error);
             telemetry.addData("power", robot.setting_ShooterRPM());
