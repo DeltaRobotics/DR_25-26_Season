@@ -177,6 +177,68 @@ public class Gen2Teleop extends LinearOpMode {
                 buttonDD = true;
             }
 
+
+
+
+            //Increasing the P
+            if(gamepad2.y && button2Y){
+
+                robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0001);
+
+                button2Y = false;
+            }
+
+            if(!gamepad2.y && !button2Y){
+
+               button2Y = true;
+
+            }
+
+            //Decreasing the P
+            if(gamepad2.b && button2B){
+
+                robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0001);
+
+                button2B = false;
+            }
+
+            if(!gamepad2.b && !button2B){
+
+                button2B = true;
+
+            }
+
+
+            //Increasing the D
+            if(gamepad2.x && button2X){
+
+                robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+
+                button2X = false;
+            }
+
+            if(!gamepad2.x && !button2X){
+
+                button2X = true;
+
+            }
+
+            //Decreasing the D
+            if(gamepad2.a && button2A){
+
+                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
+
+                button2A = false;
+            }
+
+            if(!gamepad2.a && !button2A){
+
+                button2A = true;
+
+            }
+
+
+
             if(robot.aprilTag.getDetections().size() > 0){
 
                 Detection = robot.aprilTag.getDetections().get(0);
@@ -186,6 +248,8 @@ public class Gen2Teleop extends LinearOpMode {
                 }
             }
 
+            telemetry.addData("current P", robot.PIDShooter.getP());
+            telemetry.addData("current D", robot.PIDShooter.getD());
             telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());
             telemetry.addData("shooter Position left", robot.L_shooter.getCurrentPosition());
             telemetry.addData("real shooter power", robot.R_shooter.getPower());

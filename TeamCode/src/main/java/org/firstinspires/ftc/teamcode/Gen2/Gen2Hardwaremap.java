@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -46,6 +47,9 @@ public class Gen2Hardwaremap {
     public double shooterP = 0.001;
 
     public double turretP = 0.01;
+
+    public double currentP = 0.001;
+    public double currentD = 0;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -86,9 +90,11 @@ public class Gen2Hardwaremap {
     public double turretEncoderCounts = 0;
     public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
-
+    PIDController PIDShooter;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
+
+        PIDShooter = new PIDController(0.001,0,0,0, MIN_SAMPLE_TIME,0,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -180,7 +186,8 @@ public class Gen2Hardwaremap {
         angleError = (int)cameraDifferenceAngle;
         double turretPower = -angleError * turretP;
 
-        if(turretAngle < -90 || turretAngle > 90){
+        //safety check so the turret doesn't go past 90
+        if((turretAngle < -90 && turretPower < 0) || (turretAngle > 90 && turretPower > 0)){
             turretPower = 0;
         }
 
@@ -433,10 +440,9 @@ public class Gen2Hardwaremap {
 
     public double setting_ShooterRPM(){
 
-        error = targetRPM - shooterRPM();
-        double power = error * shooterP;
+        PIDShooter.setSetPoint(targetRPM);
 
-        return power;
+        return PIDShooter.Update(shooterRPM());
     }
 
 }

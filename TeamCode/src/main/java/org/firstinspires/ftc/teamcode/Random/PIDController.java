@@ -22,13 +22,21 @@ public class PIDController {
 
     private double minSampleTime;
 
-    public PIDController (double P, double I, double D, double setPoint, double minSampleTime){
+    private double min = 0;
+
+    private double max = 0;
+
+    private double previousControlValue = 0;
+
+    public PIDController (double P, double I, double D, double setPoint, double minSampleTime, double min, double max){
 
         this.P = P;
         this.I = I;
         this.D = D;
         this.setPoint = setPoint;
         this.minSampleTime = minSampleTime;
+        this.min = min;
+        this.max = max;
 
         elapsedTime = new ElapsedTime();
         totalError = 0;
@@ -37,28 +45,44 @@ public class PIDController {
     }
     public double Update (double sensorReading){
 
-        double error = setPoint - sensorReading;
-
-        double controlValue = 0;
-
-        if(firstRun){
-
-            firstRun = false;
+        if(elapsedTime.milliseconds() < minSampleTime){
+            return previousControlValue;
         }
-        else{
-            double deltaTime = elapsedTime.seconds();
+        else {
+            double error = setPoint - sensorReading;
 
-            totalError += error * deltaTime;
+            double controlValue = 0;
 
-            controlValue = P * error + I * totalError + D * ((error - previousError) / deltaTime);
+            if (firstRun) {
 
+                firstRun = false;
+            } else {
+                double deltaTime = elapsedTime.seconds() / 60;
+
+                totalError += error * deltaTime;
+
+                controlValue = (P * error) + (I * totalError) + (D * ((error - previousError) / deltaTime));
+
+            }
+
+            elapsedTime.reset();
+            previousError = error;
+
+            if (controlValue < min) {
+                previousControlValue = min;
+                return min;
+
+            }
+
+            if (controlValue > max) {
+                previousControlValue = max;
+                return max;
+
+            }
+
+            previousControlValue = controlValue;
+            return controlValue;
         }
-
-        elapsedTime.reset();
-        previousError = error;
-
-        return controlValue;
-
     }
 
     // Getters and setters
