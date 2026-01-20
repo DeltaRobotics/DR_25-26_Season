@@ -45,11 +45,7 @@ public class Gen2Hardwaremap {
 
     public boolean waiting = false;
     public double shooterP = 0.001;
-
-    public double turretP = 0.01;
-
-    public double currentP = 0.001;
-    public double currentD = 0;
+    public double turretP = 0.045;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -70,7 +66,7 @@ public class Gen2Hardwaremap {
 
     public int error;
 
-    public int angleError;
+    public double angleError;
     ElapsedTime timerS = new ElapsedTime();
     private static final double MIN_SAMPLE_TIME = 0.01;
 
@@ -90,11 +86,14 @@ public class Gen2Hardwaremap {
     public double turretEncoderCounts = 0;
     public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
+    public boolean blue = false;
+
+
     PIDController PIDShooter;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        PIDShooter = new PIDController(0.001,0,0,0, MIN_SAMPLE_TIME,0,1);
+        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -162,8 +161,16 @@ public class Gen2Hardwaremap {
 
     public void turret(){
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-
         AprilTagDetection detection;
+
+        int id;
+
+        if(blue){
+            id = 20;
+        }
+        else{
+            id = 24;
+        }
 
         if(!currentDetections.isEmpty()){
 
@@ -171,19 +178,37 @@ public class Gen2Hardwaremap {
         }
         else{
             detection = null;
-
         }
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
         turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
-        if (detection != null && detection.metadata != null) {
+        if (detection != null && detection.id == id){
             cameraDifferenceAngle = detection.ftcPose.bearing;
+
+            //close range for auto ranging and shooting
+            if(detection.ftcPose.y <= 40){
+                hoodDown();
+                targetRPM = 3500;
+            }
+
+            //mid range for auto ranging and shooting
+            if(detection.ftcPose.y <= 86){
+                hoodMid();
+                targetRPM = 4000;
+            }
+
+            //long range for auto ranging and shooting
+            if(detection.ftcPose.y >= 95){
+                hoodUp();
+                targetRPM = 4500;
+            }
         }
         else{
             cameraDifferenceAngle = 1;
         }
-        angleError = (int)cameraDifferenceAngle;
+
+        angleError = cameraDifferenceAngle;
         double turretPower = -angleError * turretP;
 
         //safety check so the turret doesn't go past 90
@@ -326,7 +351,8 @@ public class Gen2Hardwaremap {
 
             hood.setPosition(hood_pose);
 
-            targetRPM = 3500;
+            R_shooter.setPower(setting_ShooterRPM());
+            L_shooter.setPower(setting_ShooterRPM());
         }
     }
 
@@ -365,53 +391,18 @@ public class Gen2Hardwaremap {
     }
 
     public void hoodUp(){
-
-        targetRPM = 3500;//Should be 4500
-        hood_pose = .5;
-
-        if(!timerInitted[1]) {//very very first thing
-            timeArray[1] = currentTime.milliseconds();
-            timerInitted[1] = true;
-        }
-
-        while(hood.getPosition() > 0.5){
-
-            hood.setPosition(hood.getPosition() - 0.01);
-
-            if (currentTime.milliseconds() > timeArray[1] + 200) {//last thing to happen
-
-                timerInitted[1] = false;
-            }
-        }
+        hood_pose = .6;
+        hood.setPosition(hood_pose);
     }
 
     public void hoodMid(){
-
-        if(!timerInitted[2]) {//very very first thing
-            timeArray[2] = currentTime.milliseconds();
-            timerInitted[2] = true;
-        }
-
-        while(hood.getPosition() > 0.85){
-
-            hood.setPosition(hood.getPosition() - 0.01);
-
-            if (currentTime.milliseconds() > timeArray[2] + 200) {//last thing to happen
-
-                timerInitted[2] = false;
-            }
-        }
-
         hood_pose = .85;
-        targetRPM = 3500;//Should be 4000
+        hood.setPosition(hood_pose);
     }
 
     public void hoodDown(){
-
-        hood.setPosition(1);
-
         hood_pose = 1;
-        targetRPM = 3500;
+        hood.setPosition(1);
     }
 
     public int shooterRPM() {

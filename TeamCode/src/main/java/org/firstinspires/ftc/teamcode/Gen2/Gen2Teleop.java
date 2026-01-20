@@ -133,86 +133,67 @@ public class Gen2Teleop extends LinearOpMode {
             robot.R_shooter.setPower(robot.setting_ShooterRPM());
             robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
-            //Close range shooting
-            if(gamepad1.dpad_right && buttonDR){
-
-                robot.hoodDown();
-
-                telemetry.addData("transfer", robot.transfer.getPower());
-
-                buttonDR = false;
-            }
-
-            if(!gamepad1.dpad_right && !buttonDR){
-
-                buttonDR = true;
-            }
-
-            //Long range shooting
-            if(gamepad1.dpad_left && buttonDL){
-
-                robot.hoodUp();
-
-                telemetry.addData("transfer", robot.transfer.getPower());
-
-                buttonDL = false;
-            }
-
-            if(!gamepad1.dpad_left && !buttonDL){
-
-                buttonDL = true;
-            }
-
-            if(gamepad1.dpad_down && buttonDD){
-
-                robot.hoodMid();
-
-                telemetry.addData("transfer", robot.transfer.getPower());
-
-                buttonDD = false;
-            }
-
-            if(!gamepad1.dpad_down && !buttonDD){
-
-                buttonDD = true;
-            }
-
-
-
-
             //Increasing the P
-            if(gamepad2.y && button2Y){
+            if(gamepad2.dpad_up && button2DU){
 
                 robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0001);
 
-                button2Y = false;
+                button2DU = false;
             }
 
-            if(!gamepad2.y && !button2Y){
+            if(!gamepad2.dpad_up && !button2DU){
 
-               button2Y = true;
+                button2DU = true;
 
             }
 
             //Decreasing the P
-            if(gamepad2.b && button2B){
+            if(gamepad2.dpad_right && button2DR){
 
                 robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0001);
 
-                button2B = false;
+                button2DR = false;
             }
 
-            if(!gamepad2.b && !button2B){
+            if(!gamepad2.dpad_right && !button2DR){
 
-                button2B = true;
+                button2DR = true;
 
             }
 
 
             //Increasing the D
-            if(gamepad2.x && button2X){
+            if(gamepad2.dpad_left && button2DL){
 
                 robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+
+                button2DL = false;
+            }
+
+            if(!gamepad2.dpad_left && !button2DL){
+
+                button2DL = true;
+
+            }
+
+            //Decreasing the D
+            if(gamepad2.dpad_down && button2DD){
+
+                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
+
+                button2DD = false;
+            }
+
+            if(!gamepad2.dpad_down && !button2DD){
+
+                button2DD = true;
+
+            }
+
+
+            //calling to track the blue AprilTag
+            if(gamepad2.x && button2X){
+                robot.blue = true;
 
                 button2X = false;
             }
@@ -220,21 +201,29 @@ public class Gen2Teleop extends LinearOpMode {
             if(!gamepad2.x && !button2X){
 
                 button2X = true;
-
             }
 
-            //Decreasing the D
-            if(gamepad2.a && button2A){
+            //calling to track the red AprilTag
+            if(gamepad2.b && button2B){
+                robot.blue = false;
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
-
-                button2A = false;
+                button2B = false;
             }
 
-            if(!gamepad2.a && !button2A){
+            if(!gamepad2.b && !button2B){
 
-                button2A = true;
+                button2B = true;
+            }
 
+            if(gamepad2.dpad_up && button2DU){
+
+
+                button2DU = false;
+            }
+
+            if(!gamepad2.dpad_up && !button2DU){
+
+                button2DU = true;
             }
 
 
