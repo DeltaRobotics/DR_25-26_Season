@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -78,7 +77,7 @@ public class Gen2Hardwaremap {
 
     public int targetRPM = 0;
 
-    public double hood_pose = 1;
+    public double hood_pos = 1;
 
     private double turretDegreeRatio = 0.003703703704;
     public DcMotor turretEncoder = null;
@@ -88,12 +87,11 @@ public class Gen2Hardwaremap {
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
 
-
     PIDController PIDShooter;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0,1);
+        PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -165,6 +163,8 @@ public class Gen2Hardwaremap {
 
         int id;
 
+        double range;
+
         if(blue){
             id = 20;
         }
@@ -185,24 +185,16 @@ public class Gen2Hardwaremap {
 
         if (detection != null && detection.id == id){
             cameraDifferenceAngle = detection.ftcPose.bearing;
+            range = detection.ftcPose.range;
 
-            //close range for auto ranging and shooting
-            if(detection.ftcPose.y <= 40){
-                hoodDown();
-                targetRPM = 3500;
-            }
+            targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
+            hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
 
-            //mid range for auto ranging and shooting
-            if(detection.ftcPose.y <= 86){
-                hoodMid();
-                targetRPM = 4000;
-            }
+            R_shooter.setPower(setting_ShooterRPM());
+            L_shooter.setPower(setting_ShooterRPM());
 
-            //long range for auto ranging and shooting
-            if(detection.ftcPose.y >= 95){
-                hoodUp();
-                targetRPM = 4500;
-            }
+            hood.setPosition(hood_pos);
+
         }
         else{
             cameraDifferenceAngle = 1;
@@ -218,7 +210,6 @@ public class Gen2Hardwaremap {
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
-
     }
 
     public void initAprilTag(HardwareMap ahwMap) {
@@ -348,11 +339,6 @@ public class Gen2Hardwaremap {
 
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
-
-            hood.setPosition(hood_pose);
-
-            R_shooter.setPower(setting_ShooterRPM());
-            L_shooter.setPower(setting_ShooterRPM());
         }
     }
 
@@ -384,24 +370,24 @@ public class Gen2Hardwaremap {
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-            hood.setPosition(hood_pose);
+            hood.setPosition(hood_pos);
 
             targetRPM = 3500;
         }
     }
 
     public void hoodUp(){
-        hood_pose = .6;
-        hood.setPosition(hood_pose);
+        hood_pos = .65;
+        hood.setPosition(hood_pos);
     }
 
     public void hoodMid(){
-        hood_pose = .85;
-        hood.setPosition(hood_pose);
+        hood_pos = .85;
+        hood.setPosition(hood_pos);
     }
 
     public void hoodDown(){
-        hood_pose = 1;
+        hood_pos = 1;
         hood.setPosition(1);
     }
 

@@ -31,27 +31,16 @@ public class AutoRed6Close extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
-    /** This is the variable where we store the state of our auto.
-     * It is used by the pathUpdate method. */
     private int pathState;
 
-    /** Start Pose of our robot */
     private final Pose startPose = new Pose(113, 114, Math.toRadians(45));
     private final Pose Shooting = new Pose(90, 92, Math.toRadians(45));
     private final Pose firstLineup = new Pose(84, 77, Math.toRadians(0));
     private final Pose firstPickup = new Pose(110, 77, Math.toRadians(0));
     private final Pose movingOffLine = new Pose(84, 108, Math.toRadians(30));
 
-
-    /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-
-
-    /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, movingBackPath ;
 
-
-    /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
-     * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
 
         scorePreload = new Path(new BezierLine(startPose, Shooting));

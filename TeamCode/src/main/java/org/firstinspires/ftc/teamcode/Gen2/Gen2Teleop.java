@@ -130,13 +130,21 @@ public class Gen2Teleop extends LinearOpMode {
                 robot.shoot();
             }
 
+
+
+
             robot.R_shooter.setPower(robot.setting_ShooterRPM());
             robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
-            //Increasing the P
+
+            //                      Driver 2
+
+
+            //Bringing the hood up
             if(gamepad2.dpad_up && button2DU){
 
-                robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0001);
+                robot.hood_pos = robot.hood_pos - 0.05;
+                robot.hood.setPosition(robot.hood_pos);
 
                 button2DU = false;
             }
@@ -147,10 +155,11 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            //Decreasing the P
+            //Bringing the hood down
             if(gamepad2.dpad_right && button2DR){
 
-                robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0001);
+                robot.hood_pos = robot.hood_pos + 0.05;
+                robot.hood.setPosition(robot.hood_pos);
 
                 button2DR = false;
             }
@@ -162,10 +171,10 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
-            //Increasing the D
+            //increasing RPM
             if(gamepad2.dpad_left && button2DL){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+                robot.targetRPM = robot.targetRPM + 500;
 
                 button2DL = false;
             }
@@ -176,10 +185,10 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            //Decreasing the D
+            //Decreasing the RPM
             if(gamepad2.dpad_down && button2DD){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
+                robot.targetRPM = robot.targetRPM - 500;
 
                 button2DD = false;
             }
@@ -227,20 +236,37 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
+            // Race condition where getDetections() is not empty and then when it is read,
+            // becomes empty because its data updated.
+            try
+            {
+                if(robot.aprilTag.getDetections().isEmpty()){
 
-            if(robot.aprilTag.getDetections().size() > 0){
+                    Detection = robot.aprilTag.getDetections().get(0);
 
-                Detection = robot.aprilTag.getDetections().get(0);
-
-                if(Detection != null){
-                    telemetry.addData("bearing", Detection.ftcPose.bearing);
+                    if(Detection != null){
+                        telemetry.addData("bearing", Detection.ftcPose.bearing);
+                        telemetry.addData("Range", Detection.ftcPose.range);
+                    }
+                    else{
+                        telemetry.addData("bearing", "Tag Not Detected");
+                        telemetry.addData("Range", "Tag Not Detected");
+                    }
+                }
+                else{
+                    telemetry.addData("bearing", "Tag Not Detected");
+                    telemetry.addData("Range", "Tag Not Detected");
                 }
             }
+            catch (IndexOutOfBoundsException e)
+            {
+                telemetry.addData("bearing", "Tag Not Detected");
+                telemetry.addData("Range", "Tag Not Detected");
+            }
 
-            telemetry.addData("current P", robot.PIDShooter.getP());
-            telemetry.addData("current D", robot.PIDShooter.getD());
+            telemetry.addData("target RPM ", robot.targetRPM);
+            telemetry.addData("hood position ", robot.hood_pos);
             telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());
-            telemetry.addData("shooter Position left", robot.L_shooter.getCurrentPosition());
             telemetry.addData("real shooter power", robot.R_shooter.getPower());
             telemetry.addData("error", robot.error);
             telemetry.addData("power", robot.setting_ShooterRPM());
