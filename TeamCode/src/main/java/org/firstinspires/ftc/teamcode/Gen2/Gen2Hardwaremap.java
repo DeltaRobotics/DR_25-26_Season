@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,8 +15,13 @@ import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 //@Config //We need this for Dashboard to change variables
@@ -28,7 +34,13 @@ public class Gen2Hardwaremap {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     public AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
+    public VisionPortal visionPortal;
+    ExposureControl myExposureControl;  // declare exposure control object
+    public long currentExposure = 0;
+
+
+
+
 
     double[] timeArray = new double[20];
 
@@ -83,6 +95,7 @@ public class Gen2Hardwaremap {
     public double cameraDifferenceAngle = 0 ;
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
+    public final String VUFORIA_KEY = "AQIjJXP/////AAABmX8DXrmUxEBjvVNbT94EWcg3A75NZTjC3HG9/ur6NlOGrwrPUBWwLK8GlSeDl/fPcBsf+HkwYZQt7Fu8g/fJSvgftOYprWUaAWTCcyEnjfqU7CKCEEeWOO97PEJHdsjSPaRCoKAUjmRCknWJWxPuvgBXU4z63zwtr45AR0DzsF9FRdoj9pNR7hcmPKZmMLSfU6zdeBinzk2DQrJq2GGHJJgI0Mgh/IcrRA54NaGttRaqLpvLOuDHRiPyHnOtOXkjHBZp4Simdyqht675alc36Kyz3PF34/9X6m3b/43kuI231AaSBt1r5GnQv0jL9QRbGde2lr0U8mTmnatRm1ASpgCIcAJJ82jRpyWf3yELRH1w";
 
     PIDController PIDShooter;
     PIDController PIDTurret;
@@ -91,7 +104,7 @@ public class Gen2Hardwaremap {
 
         PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
 
-        PIDTurret = new PIDController(0.025,0,0.0000002,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.02,0,0.0000008,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -167,9 +180,16 @@ public class Gen2Hardwaremap {
 
         if (detection != null){
             range = detection.ftcPose.range;
+            if (range > 110){
+                targetRPM = 5000;
+                hood_pos = 0.6;
+            }
+            else{
+                targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
+                hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+            }
 
-            targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
-            hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+
 
             R_shooter.setPower(setting_ShooterRPM());
             L_shooter.setPower(setting_ShooterRPM());
@@ -188,19 +208,32 @@ public class Gen2Hardwaremap {
         L_turret.setPower(turretPower);
     }
 
-    public void initAprilTag(HardwareMap ahwMap) {
+    public void initAprilTag(HardwareMap ahwMap, LinearOpMode opmode) {
 
         // Create the AprilTag processor the easy way.
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(ahwMap.get(WebcamName.class, "Webcam 1"))
+                    .addProcessors(aprilTag)
+                    //.enableLiveView(true)
+                    .build();
         } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    BuiltinCameraDirection.BACK, aprilTag);
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessors(aprilTag)
+                    //.enableLiveView(true)
+                    .build();
         }
+
+        opmode.sleep(1000);
+        visionPortal.resumeStreaming();
+        myExposureControl = visionPortal.getCameraControl(ExposureControl.class);
+        currentExposure = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
+        myExposureControl.setMode(ExposureControl.Mode.Manual);
+        myExposureControl.setExposure(2, TimeUnit.MILLISECONDS);
 
     }   // end method initAprilTag()
 

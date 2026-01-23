@@ -6,7 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name = "Gen2Teleop")
@@ -58,11 +61,15 @@ public class Gen2Teleop extends LinearOpMode {
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
 
-        robot.initAprilTag(hardwareMap);
+        robot.initAprilTag(hardwareMap, this);
 
         robot.hoodDown();
 
+
+
+
         waitForStart();
+
 
         while (opModeIsActive()) {
 
@@ -147,10 +154,9 @@ public class Gen2Teleop extends LinearOpMode {
                 button2DU = false;
             }
 
-            if(!gamepad2.dpad_up && !button2DU){
+            if(!gamepad2.dpad_up && !button2DU) {
 
                 button2DU = true;
-
             }
 
             //Bringing the hood down
@@ -186,7 +192,8 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad2.dpad_down && button2DD){
 
                 robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
-
+                //robot.currentExposure += 1;
+                //robot.myExposureControl.setExposure(robot.currentExposure, TimeUnit.MILLISECONDS);
                 button2DD = false;
             }
 
@@ -221,16 +228,9 @@ public class Gen2Teleop extends LinearOpMode {
                 button2B = true;
             }
 
-            if(gamepad2.dpad_up && button2DU){
 
 
-                button2DU = false;
-            }
 
-            if(!gamepad2.dpad_up && !button2DU){
-
-                button2DU = true;
-            }
 
 
             // Race condition where getDetections() is not empty and then when it is read,
@@ -248,6 +248,9 @@ public class Gen2Teleop extends LinearOpMode {
                 telemetry.addData("Range", "Tag Not Detected");
             }
 
+            telemetry.addData("min exposure ", robot.myExposureControl.getMinExposure(TimeUnit.MILLISECONDS) );
+            telemetry.addData("max exposure ", robot.myExposureControl.getMaxExposure(TimeUnit.MILLISECONDS) );
+            telemetry.addData("current exposure ", robot.myExposureControl.getExposure(TimeUnit.MILLISECONDS) );
             telemetry.addData("current P ", String.valueOf(robot.PIDTurret.getP()));
             telemetry.addData("current D ", String.valueOf(robot.PIDTurret.getD()));
             telemetry.addData("target RPM ", robot.targetRPM);
