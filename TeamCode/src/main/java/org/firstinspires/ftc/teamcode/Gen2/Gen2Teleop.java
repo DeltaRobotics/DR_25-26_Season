@@ -142,9 +142,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             //Bringing the hood up
             if(gamepad2.dpad_up && button2DU){
-
-                robot.hood_pos = robot.hood_pos - 0.05;
-                robot.hood.setPosition(robot.hood_pos);
+                robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.0000001);
 
                 button2DU = false;
             }
@@ -158,8 +156,7 @@ public class Gen2Teleop extends LinearOpMode {
             //Bringing the hood down
             if(gamepad2.dpad_right && button2DR){
 
-                robot.hood_pos = robot.hood_pos + 0.05;
-                robot.hood.setPosition(robot.hood_pos);
+                robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.0000001);
 
                 button2DR = false;
             }
@@ -174,7 +171,7 @@ public class Gen2Teleop extends LinearOpMode {
             //increasing RPM
             if(gamepad2.dpad_left && button2DL){
 
-                robot.targetRPM = robot.targetRPM + 500;
+                robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
 
                 button2DL = false;
             }
@@ -188,7 +185,7 @@ public class Gen2Teleop extends LinearOpMode {
             //Decreasing the RPM
             if(gamepad2.dpad_down && button2DD){
 
-                robot.targetRPM = robot.targetRPM - 500;
+                robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
 
                 button2DD = false;
             }
@@ -238,32 +235,21 @@ public class Gen2Teleop extends LinearOpMode {
 
             // Race condition where getDetections() is not empty and then when it is read,
             // becomes empty because its data updated.
-            try
-            {
-                if(robot.aprilTag.getDetections().isEmpty()){
 
-                    Detection = robot.aprilTag.getDetections().get(0);
 
-                    if(Detection != null){
-                        telemetry.addData("bearing", Detection.ftcPose.bearing);
-                        telemetry.addData("Range", Detection.ftcPose.range);
-                    }
-                    else{
-                        telemetry.addData("bearing", "Tag Not Detected");
-                        telemetry.addData("Range", "Tag Not Detected");
-                    }
-                }
-                else{
-                    telemetry.addData("bearing", "Tag Not Detected");
-                    telemetry.addData("Range", "Tag Not Detected");
-                }
+
+            Detection = robot.getDetection();
+            if(Detection != null){
+                telemetry.addData("bearing", Detection.ftcPose.bearing);
+                telemetry.addData("Range", Detection.ftcPose.range);
             }
-            catch (IndexOutOfBoundsException e)
-            {
+            else{
                 telemetry.addData("bearing", "Tag Not Detected");
                 telemetry.addData("Range", "Tag Not Detected");
             }
 
+            telemetry.addData("current P ", String.valueOf(robot.PIDTurret.getP()));
+            telemetry.addData("current D ", String.valueOf(robot.PIDTurret.getD()));
             telemetry.addData("target RPM ", robot.targetRPM);
             telemetry.addData("hood position ", robot.hood_pos);
             telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());

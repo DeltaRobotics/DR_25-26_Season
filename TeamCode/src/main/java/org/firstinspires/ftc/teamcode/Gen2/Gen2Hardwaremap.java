@@ -43,7 +43,6 @@ public class Gen2Hardwaremap {
     public DcMotor transfer = null;
 
     public boolean waiting = false;
-    public double shooterP = 0.001;
     public double turretP = 0.045;
 
     public Servo L_swingythingy = null;
@@ -82,16 +81,17 @@ public class Gen2Hardwaremap {
     private double turretDegreeRatio = 0.003703703704;
     public DcMotor turretEncoder = null;
     public double cameraDifferenceAngle = 0 ;
-    public double turretEncoderCounts = 0;
-    public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
 
     PIDController PIDShooter;
+    PIDController PIDTurret;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
         PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+
+        PIDTurret = new PIDController(0.025,0,0.0000002,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -158,33 +158,14 @@ public class Gen2Hardwaremap {
     }
 
     public void turret(){
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        AprilTagDetection detection;
+        AprilTagDetection detection = getDetection();
 
-        int id;
-
+        double angle;
         double range;
 
-        if(blue){
-            id = 20;
-        }
-        else{
-            id = 24;
-        }
+        angle = getTurretEncoderHeading();
 
-        if(!currentDetections.isEmpty()){
-
-           detection = currentDetections.get(0);
-        }
-        else{
-            detection = null;
-        }
-
-        turretEncoderCounts = turretEncoder.getCurrentPosition();
-        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
-
-        if (detection != null && detection.id == id){
-            cameraDifferenceAngle = detection.ftcPose.bearing;
+        if (detection != null){
             range = detection.ftcPose.range;
 
             targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
@@ -194,17 +175,12 @@ public class Gen2Hardwaremap {
             L_shooter.setPower(setting_ShooterRPM());
 
             hood.setPosition(hood_pos);
-
-        }
-        else{
-            cameraDifferenceAngle = 1;
         }
 
-        angleError = cameraDifferenceAngle;
-        double turretPower = -angleError * turretP;
+        double turretPower = setting_Turret();
 
         //safety check so the turret doesn't go past 90
-        if((turretAngle < -90 && turretPower < 0) || (turretAngle > 90 && turretPower > 0)){
+        if((angle < -180 && turretPower < 0) || (angle > 180 && turretPower > 0)){
             turretPower = 0;
         }
 
@@ -245,19 +221,6 @@ public class Gen2Hardwaremap {
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
-    }
-
-    public boolean boolTimer (double time){
-        return currentTime.milliseconds() > time;
-    }
-
-    public double timerInit(int t){
-
-        double ti = currentTime.milliseconds() + t;
-        //timerInitted = true;
-
-        return ti;
-
     }
 
     public void intake (){
@@ -342,47 +305,8 @@ public class Gen2Hardwaremap {
         }
     }
 
-    public void autoShoot(){
-
-        if(!timerInitted[7]) {//very very first thing to happen
-            timeArray[7] = currentTime.milliseconds();
-            timerInitted[7] = true;
-        }
-
-        if (currentTime.milliseconds() > timeArray[7] + 2000) {//Last thing to happen
-
-            timerInitted[7] = false;
-        }
-
-        else if (currentTime.milliseconds() > timeArray[7] + 500) {
-
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-
-            transfer.setPower(1);
-        }
-
-        else {//Second thing to happen
-
-            transfer.setPower(0);
-            intake.setPower(-1);
-
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-
-            hood.setPosition(hood_pos);
-
-            targetRPM = 3500;
-        }
-    }
-
     public void hoodUp(){
         hood_pos = .65;
-        hood.setPosition(hood_pos);
-    }
-
-    public void hoodMid(){
-        hood_pos = .85;
         hood.setPosition(hood_pos);
     }
 
@@ -420,6 +344,68 @@ public class Gen2Hardwaremap {
         PIDShooter.setSetPoint(targetRPM);
 
         return PIDShooter.Update(shooterRPM());
+    }
+
+    public double getTurretEncoderHeading(){
+
+        double turretEncoderCounts = 0;
+        double turretAngle = 0;
+
+        turretEncoderCounts = turretEncoder.getCurrentPosition();
+        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
+
+        return turretAngle;
+    }
+
+    public AprilTagDetection getDetection(){
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        AprilTagDetection detection = null;
+
+        int id;
+
+        if(blue){
+            id = 20;
+        }
+        else{
+            id = 24;
+        }
+
+
+        if(!currentDetections.isEmpty()){
+
+            for(int i = 0; i < currentDetections.size(); i ++){
+
+                detection = currentDetections.get(i);
+
+                if (detection != null && detection.id != id){
+
+                    detection = null;
+                }
+                else{
+
+                    return detection;
+                }
+            }
+        }
+
+        return detection;
+    }
+
+    public double setting_Turret(){
+
+        AprilTagDetection detection = getDetection();
+
+        PIDTurret.setSetPoint(0);
+
+        if(detection == null){
+            return PIDTurret.Update(getTurretEncoderHeading());
+        }
+        else{
+            return PIDTurret.Update(detection.ftcPose.bearing);
+
+        }
+
     }
 
 }
