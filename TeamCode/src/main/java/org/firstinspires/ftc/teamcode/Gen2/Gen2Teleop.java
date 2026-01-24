@@ -137,14 +137,12 @@ public class Gen2Teleop extends LinearOpMode {
 
 
 
-
-
             //                      Driver 2
 
 
             //Bringing the hood up
             if(gamepad2.dpad_up && button2DU){
-                robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.005);
+                //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.005);
 
                 button2DU = false;
             }
@@ -157,7 +155,7 @@ public class Gen2Teleop extends LinearOpMode {
             //Decreasing the RPM
             if(gamepad2.dpad_down && button2DD){
 
-                robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
+                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
 
                 button2DD = false;
             }
@@ -171,7 +169,7 @@ public class Gen2Teleop extends LinearOpMode {
             //Bringing the hood down
             if(gamepad2.dpad_right && button2DR){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.000005);
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.000005);
 
                 button2DR = false;
             }
@@ -185,7 +183,7 @@ public class Gen2Teleop extends LinearOpMode {
             //increasing RPM
             if(gamepad2.dpad_left && button2DL){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.000005);
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.000005);
 
                 button2DL = false;
             }
