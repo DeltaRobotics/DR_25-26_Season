@@ -73,58 +73,122 @@ public class AutoRed9Far extends OpMode {
 
                 if(!follower.isBusy()) {
 
+                    robot.intake.setPower(1);
+                    robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+                    robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
+
                     follower.followPath(scorePreload, true);
-                    setPathState(2);
+                    setPathState(1);
                 }
 
                 break;
 
+            case 1:
+
+                if(!follower.isBusy()) {
+
+                    robot.hoodDown();
+
+                    if(!robot.timerInitted[4]) {//very very first thing to happen
+                        robot.timeArray[4] = robot.currentTime.milliseconds();
+                        robot.timerInitted[4] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6100) {//Last thing to happen
+                        setPathState(2);
+                        robot.timerInitted[4] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
+
+                        robot.shoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
+
+                        robot.shoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.shoot();
+
+                    }
+                }
+                break;
             case 2:
 
                 if(!follower.isBusy()) {
 
+                    robot.intake();
+                    follower.followPath(firstLineupPath, true);
                     setPathState(3);
                 }
                 break;
             case 3:
 
-
                 if(!follower.isBusy()) {
-                    follower.followPath(firstLineupPath, true);
+
+                    follower.followPath(firstPickupPath, true);
                     setPathState(4);
                 }
                 break;
             case 4:
 
-
                 if(!follower.isBusy()) {
-                    follower.followPath(firstPickupPath, true);
+
+                    follower.followPath(shootFirstPickupPath, true);
                     setPathState(5);
                 }
                 break;
             case 5:
 
-
                 if(!follower.isBusy()) {
 
-                    follower.followPath(shootFirstPickupPath, true);
-                    setPathState(6);
+                    robot.hoodDown();
+
+                    if(!robot.timerInitted[5]) {//very very first thing to happen
+                        robot.timeArray[5] = robot.currentTime.milliseconds();
+                        robot.timerInitted[5] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5100) {//Last thing to happen
+                        setPathState(6);
+                        robot.timerInitted[5] = false;
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
+
+                        robot.shoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
+
+                        robot.shoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.shoot();
+
+                    }
+
                 }
                 break;
             case 6:
 
-
                 if(!follower.isBusy()) {
-
+                    robot.intake();
+                    follower.followPath(secondLineupPath, true);
                     setPathState(7);
                 }
                 break;
             case 7:
 
-
                 if(!follower.isBusy()) {
-
-                    follower.followPath(secondLineupPath, true);
+                    follower.followPath(secondPickupPath, true);
                     setPathState(8);
                 }
                 break;
@@ -132,38 +196,46 @@ public class AutoRed9Far extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    follower.followPath(secondPickupPath, true);
+                    follower.followPath(secondPickupBackPath, true);
                     setPathState(9);
                 }
                 break;
             case 9:
 
                 if(!follower.isBusy()) {
-
-                    follower.followPath(secondPickupBackPath, true);
+                    follower.followPath(shootSecondLineupPath, true);
                     setPathState(10);
                 }
                 break;
             case 10:
 
                 if(!follower.isBusy()) {
+                    robot.hoodDown();
 
-                    follower.followPath(shootSecondLineupPath, true);
-                    setPathState(11);
-                }
-                break;
-            case 11:
+                    if(!robot.timerInitted[6]) {//very very first thing to happen
+                        robot.timeArray[6] = robot.currentTime.milliseconds();
+                        robot.timerInitted[6] = true;
+                    }
 
-                if(!follower.isBusy()) {
+                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5100) {//Last thing to happen
+                        setPathState(-1);
+                        robot.timerInitted[6] = false;
+                    }
 
-                    setPathState(12);
-                }
-                break;
-            case 12:
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
 
-                if(!follower.isBusy()) {
-                    follower.followPath(movingBackPath, true);
-                    setPathState(-1);
+                        robot.shoot();
+                    }
+
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
+
+                        robot.shoot();
+                    }
+
+                    else {//Second thing to happen
+                        robot.shoot();
+
+                    }
                 }
                 break;
 
@@ -193,6 +265,11 @@ public class AutoRed9Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
+        robot.turret(true, 1, true, 6000);
+
+        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+        robot.L_shooter.setPower(robot.setting_ShooterRPM());
+
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
@@ -208,6 +285,10 @@ public class AutoRed9Far extends OpMode {
         opmodeTimer.resetTimer();
 
         robot = new Gen2Hardwaremap(hardwareMap);
+
+        robot.initAprilTag(hardwareMap);
+
+        robot.blue = false;
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

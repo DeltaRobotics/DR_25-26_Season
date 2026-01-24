@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -95,16 +97,14 @@ public class Gen2Hardwaremap {
     public double cameraDifferenceAngle = 0 ;
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
-    public final String VUFORIA_KEY = "AQIjJXP/////AAABmX8DXrmUxEBjvVNbT94EWcg3A75NZTjC3HG9/ur6NlOGrwrPUBWwLK8GlSeDl/fPcBsf+HkwYZQt7Fu8g/fJSvgftOYprWUaAWTCcyEnjfqU7CKCEEeWOO97PEJHdsjSPaRCoKAUjmRCknWJWxPuvgBXU4z63zwtr45AR0DzsF9FRdoj9pNR7hcmPKZmMLSfU6zdeBinzk2DQrJq2GGHJJgI0Mgh/IcrRA54NaGttRaqLpvLOuDHRiPyHnOtOXkjHBZp4Simdyqht675alc36Kyz3PF34/9X6m3b/43kuI231AaSBt1r5GnQv0jL9QRbGde2lr0U8mTmnatRm1ASpgCIcAJJ82jRpyWf3yELRH1w";
-
     PIDController PIDShooter;
     PIDController PIDTurret;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+        PIDShooter = new PIDController(0.0015,0,0.000005,0, MIN_SAMPLE_TIME * 2,0.1,1);
 
-        PIDTurret = new PIDController(0.02,0,0.0000008,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.02,0,0.0000008,0, 0.1,-1,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -170,7 +170,7 @@ public class Gen2Hardwaremap {
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
     }
 
-    public void turret(){
+    public void turret(boolean hoodOverride, double newHood, boolean RPMOverride, int RPM ){
         AprilTagDetection detection = getDetection();
 
         double angle;
@@ -179,17 +179,37 @@ public class Gen2Hardwaremap {
         angle = getTurretEncoderHeading();
 
         if (detection != null){
-            range = detection.ftcPose.range;
-            if (range > 110){
-                targetRPM = 5000;
-                hood_pos = 0.6;
+            range = detection.ftcPose.range - 15; //Was broken -15 is an offset
+
+            if (range >= 95){
+                if (RPMOverride){
+                    targetRPM = RPM;
+                }
+                else{
+                    targetRPM = 6000;
+                }
+                if (hoodOverride){
+                    hood_pos = newHood;
+                }
+                else{
+                    hood_pos = 0.6;
+                }
             }
             else{
-                targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
-                hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+                if (RPMOverride){
+                    targetRPM = RPM;
+                }
+                else{
+                    targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));;
+                }
+                if (hoodOverride){
+                    hood_pos = newHood;
+                }
+                else{
+                    hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);;
+                }
+
             }
-
-
 
             R_shooter.setPower(setting_ShooterRPM());
             L_shooter.setPower(setting_ShooterRPM());
@@ -207,11 +227,14 @@ public class Gen2Hardwaremap {
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
     }
+    public void turret(){
+        turret(false, 0, false, 0);
+    }
 
-    public void initAprilTag(HardwareMap ahwMap, LinearOpMode opmode) {
+    public void initAprilTag(HardwareMap ahwMap) {
 
         // Create the AprilTag processor the easy way.
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+        aprilTag = new AprilTagProcessor.Builder().setLensIntrinsics(979.084, 979.084, 643.954, 374.755).build();
 
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
@@ -219,16 +242,19 @@ public class Gen2Hardwaremap {
                     .setCamera(ahwMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessors(aprilTag)
                     //.enableLiveView(true)
+                    .setCameraResolution(new Size(1280, 720))
+                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                     .build();
         } else {
             visionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
                     .addProcessors(aprilTag)
                     //.enableLiveView(true)
+                    .setCameraResolution(new Size(1280, 720))
+                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                     .build();
         }
 
-        opmode.sleep(1000);
         visionPortal.resumeStreaming();
         myExposureControl = visionPortal.getCameraControl(ExposureControl.class);
         currentExposure = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
@@ -310,7 +336,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[0] + 1750) {//Last thing to happen
+        if (currentTime.milliseconds() > timeArray[0] + 1500) {//Last thing to happen
 
             L_feeder.setPower(0);
             R_feeder.setPower(0);

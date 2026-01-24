@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
 
-//@Disabled
+@Disabled
 @Autonomous(name = "AutoRed9Close")
 public class AutoRed9Close extends OpMode {
 
