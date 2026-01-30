@@ -6,10 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.concurrent.TimeUnit;
 
 
 @TeleOp(name = "Gen2Teleop")
@@ -58,6 +55,9 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.transfer.setPower(0);
 
+        robot.L_PTO.setPosition(0.5);
+        robot.R_PTO.setPosition(0.5);
+
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
 
@@ -65,9 +65,7 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.hoodDown();
 
-
         waitForStart();
-
 
         while (opModeIsActive()) {
 
@@ -135,27 +133,62 @@ public class Gen2Teleop extends LinearOpMode {
                 robot.shoot();
             }
 
+            robot.R_shooter.setPower(robot.setting_ShooterRPM(1));
+            robot.L_shooter.setPower(robot.setting_ShooterRPM(1));
 
-
-            //                      Driver 2
-
-
-            //Bringing the hood up
+            //Increasing the P
             if(gamepad2.dpad_up && button2DU){
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.005);
+
+                robot.R_PTO.setPosition(robot.R_PTO.getPosition() + 0.05);
+                robot.L_PTO.setPosition(robot.L_PTO.getPosition() - 0.05);
+
+                //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0001);
 
                 button2DU = false;
             }
 
-            if(!gamepad2.dpad_up && !button2DU) {
+            if(!gamepad2.dpad_up && !button2DU){
 
                 button2DU = true;
+
             }
 
-            //Decreasing the RPM
+            //Decreasing the P
+            if(gamepad2.dpad_right && button2DR){
+
+                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0001);
+
+                button2DR = false;
+            }
+
+            if(!gamepad2.dpad_right && !button2DR){
+
+                button2DR = true;
+
+            }
+
+
+            //Increasing the D
+            if(gamepad2.dpad_left && button2DL){
+
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+
+                button2DL = false;
+            }
+
+            if(!gamepad2.dpad_left && !button2DL){
+
+                button2DL = true;
+
+            }
+
+            //Decreasing the D
             if(gamepad2.dpad_down && button2DD){
 
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
+                robot.R_PTO.setPosition(robot.R_PTO.getPosition() - 0.05);
+                robot.L_PTO.setPosition(robot.L_PTO.getPosition() + 0.05);
+
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
 
                 button2DD = false;
             }
@@ -165,34 +198,6 @@ public class Gen2Teleop extends LinearOpMode {
                 button2DD = true;
 
             }
-
-            //Bringing the hood down
-            if(gamepad2.dpad_right && button2DR){
-
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.000005);
-
-                button2DR = false;
-            }
-
-            if(!gamepad2.dpad_right && !button2DR){
-
-                button2DR = true;
-            }
-
-
-            //increasing RPM
-            if(gamepad2.dpad_left && button2DL){
-
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.000005);
-
-                button2DL = false;
-            }
-
-            if(!gamepad2.dpad_left && !button2DL){
-
-                button2DL = true;
-            }
-
 
 
             //calling to track the blue AprilTag
@@ -221,42 +226,26 @@ public class Gen2Teleop extends LinearOpMode {
 
 
 
+            if(robot.aprilTag.getDetections().size() > 0){
 
+                Detection = robot.aprilTag.getDetections().get(0);
 
-
-            // Race condition where getDetections() is not empty and then when it is read,
-            // becomes empty because its data updated.
-
-
-
-            Detection = robot.getDetection();
-            if(Detection != null){
-                telemetry.addData("bearing", Detection.ftcPose.bearing);
-                telemetry.addData("Range", Detection.ftcPose.range);
-            }
-            else{
-                telemetry.addData("bearing", "Tag Not Detected");
-                telemetry.addData("Range", "Tag Not Detected");
+                if(Detection != null){
+                    telemetry.addData("bearing", Detection.ftcPose.bearing);
+                }
             }
 
-            telemetry.addData("min exposure ", robot.myExposureControl.getMinExposure(TimeUnit.MILLISECONDS) );
-            telemetry.addData("max exposure ", robot.myExposureControl.getMaxExposure(TimeUnit.MILLISECONDS) );
-            telemetry.addData("current exposure ", robot.myExposureControl.getExposure(TimeUnit.MILLISECONDS) );
 
-            telemetry.addData("current shooter P ", String.valueOf(robot.PIDShooter.getP()));
-            telemetry.addData("current shooter D ", String.valueOf(robot.PIDShooter.getD()));
-
-
-            telemetry.addData("current turret P ", String.valueOf(robot.PIDTurret.getP()));
-            telemetry.addData("current turret D ", String.valueOf(robot.PIDTurret.getD()));
-
-            telemetry.addData("target RPM ", robot.targetRPM);
-            telemetry.addData("shooterRPM", robot.shooterRPM());
-            telemetry.addData("hood position ", robot.hood_pos);
+            telemetry.addData("L_PTO Pos", robot.L_PTO.getPosition());
+            telemetry.addData("R_PTO Pos", robot.R_PTO.getPosition());
+            telemetry.addData("current P", robot.PIDShooter.getP());
+            telemetry.addData("current D", robot.PIDShooter.getD());
             telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());
+            telemetry.addData("shooter Position left", robot.L_shooter.getCurrentPosition());
             telemetry.addData("real shooter power", robot.R_shooter.getPower());
             telemetry.addData("error", robot.error);
-            telemetry.addData("power", robot.setting_ShooterRPM());
+            telemetry.addData("power", robot.setting_ShooterRPM(1));
+            telemetry.addData("shooterRPM", robot.shooterRPM());
             telemetry.addData("hood", robot.hood.getPosition());
             telemetry.addData("heading", robot.hood.getPosition());
             telemetry.addData("leftOdo", robot.motorLF.getCurrentPosition());

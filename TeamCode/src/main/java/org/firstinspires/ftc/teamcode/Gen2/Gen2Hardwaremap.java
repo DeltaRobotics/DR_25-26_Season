@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
-import android.util.Size;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -17,13 +15,8 @@ import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 //@Config //We need this for Dashboard to change variables
@@ -36,13 +29,7 @@ public class Gen2Hardwaremap {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     public AprilTagProcessor aprilTag;
-    public VisionPortal visionPortal;
-    ExposureControl myExposureControl;  // declare exposure control object
-    public long currentExposure = 0;
-
-
-
-
+    private VisionPortal visionPortal;
 
     double[] timeArray = new double[20];
 
@@ -57,6 +44,7 @@ public class Gen2Hardwaremap {
     public DcMotor transfer = null;
 
     public boolean waiting = false;
+    public double shooterP = 0.001;
     public double turretP = 0.045;
 
     public Servo L_swingythingy = null;
@@ -90,21 +78,22 @@ public class Gen2Hardwaremap {
 
     public int targetRPM = 0;
 
-    public double hood_pos = 1;
+    public double hood_pose = 1;
 
     private double turretDegreeRatio = 0.003703703704;
     public DcMotor turretEncoder = null;
     public double cameraDifferenceAngle = 0 ;
+    public double turretEncoderCounts = 0;
+    public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
+
+
     PIDController PIDShooter;
-    PIDController PIDTurret;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        PIDShooter = new PIDController(0.0015,0,0.000005,0, MIN_SAMPLE_TIME * 2,0.1,1);
-
-        PIDTurret = new PIDController(0.02,0,0.0000008,0, 0.1,-1,1);
+        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0,1);
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -118,11 +107,14 @@ public class Gen2Hardwaremap {
         L_turret = ahwMap.crservo.get("L_turret");
         R_turret = ahwMap.crservo.get("R_turret");
 
-        R_shooter = ahwMap.dcMotor.get("R_shooter");
         L_shooter = ahwMap.dcMotor.get("L_shooter");
+        R_shooter = ahwMap.dcMotor.get("R_shooter");
 
         L_feeder = ahwMap.crservo.get("L_feeder");
         R_feeder = ahwMap.crservo.get("R_feeder");
+
+        L_PTO = ahwMap.servo.get("L_PTO");
+        R_PTO = ahwMap.servo.get("R_PTO");
 
         L_swingythingy = ahwMap.servo.get("L_swingythingy");
         R_swingythingy = ahwMap.servo.get("R_swingythingy");
@@ -149,6 +141,7 @@ public class Gen2Hardwaremap {
         motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
         L_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
@@ -170,96 +163,81 @@ public class Gen2Hardwaremap {
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
     }
 
-    public void turret(boolean hoodOverride, double newHood, boolean RPMOverride, int RPM ){
-        AprilTagDetection detection = getDetection();
+    public void turret(){
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        AprilTagDetection detection;
 
-        double angle;
-        double range;
+        int id;
 
-        angle = getTurretEncoderHeading();
-
-        if (detection != null){
-            range = detection.ftcPose.range - 15; //Was broken -15 is an offset
-
-            if (range >= 95){
-                if (RPMOverride){
-                    targetRPM = RPM;
-                }
-                else{
-                    targetRPM = 6000;
-                }
-                if (hoodOverride){
-                    hood_pos = newHood;
-                }
-                else{
-                    hood_pos = 0.6;
-                }
-            }
-            else{
-                if (RPMOverride){
-                    targetRPM = RPM;
-                }
-                else{
-                    targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));;
-                }
-                if (hoodOverride){
-                    hood_pos = newHood;
-                }
-                else{
-                    hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);;
-                }
-
-            }
-
-            R_shooter.setPower(setting_ShooterRPM());
-            L_shooter.setPower(setting_ShooterRPM());
-
-            hood.setPosition(hood_pos);
+        if(blue){
+            id = 20;
+        }
+        else{
+            id = 24;
         }
 
-        double turretPower = setting_Turret();
+        if(!currentDetections.isEmpty()){
+
+           detection = currentDetections.get(0);
+        }
+        else{
+            detection = null;
+        }
+
+        turretEncoderCounts = turretEncoder.getCurrentPosition();
+        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
+
+        if (detection != null && detection.id == id){
+            cameraDifferenceAngle = detection.ftcPose.bearing;
+
+            //close range for auto ranging and shooting
+            if(detection.ftcPose.y <= 40){
+                hoodDown();
+                targetRPM = 3500;
+            }
+
+            //mid range for auto ranging and shooting
+            if(detection.ftcPose.y <= 86){
+                hoodMid();
+                targetRPM = 4000;
+            }
+
+            //long range for auto ranging and shooting
+            if(detection.ftcPose.y >= 95){
+                hoodUp();
+                targetRPM = 4500;
+            }
+        }
+        else{
+            cameraDifferenceAngle = 1;
+        }
+
+        angleError = cameraDifferenceAngle;
+        double turretPower = -angleError * turretP;
 
         //safety check so the turret doesn't go past 90
-        if((angle < -180 && turretPower < 0) || (angle > 180 && turretPower > 0)){
+        if((turretAngle < -90 && turretPower < 0) || (turretAngle > 90 && turretPower > 0)){
             turretPower = 0;
         }
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
-    }
-    public void turret(){
-        turret(false, 0, false, 0);
+
     }
 
     public void initAprilTag(HardwareMap ahwMap) {
 
         // Create the AprilTag processor the easy way.
-        aprilTag = new AprilTagProcessor.Builder().setLensIntrinsics(979.084, 979.084, 643.954, 374.755).build();
+        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(ahwMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessors(aprilTag)
-                    //.enableLiveView(true)
-                    .setCameraResolution(new Size(1280, 720))
-                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                    .build();
+            visionPortal = VisionPortal.easyCreateWithDefaults(
+                    ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
         } else {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessors(aprilTag)
-                    //.enableLiveView(true)
-                    .setCameraResolution(new Size(1280, 720))
-                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                    .build();
+            visionPortal = VisionPortal.easyCreateWithDefaults(
+                    BuiltinCameraDirection.BACK, aprilTag);
         }
-
-        visionPortal.resumeStreaming();
-        myExposureControl = visionPortal.getCameraControl(ExposureControl.class);
-        currentExposure = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
-        myExposureControl.setMode(ExposureControl.Mode.Manual);
-        myExposureControl.setExposure(2, TimeUnit.MILLISECONDS);
 
     }   // end method initAprilTag()
 
@@ -280,6 +258,19 @@ public class Gen2Hardwaremap {
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }   // end for() loop
+    }
+
+    public boolean boolTimer (double time){
+        return currentTime.milliseconds() > time;
+    }
+
+    public double timerInit(int t){
+
+        double ti = currentTime.milliseconds() + t;
+        //timerInitted = true;
+
+        return ti;
+
     }
 
     public void intake (){
@@ -336,7 +327,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[0] + 1500) {//Last thing to happen
+        if (currentTime.milliseconds() > timeArray[0] + 1750) {//Last thing to happen
 
             L_feeder.setPower(0);
             R_feeder.setPower(0);
@@ -361,16 +352,60 @@ public class Gen2Hardwaremap {
 
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
+
+            hood.setPosition(hood_pose);
+
+            R_shooter.setPower(setting_ShooterRPM());
+            L_shooter.setPower(setting_ShooterRPM());
+        }
+    }
+
+    public void autoShoot(){
+
+        if(!timerInitted[7]) {//very very first thing to happen
+            timeArray[7] = currentTime.milliseconds();
+            timerInitted[7] = true;
+        }
+
+        if (currentTime.milliseconds() > timeArray[7] + 2000) {//Last thing to happen
+
+            timerInitted[7] = false;
+        }
+
+        else if (currentTime.milliseconds() > timeArray[7] + 500) {
+
+            L_feeder.setPower(1);
+            R_feeder.setPower(-1);
+
+            transfer.setPower(1);
+        }
+
+        else {//Second thing to happen
+
+            transfer.setPower(0);
+            intake.setPower(-1);
+
+            L_swingythingy.setPosition(L_swingy_Thingy_Close);
+            R_swingythingy.setPosition(R_swingy_Thingy_Close);
+
+            hood.setPosition(hood_pose);
+
+            targetRPM = 3500;
         }
     }
 
     public void hoodUp(){
-        hood_pos = .65;
-        hood.setPosition(hood_pos);
+        hood_pose = .6;
+        hood.setPosition(hood_pose);
+    }
+
+    public void hoodMid(){
+        hood_pose = .85;
+        hood.setPosition(hood_pose);
     }
 
     public void hoodDown(){
-        hood_pos = 1;
+        hood_pose = 1;
         hood.setPosition(1);
     }
 
@@ -402,69 +437,20 @@ public class Gen2Hardwaremap {
 
         PIDShooter.setSetPoint(targetRPM);
 
+        if(shooterRPM() > 3500){
+            return PIDShooter.Update(3500);
+
+        }
+
+
         return PIDShooter.Update(shooterRPM());
     }
 
-    public double getTurretEncoderHeading(){
+    public double setting_ShooterRPM(int con){
 
-        double turretEncoderCounts = 0;
-        double turretAngle = 0;
+        PIDShooter.setSetPoint(targetRPM);
 
-        turretEncoderCounts = turretEncoder.getCurrentPosition();
-        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
-
-        return turretAngle;
-    }
-
-    public AprilTagDetection getDetection(){
-
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        AprilTagDetection detection = null;
-
-        int id;
-
-        if(blue){
-            id = 20;
-        }
-        else{
-            id = 24;
-        }
-
-
-        if(!currentDetections.isEmpty()){
-
-            for(int i = 0; i < currentDetections.size(); i ++){
-
-                detection = currentDetections.get(i);
-
-                if (detection != null && detection.id != id){
-
-                    detection = null;
-                }
-                else{
-
-                    return detection;
-                }
-            }
-        }
-
-        return detection;
-    }
-
-    public double setting_Turret(){
-
-        AprilTagDetection detection = getDetection();
-
-        PIDTurret.setSetPoint(0);
-
-        if(detection == null){
-            return PIDTurret.Update(getTurretEncoderHeading());
-        }
-        else{
-            return PIDTurret.Update(detection.ftcPose.bearing);
-
-        }
-
+        return PIDShooter.Update(shooterRPM());
     }
 
 }

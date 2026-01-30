@@ -121,6 +121,9 @@ class Red9Close extends OpMode {
         switch (pathState) {
             case 0:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     robot.intake.setPower(1);
@@ -137,6 +140,9 @@ class Red9Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
+                    telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                    telemetry.update();
+
                     robot.hoodDown();
 
                     if(!robot.timerInitted[4]) {//very very first thing to happen
@@ -150,16 +156,21 @@ class Red9Close extends OpMode {
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
@@ -168,6 +179,9 @@ class Red9Close extends OpMode {
                 }
                 break;
             case 2:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -178,6 +192,9 @@ class Red9Close extends OpMode {
                 break;
             case 3:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     follower.followPath(firstPickupPath, true);
@@ -185,6 +202,9 @@ class Red9Close extends OpMode {
                 }
                 break;
             case 4:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -194,9 +214,15 @@ class Red9Close extends OpMode {
                 break;
             case 5:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
+
+                    telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                    telemetry.update();
 
                     if(!robot.timerInitted[5]) {//very very first thing to happen
                         robot.timeArray[5] = robot.currentTime.milliseconds();
@@ -209,16 +235,21 @@ class Red9Close extends OpMode {
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
@@ -229,6 +260,9 @@ class Red9Close extends OpMode {
                 break;
             case 6:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     robot.intake();
                     follower.followPath(secondLineupPath, true);
@@ -237,12 +271,18 @@ class Red9Close extends OpMode {
                 break;
             case 7:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     follower.followPath(secondPickupPath, true);
                     setPathState(8);
                 }
                 break;
             case 8:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -252,12 +292,18 @@ class Red9Close extends OpMode {
                 break;
             case 9:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     follower.followPath(shootSecondLineupPath, true);
                     setPathState(10);
                 }
                 break;
             case 10:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
                     robot.hoodDown();
@@ -273,16 +319,23 @@ class Red9Close extends OpMode {
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
-
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
 
                     }
@@ -313,7 +366,16 @@ class Red9Close extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 3500);
+        //robot.turret(true, 1, true, 3500);
+        double maxSpeedForThis = 0.75;
+
+        if(robot.setting_ShooterRPM() > maxSpeedForThis){
+            robot.R_shooter.setPower(maxSpeedForThis);
+            robot.L_shooter.setPower(maxSpeedForThis);
+        } else {
+            robot.R_shooter.setPower(robot.setting_ShooterRPM());
+            robot.L_shooter.setPower(robot.setting_ShooterRPM());
+        }
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -608,7 +670,7 @@ class Red9Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 6000);
+        //robot.turret(true, 1, true, 6000);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -839,7 +901,7 @@ class Red6Close extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 3500);
+        //robot.turret(true, 1, true, 3500);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -1002,7 +1064,7 @@ class Red6Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 6000);
+        //robot.turret(true, 1, true, 6000);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -1102,6 +1164,9 @@ class Blue9Close extends OpMode {
         switch (pathState) {
             case 0:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     robot.intake.setPower(1);
@@ -1118,29 +1183,37 @@ class Blue9Close extends OpMode {
 
                 if(!follower.isBusy()) {
 
+                    telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                    telemetry.update();
+
                     robot.hoodDown();
 
-                    if(!robot.timerInitted[8]) {//very very first thing to happen
-                        robot.timeArray[8] = robot.currentTime.milliseconds();
-                        robot.timerInitted[8] = true;
+                    if(!robot.timerInitted[4]) {//very very first thing to happen
+                        robot.timeArray[4] = robot.currentTime.milliseconds();
+                        robot.timerInitted[4] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6100) {//Last thing to happen
+                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6100) {//Last thing to happen
                         setPathState(2);
-                        robot.timerInitted[8] = false;
+                        robot.timerInitted[4] = false;
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
@@ -1149,6 +1222,9 @@ class Blue9Close extends OpMode {
                 }
                 break;
             case 2:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -1159,6 +1235,9 @@ class Blue9Close extends OpMode {
                 break;
             case 3:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     follower.followPath(firstPickupPath, true);
@@ -1166,6 +1245,9 @@ class Blue9Close extends OpMode {
                 }
                 break;
             case 4:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -1175,31 +1257,42 @@ class Blue9Close extends OpMode {
                 break;
             case 5:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
 
-                    if(!robot.timerInitted[9]) {//very very first thing to happen
-                        robot.timeArray[9] = robot.currentTime.milliseconds();
-                        robot.timerInitted[9] = true;
+                    telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                    telemetry.update();
+
+                    if(!robot.timerInitted[5]) {//very very first thing to happen
+                        robot.timeArray[5] = robot.currentTime.milliseconds();
+                        robot.timerInitted[5] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5100) {//Last thing to happen
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5100) {//Last thing to happen
                         setPathState(6);
-                        robot.timerInitted[9] = false;
+                        robot.timerInitted[5] = false;
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
@@ -1210,6 +1303,9 @@ class Blue9Close extends OpMode {
                 break;
             case 6:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     robot.intake();
                     follower.followPath(secondLineupPath, true);
@@ -1218,12 +1314,18 @@ class Blue9Close extends OpMode {
                 break;
             case 7:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     follower.followPath(secondPickupPath, true);
                     setPathState(8);
                 }
                 break;
             case 8:
+
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
 
                 if(!follower.isBusy()) {
 
@@ -1233,6 +1335,9 @@ class Blue9Close extends OpMode {
                 break;
             case 9:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     follower.followPath(shootSecondLineupPath, true);
                     setPathState(10);
@@ -1240,30 +1345,40 @@ class Blue9Close extends OpMode {
                 break;
             case 10:
 
+                telemetry.addData("motor RPM", robot.setting_ShooterRPM());
+                telemetry.update();
+
                 if(!follower.isBusy()) {
                     robot.hoodDown();
 
-                    if(!robot.timerInitted[10]) {//very very first thing to happen
-                        robot.timeArray[10] = robot.currentTime.milliseconds();
-                        robot.timerInitted[10] = true;
+                    if(!robot.timerInitted[6]) {//very very first thing to happen
+                        robot.timeArray[6] = robot.currentTime.milliseconds();
+                        robot.timerInitted[6] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5100) {//Last thing to happen
+                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5100) {//Last thing to happen
                         setPathState(-1);
-                        robot.timerInitted[10] = false;
+                        robot.timerInitted[6] = false;
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5000) {//Last thing to happen
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 2500) {
-
+                    else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
                     }
 
                     else {//Second thing to happen
+                        robot.targetRPM = 3500;
+                        robot.R_shooter.setPower(robot.setting_ShooterRPM());
+                        robot.L_shooter.setPower(robot.setting_ShooterRPM());
                         robot.shoot();
 
                     }
@@ -1295,10 +1410,19 @@ class Blue9Close extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 3500);
+        //robot.turret(true, 1, true, 3500);
 
-        robot.R_shooter.setPower(robot.setting_ShooterRPM());
-        robot.L_shooter.setPower(robot.setting_ShooterRPM());
+        robot.targetRPM = 3500;
+
+        double maxSpeedForThis = 0.75;
+
+        if(robot.setting_ShooterRPM() > maxSpeedForThis){
+            robot.R_shooter.setPower(maxSpeedForThis);
+            robot.L_shooter.setPower(maxSpeedForThis);
+        } else {
+            robot.R_shooter.setPower(robot.setting_ShooterRPM());
+            robot.L_shooter.setPower(robot.setting_ShooterRPM());
+        }
 
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
@@ -1573,7 +1697,7 @@ class Blue9Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 6000);
+        //robot.turret(true, 1, true, 6000);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -1799,7 +1923,7 @@ class Blue6Close extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 3500);
+        //robot.turret(true, 1, true, 3500);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -2020,7 +2144,7 @@ class Blue6Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 6000);
+        //robot.turret(true, 1, true, 6000);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());

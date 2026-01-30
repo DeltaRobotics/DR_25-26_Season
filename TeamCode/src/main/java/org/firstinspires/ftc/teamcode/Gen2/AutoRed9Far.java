@@ -265,7 +265,9 @@ public class AutoRed9Far extends OpMode {
         follower.update();
         autonomousPathUpdate();
 
-        robot.turret(true, 1, true, 6000);
+        //robot.turret(true, 1, true, 6000);
+
+        robot.targetRPM = 6000;
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
