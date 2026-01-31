@@ -15,6 +15,11 @@ import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
@@ -76,6 +81,12 @@ public class Gen2Hardwaremap {
     public final double L_swingy_Thingy_Close = 0.15;
     public final double R_swingy_Thingy_Close = 0.85;
 
+    public final double L_PTO_DOWN = 0.5;
+    public final double R_PTO_DOWN = 0.5;
+
+    public final double L_PTO_UP = 0.2;
+    public final double R_PTO_UP = 0.8;
+
     public int targetRPM = 0;
 
     public double hood_pose = 1;
@@ -88,10 +99,16 @@ public class Gen2Hardwaremap {
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
 
-
+    public Limelight3A limelight;
     PIDController PIDShooter;
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+
+        limelight.pipelineSwitch(0);
+
+        limelight.start();
 
         PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0,1);
 
@@ -164,9 +181,43 @@ public class Gen2Hardwaremap {
     }
 
     public void turret(){
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        AprilTagDetection detection;
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            // Access general information
+            Pose3D botpose = result.getBotpose();
 
+            telemetry.addData("tx", result.getTx());
+            telemetry.addData("txnc", result.getTxNC());
+            telemetry.addData("ty", result.getTy());
+            telemetry.addData("tync", result.getTyNC());
+
+            telemetry.addData("Botpose", botpose.toString());
+
+            // Access classifier results
+            List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
+            for (LLResultTypes.ClassifierResult cr : classifierResults) {
+                telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
+            }
+
+            // Access fiducial results
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+            }
+
+            // Access color results
+            List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+            for (LLResultTypes.ColorResult cr : colorResults) {
+                telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
+            }
+        }
+        else {
+            telemetry.addData("Limelight", "No data available");
+        }
+        telemetry.update();
+
+
+        /**
         int id;
 
         if(blue){
@@ -187,7 +238,9 @@ public class Gen2Hardwaremap {
         turretEncoderCounts = turretEncoder.getCurrentPosition();
         turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
-        if (detection != null && detection.id == id){
+
+
+        if (fr.getFiducialId() == id){
             cameraDifferenceAngle = detection.ftcPose.bearing;
 
             //close range for auto ranging and shooting
@@ -211,6 +264,7 @@ public class Gen2Hardwaremap {
         else{
             cameraDifferenceAngle = 1;
         }
+         **/
 
         angleError = cameraDifferenceAngle;
         double turretPower = -angleError * turretP;
@@ -220,6 +274,7 @@ public class Gen2Hardwaremap {
             turretPower = 0;
         }
 
+
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
 
@@ -228,16 +283,16 @@ public class Gen2Hardwaremap {
     public void initAprilTag(HardwareMap ahwMap) {
 
         // Create the AprilTag processor the easy way.
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+        //aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
         // Create the vision portal the easy way.
-        if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
-        } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    BuiltinCameraDirection.BACK, aprilTag);
-        }
+        //if (USE_WEBCAM) {
+        //    visionPortal = VisionPortal.easyCreateWithDefaults(
+        //            ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+        //} else {
+        //    visionPortal = VisionPortal.easyCreateWithDefaults(
+        //            BuiltinCameraDirection.BACK, aprilTag);
+        //}
 
     }   // end method initAprilTag()
 

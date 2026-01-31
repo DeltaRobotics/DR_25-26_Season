@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
 //two face teleop
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
@@ -39,12 +44,11 @@ public class Gen2Teleop extends LinearOpMode {
     public boolean button2DU = true;
     public boolean button2DD = true;
 
+    public boolean lifting = false;
+
     public AprilTagDetection Detection = null;
 
-    double time = 0;
-    public boolean timerInitted = false;
 
-    ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -55,8 +59,8 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.transfer.setPower(0);
 
-        robot.L_PTO.setPosition(0.5);
-        robot.R_PTO.setPosition(0.5);
+        robot.L_PTO.setPosition(robot.L_PTO_UP);
+        robot.R_PTO.setPosition(robot.R_PTO_UP);
 
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
@@ -69,7 +73,10 @@ public class Gen2Teleop extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
+            if(!lifting) {
+                robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
+            }
+
             robot.turret();
 
             if(gamepad1.left_bumper && buttonLB){
@@ -87,8 +94,6 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad1.left_trigger > 0.5 && buttonLT ){
 
                 robot.outTake();
-
-                telemetry.addData("transfer", robot.transfer.getPower());
 
                 buttonLT = false;
             }
@@ -116,8 +121,6 @@ public class Gen2Teleop extends LinearOpMode {
 
                 robot.shoot();
 
-                telemetry.addData("transfer", robot.transfer.getPower());
-
                 buttonRB = false;
 
             }
@@ -136,69 +139,67 @@ public class Gen2Teleop extends LinearOpMode {
             robot.R_shooter.setPower(robot.setting_ShooterRPM(1));
             robot.L_shooter.setPower(robot.setting_ShooterRPM(1));
 
-            //Increasing the P
-            if(gamepad2.dpad_up && button2DU){
 
-                robot.R_PTO.setPosition(robot.R_PTO.getPosition() + 0.05);
-                robot.L_PTO.setPosition(robot.L_PTO.getPosition() - 0.05);
+            /**
+             *
+             *
+             *                  DRIVER 2
+             *
+             *
+             */
 
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0001);
 
-                button2DU = false;
+            //shooting for driver 2
+            if(gamepad2.right_trigger > 0.5 && button2RT){
+
+                robot.shoot();
+                button2RT = false;
             }
 
-            if(!gamepad2.dpad_up && !button2DU){
+            if(gamepad2.right_trigger < 0.5 && !button2RT){
+
+                button2RT = true;
+            }
+
+            //Lifting
+            if(gamepad2.start && gamepad2.dpad_up && button2DU){
+
+                lifting = true;
+
+                if(!robot.timerInitted[15]) {//very very first thing to happen
+                    robot.timeArray[15] = robot.currentTime.milliseconds();
+                    robot.timerInitted[15] = true;
+                }
+
+                if (robot.currentTime.milliseconds() > robot.timeArray[15] + 350) {//Last thing to happen
+
+                    button2DU = false;
+                }
+
+                else if (robot.currentTime.milliseconds() > robot.timeArray[15] + 250) {
+
+                    robot.motorRF.setPower(-0.25);
+                    robot.motorLF.setPower(-0.25);
+                    robot.motorRB.setPower(-0.25);
+                    robot.motorLB.setPower(-0.25);
+
+                }
+
+                else {//Second thing to happen
+
+                    robot.L_PTO.setPosition(robot.L_PTO_DOWN);
+                    robot.R_PTO.setPosition(robot.R_PTO_DOWN);
+                }
+            }
+
+            if(lifting){
+                robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
+            }
+
+            if(!gamepad2.start && !gamepad2.dpad_up && !button2DU){
 
                 button2DU = true;
-
             }
-
-            //Decreasing the P
-            if(gamepad2.dpad_right && button2DR){
-
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0001);
-
-                button2DR = false;
-            }
-
-            if(!gamepad2.dpad_right && !button2DR){
-
-                button2DR = true;
-
-            }
-
-
-            //Increasing the D
-            if(gamepad2.dpad_left && button2DL){
-
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
-
-                button2DL = false;
-            }
-
-            if(!gamepad2.dpad_left && !button2DL){
-
-                button2DL = true;
-
-            }
-
-            //Decreasing the D
-            if(gamepad2.dpad_down && button2DD){
-
-                robot.R_PTO.setPosition(robot.R_PTO.getPosition() - 0.05);
-                robot.L_PTO.setPosition(robot.L_PTO.getPosition() + 0.05);
-
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
-
-                button2DD = false;
-            }
-
-            if(!gamepad2.dpad_down && !button2DD){
-
-                button2DD = true;
-
-            }
-
 
             //calling to track the blue AprilTag
             if(gamepad2.x && button2X){
@@ -226,34 +227,31 @@ public class Gen2Teleop extends LinearOpMode {
 
 
 
-            if(robot.aprilTag.getDetections().size() > 0){
+            //if(robot.aprilTag.getDetections().size() > 0){
 
-                Detection = robot.aprilTag.getDetections().get(0);
+            //    Detection = robot.aprilTag.getDetections().get(0);
 
-                if(Detection != null){
-                    telemetry.addData("bearing", Detection.ftcPose.bearing);
-                }
-            }
+            //    if(Detection != null){
+            //        telemetry.addData("bearing", Detection.ftcPose.bearing);
+            //    }
+            //}
 
 
-            telemetry.addData("L_PTO Pos", robot.L_PTO.getPosition());
-            telemetry.addData("R_PTO Pos", robot.R_PTO.getPosition());
-            telemetry.addData("current P", robot.PIDShooter.getP());
-            telemetry.addData("current D", robot.PIDShooter.getD());
-            telemetry.addData("shooter Position right", robot.R_shooter.getCurrentPosition());
-            telemetry.addData("shooter Position left", robot.L_shooter.getCurrentPosition());
-            telemetry.addData("real shooter power", robot.R_shooter.getPower());
-            telemetry.addData("error", robot.error);
-            telemetry.addData("power", robot.setting_ShooterRPM(1));
-            telemetry.addData("shooterRPM", robot.shooterRPM());
-            telemetry.addData("hood", robot.hood.getPosition());
-            telemetry.addData("heading", robot.hood.getPosition());
-            telemetry.addData("leftOdo", robot.motorLF.getCurrentPosition());
-            telemetry.addData("rightOdo", robot.motorRB.getCurrentPosition());
-            telemetry.addData("strafeOdo", robot.motorLB.getCurrentPosition());
+            telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
+            telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());
+
+            telemetry.addData("shooter Position right ", robot.R_shooter.getCurrentPosition());
+            telemetry.addData("shooterRPM ", robot.shooterRPM());
+            telemetry.addData("power ", robot.setting_ShooterRPM(1));
+            telemetry.addData("real shooter power ", robot.R_shooter.getPower());
+
+            telemetry.addData("error ", robot.error);
+
+            telemetry.addData("hood ", robot.hood.getPosition());
             telemetry.update();
 
         }
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //robot.limelight.stop();
     }
 }
