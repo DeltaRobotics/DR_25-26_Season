@@ -77,7 +77,7 @@ public class Gen2Teleop extends LinearOpMode {
                 robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
             }
 
-            robot.turret();
+            robot.turret(telemetry);
 
             if(gamepad1.left_bumper && buttonLB){
 
@@ -182,7 +182,6 @@ public class Gen2Teleop extends LinearOpMode {
                     robot.motorLF.setPower(-0.25);
                     robot.motorRB.setPower(-0.25);
                     robot.motorLB.setPower(-0.25);
-
                 }
 
                 else {//Second thing to happen
@@ -191,14 +190,13 @@ public class Gen2Teleop extends LinearOpMode {
                     robot.R_PTO.setPosition(robot.R_PTO_DOWN);
                 }
             }
-
-            if(lifting){
-                robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
-            }
-
             if(!gamepad2.start && !gamepad2.dpad_up && !button2DU){
 
                 button2DU = true;
+            }
+
+            if(lifting){
+                robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
             }
 
             //calling to track the blue AprilTag
@@ -242,6 +240,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("shooter Position right ", robot.R_shooter.getCurrentPosition());
             telemetry.addData("shooterRPM ", robot.shooterRPM());
+            telemetry.addData("targetRPM ", robot.targetRPM);
             telemetry.addData("power ", robot.setting_ShooterRPM(1));
             telemetry.addData("real shooter power ", robot.R_shooter.getPower());
 

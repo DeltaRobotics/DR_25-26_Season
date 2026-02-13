@@ -16,13 +16,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(14.1)
+            .mass(15.92109)
             .forwardZeroPowerAcceleration(-45.33265128583838)
             .lateralZeroPowerAcceleration(-90.34636138484028)
             .centripetalScaling(0.0005)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.5, 0, .05, 0))
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.005, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.0045,0.001,0.0008,0.6,0));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.0045,0.0023,0.0017,0.6,0));
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()

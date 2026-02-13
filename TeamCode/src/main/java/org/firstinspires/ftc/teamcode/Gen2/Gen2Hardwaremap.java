@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Random.PIDController;
@@ -32,7 +34,7 @@ public class Gen2Hardwaremap {
 
     public ElapsedTime currentTime = new ElapsedTime();
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+    private final static int LED_PERIOD = 10;
     public AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
@@ -85,7 +87,7 @@ public class Gen2Hardwaremap {
     public final double R_PTO_DOWN = 0.5;
 
     public final double L_PTO_UP = 0.2;
-    public final double R_PTO_UP = 0.8;
+    public final double R_PTO_UP = 0.6;
 
     public int targetRPM = 0;
 
@@ -104,15 +106,14 @@ public class Gen2Hardwaremap {
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight = ahwMap.get(Limelight3A.class, "limelight");
 
         limelight.pipelineSwitch(0);
 
         limelight.start();
 
-        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0,1);
+        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0.1,1);
 
-        //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
         motorRB = ahwMap.dcMotor.get("motorRB");
@@ -180,7 +181,7 @@ public class Gen2Hardwaremap {
         motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
     }
 
-    public void turret(){
+    public void turret(Telemetry telemetry){
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             // Access general information
@@ -217,7 +218,7 @@ public class Gen2Hardwaremap {
         telemetry.update();
 
 
-        /**
+
         int id;
 
         if(blue){
@@ -227,44 +228,26 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
-        if(!currentDetections.isEmpty()){
+        //if (range > 110){
+        //    targetRPM = 5000;
+        //    hood_pos = 0.6;
+        //}
+        //else{
+        //    targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
+        //    hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+        //}
 
-           detection = currentDetections.get(0);
-        }
-        else{
-            detection = null;
-        }
+
+        //targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
+        //hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
         turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
 
 
-        if (fr.getFiducialId() == id){
-            cameraDifferenceAngle = detection.ftcPose.bearing;
 
-            //close range for auto ranging and shooting
-            if(detection.ftcPose.y <= 40){
-                hoodDown();
-                targetRPM = 3500;
-            }
-
-            //mid range for auto ranging and shooting
-            if(detection.ftcPose.y <= 86){
-                hoodMid();
-                targetRPM = 4000;
-            }
-
-            //long range for auto ranging and shooting
-            if(detection.ftcPose.y >= 95){
-                hoodUp();
-                targetRPM = 4500;
-            }
-        }
-        else{
-            cameraDifferenceAngle = 1;
-        }
-         **/
 
         angleError = cameraDifferenceAngle;
         double turretPower = -angleError * turretP;
@@ -273,7 +256,6 @@ public class Gen2Hardwaremap {
         if((turretAngle < -90 && turretPower < 0) || (turretAngle > 90 && turretPower > 0)){
             turretPower = 0;
         }
-
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
@@ -415,40 +397,6 @@ public class Gen2Hardwaremap {
         }
     }
 
-    public void autoShoot(){
-
-        if(!timerInitted[7]) {//very very first thing to happen
-            timeArray[7] = currentTime.milliseconds();
-            timerInitted[7] = true;
-        }
-
-        if (currentTime.milliseconds() > timeArray[7] + 2000) {//Last thing to happen
-
-            timerInitted[7] = false;
-        }
-
-        else if (currentTime.milliseconds() > timeArray[7] + 500) {
-
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-
-            transfer.setPower(1);
-        }
-
-        else {//Second thing to happen
-
-            transfer.setPower(0);
-            intake.setPower(-1);
-
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-
-            hood.setPosition(hood_pose);
-
-            targetRPM = 3500;
-        }
-    }
-
     public void hoodUp(){
         hood_pose = .6;
         hood.setPosition(hood_pose);
@@ -491,12 +439,6 @@ public class Gen2Hardwaremap {
     public double setting_ShooterRPM(){
 
         PIDShooter.setSetPoint(targetRPM);
-
-        if(shooterRPM() > 3500){
-            return PIDShooter.Update(3500);
-
-        }
-
 
         return PIDShooter.Update(shooterRPM());
     }
