@@ -91,11 +91,10 @@ public class Gen2Hardwaremap {
 
     public int targetRPM = 0;
 
-    public double hood_pose = 1;
+    public double hood_pos = 1;
 
     private double turretDegreeRatio = 0.003703703704;
     public DcMotor turretEncoder = null;
-    public double cameraDifferenceAngle = 0 ;
     public double turretEncoderCounts = 0;
     public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
@@ -182,41 +181,29 @@ public class Gen2Hardwaremap {
     }
 
     public void turret(Telemetry telemetry){
+
         LLResult result = limelight.getLatestResult();
-        if (result.isValid()) {
-            // Access general information
-            Pose3D botpose = result.getBotpose();
+        double ty = result.getTy();
+        double targetOffsetAngle_Vertical = ty;
 
-            telemetry.addData("tx", result.getTx());
-            telemetry.addData("txnc", result.getTxNC());
-            telemetry.addData("ty", result.getTy());
-            telemetry.addData("tync", result.getTyNC());
+        // how many degrees back is your limelight rotated from perfectly vertical?
+        double limelightMountAngleDegrees = 12.56021; //10.262226
 
-            telemetry.addData("Botpose", botpose.toString());
+        // distance from the center of the Limelight lens to the floor
+        double limelightLensHeightInches = 16.0;
 
-            // Access classifier results
-            List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
-            for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
-            }
+        // distance from the target to the floor
+        double goalHeightInches = 29.5;
 
-            // Access fiducial results
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
-            }
+        double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
-            // Access color results
-            List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-            for (LLResultTypes.ColorResult cr : colorResults) {
-                telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
-            }
-        }
-        else {
-            telemetry.addData("Limelight", "No data available");
-        }
-        telemetry.update();
+        //calculate distance
+        double range = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
 
+
+        //telemetry.addData("range", range);
+        //telemetry.update();
 
 
         int id;
@@ -227,29 +214,23 @@ public class Gen2Hardwaremap {
         else{
             id = 24;
         }
-
-        //if (range > 110){
-        //    targetRPM = 5000;
-        //    hood_pos = 0.6;
-        //}
-        //else{
-        //    targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
-        //    hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
-        //}
-
-
-        //targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
-        //hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
-
+/**
+        if (range > 110){
+            targetRPM = 5000;
+            hood_pos = 0.6;
+        }
+        else{
+            targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
+            hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+        }
+ **/
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
         turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
 
 
-
-
-        angleError = cameraDifferenceAngle;
+        angleError = result.getTx();
         double turretPower = -angleError * turretP;
 
         //safety check so the turret doesn't go past 90
@@ -257,8 +238,8 @@ public class Gen2Hardwaremap {
             turretPower = 0;
         }
 
-        R_turret.setPower(turretPower);
-        L_turret.setPower(turretPower);
+        //R_turret.setPower(turretPower);
+        //L_turret.setPower(turretPower);
 
     }
 
@@ -364,7 +345,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = true;
         }
 
-        if (currentTime.milliseconds() > timeArray[0] + 1750) {//Last thing to happen
+        if (currentTime.milliseconds() > timeArray[0] + 500) {//Last thing to happen
 
             L_feeder.setPower(0);
             R_feeder.setPower(0);
@@ -374,7 +355,7 @@ public class Gen2Hardwaremap {
             timerInitted[0] = false;
         }
 
-        else if (currentTime.milliseconds() > timeArray[0] + 500) {
+        else if (currentTime.milliseconds() > timeArray[0] + 250) {
 
             L_feeder.setPower(1);
             R_feeder.setPower(-1);
@@ -390,25 +371,41 @@ public class Gen2Hardwaremap {
             L_swingythingy.setPosition(L_swingy_Thingy_Close);
             R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-            hood.setPosition(hood_pose);
+            hood.setPosition(hood_pos);
 
             R_shooter.setPower(setting_ShooterRPM());
             L_shooter.setPower(setting_ShooterRPM());
         }
     }
 
+    public void teleOpShoot(){
+
+        transfer.setPower(0);
+        intake.setPower(-.75);
+
+        L_swingythingy.setPosition(L_swingy_Thingy_Close);
+        R_swingythingy.setPosition(R_swingy_Thingy_Close);
+
+        hood.setPosition(hood_pos);
+
+        R_shooter.setPower(setting_ShooterRPM());
+        L_shooter.setPower(setting_ShooterRPM());
+
+
+    }
+
     public void hoodUp(){
-        hood_pose = .6;
-        hood.setPosition(hood_pose);
+        hood_pos = .6;
+        hood.setPosition(hood_pos);
     }
 
     public void hoodMid(){
-        hood_pose = .85;
-        hood.setPosition(hood_pose);
+        hood_pos = .85;
+        hood.setPosition(hood_pos);
     }
 
     public void hoodDown(){
-        hood_pose = 1;
+        hood_pos = 1;
         hood.setPosition(1);
     }
 

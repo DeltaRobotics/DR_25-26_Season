@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 //two face teleop
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 
 @TeleOp(name = "Gen2Teleop")
@@ -65,6 +68,9 @@ public class Gen2Teleop extends LinearOpMode {
         robot.R_feeder.setPower(0);
         robot.L_feeder.setPower(0);
 
+        robot.R_turret.setPower(0);
+        robot.L_turret.setPower(0);
+
         robot.initAprilTag(hardwareMap);
 
         robot.hoodDown();
@@ -117,27 +123,88 @@ public class Gen2Teleop extends LinearOpMode {
 
             }
 
-            if(gamepad1.right_bumper){
+            if(gamepad1.right_bumper && buttonRB){
 
-                robot.shoot();
+                robot.teleOpShoot();
 
-                buttonRB = false;
+                robot.transfer.setPower(1);
 
+                robot.L_feeder.setPower(1);
+                robot.R_feeder.setPower(-1);
+
+                //buttonRB = false;
             }
 
-            if(!gamepad1.right_bumper && !buttonRB){
+            //if(!gamepad1.right_bumper && !buttonRB){
+                //buttonRB = true;
 
-                buttonRB = true;
-
-            }
+            //}
 
             if(robot.timerInitted[0]){
 
                 robot.shoot();
             }
 
-            robot.R_shooter.setPower(robot.setting_ShooterRPM(1));
-            robot.L_shooter.setPower(robot.setting_ShooterRPM(1));
+            //robot.R_shooter.setPower(robot.setting_ShooterRPM(1));
+            //robot.L_shooter.setPower(robot.setting_ShooterRPM(1));
+
+            if(gamepad1.dpad_up && buttonDU){
+
+                robot.targetRPM = robot.targetRPM + 100;
+
+                robot.R_shooter.setPower(robot.targetRPM);
+                robot.L_shooter.setPower(robot.targetRPM);
+
+                buttonDU = false;
+
+            }
+
+            if(!gamepad1.dpad_up && !buttonDU){
+                buttonDU = true;
+            }
+
+            if(gamepad1.dpad_down && buttonDD){
+
+                robot.targetRPM = robot.targetRPM - 100;
+
+                robot.R_shooter.setPower(robot.targetRPM);
+                robot.L_shooter.setPower(robot.targetRPM);
+
+                buttonDD = false;
+            }
+
+            if(!gamepad1.dpad_down && !buttonDD){
+                buttonDD = true;
+            }
+
+            if(gamepad1.dpad_left && buttonDL){
+
+                robot.hood_pos = robot.hood_pos - 0.05;
+
+                robot.hood.setPosition(robot.hood_pos);
+
+                buttonDL = false;
+            }
+
+            if(!gamepad1.dpad_left && !buttonDL){
+                buttonDL = true;
+            }
+
+            if(gamepad1.dpad_right && buttonDR){
+
+                robot.hood_pos = robot.hood_pos + 0.05;
+
+                robot.hood.setPosition(robot.hood_pos);
+
+                buttonDR = false;
+
+            }
+
+            if(!gamepad1.dpad_right && !buttonDR){
+                buttonDR = true;
+            }
+
+
 
 
             /**
@@ -148,6 +215,9 @@ public class Gen2Teleop extends LinearOpMode {
              *
              */
 
+            if(lifting){
+                robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
+            }
 
             //shooting for driver 2
             if(gamepad2.right_trigger > 0.5 && button2RT){
@@ -195,10 +265,6 @@ public class Gen2Teleop extends LinearOpMode {
                 button2DU = true;
             }
 
-            if(lifting){
-                robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
-            }
-
             //calling to track the blue AprilTag
             if(gamepad2.x && button2X){
                 robot.blue = true;
@@ -223,8 +289,6 @@ public class Gen2Teleop extends LinearOpMode {
                 button2B = true;
             }
 
-
-
             //if(robot.aprilTag.getDetections().size() > 0){
 
             //    Detection = robot.aprilTag.getDetections().get(0);
@@ -233,18 +297,50 @@ public class Gen2Teleop extends LinearOpMode {
             //        telemetry.addData("bearing", Detection.ftcPose.bearing);
             //    }
             //}
+            LLResult result = robot.limelight.getLatestResult();
+            //if (result.isValid()) {
+            // Access general information
+            Pose3D botpose = result.getBotpose();
 
+            telemetry.addData("tx", result.getTx());
+            telemetry.addData("txnc", result.getTxNC());
+            telemetry.addData("ty", result.getTy());
+            telemetry.addData("tync", result.getTyNC());
+
+            telemetry.addData("Botpose", botpose.toString());
+
+            // Access classifier results
+            List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
+            for (LLResultTypes.ClassifierResult cr : classifierResults) {
+                telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
+            }
+
+            // Access fiducial results
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
+            }
+
+            // Access color results
+            List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+            for (LLResultTypes.ColorResult cr : colorResults) {
+                telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
+            }
 
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
             telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());
 
+            telemetry.addData("error ", robot.error);
+
             telemetry.addData("shooter Position right ", robot.R_shooter.getCurrentPosition());
+
             telemetry.addData("shooterRPM ", robot.shooterRPM());
-            telemetry.addData("targetRPM ", robot.targetRPM);
+
             telemetry.addData("power ", robot.setting_ShooterRPM(1));
+
             telemetry.addData("real shooter power ", robot.R_shooter.getPower());
 
-            telemetry.addData("error ", robot.error);
+            telemetry.addData("targetRPM ", robot.targetRPM);
 
             telemetry.addData("hood ", robot.hood.getPosition());
             telemetry.update();
