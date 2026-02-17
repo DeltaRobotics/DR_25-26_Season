@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,9 +11,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SampleRevBlinkinLedDriver;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -23,7 +26,9 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
+
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 //@Config //We need this for Dashboard to change variables
@@ -75,6 +80,8 @@ public class Gen2Hardwaremap {
 
     public double angleError;
     ElapsedTime timerS = new ElapsedTime();
+
+    private final static int LED_PERIOD = 10;
     private static final double MIN_SAMPLE_TIME = 0.01;
 
     public final double L_swingy_Thingy_Open = 0;
@@ -99,11 +106,34 @@ public class Gen2Hardwaremap {
     public double turretAngle = 0;
     private double turretCenterPosition = 147.3;
     public boolean blue = false;
+    private final static int GAMEPAD_LOCKOUT = 500;
 
+    RevBlinkinLedDriver blinkinLedDriver;
+    RevBlinkinLedDriver.BlinkinPattern pattern;
+
+    Telemetry.Item patternName;
+    Telemetry.Item display;
+    SampleRevBlinkinLedDriver.DisplayKind displayKind;
+    Deadline ledCycleDeadline;
+    Deadline gamepadRateLimit;
     public Limelight3A limelight;
     PIDController PIDShooter;
 
+
+
     public Gen2Hardwaremap(HardwareMap ahwMap) {
+
+        displayKind = SampleRevBlinkinLedDriver.DisplayKind.AUTO;
+
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+        blinkinLedDriver.setPattern(pattern);
+
+        display = telemetry.addData("Display Kind: ", displayKind.toString());
+        patternName = telemetry.addData("Pattern: ", pattern.toString());
+
+        ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
+        gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
 
         limelight = ahwMap.get(Limelight3A.class, "limelight");
 
@@ -111,7 +141,8 @@ public class Gen2Hardwaremap {
 
         limelight.start();
 
-        PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME,0.1,1);
+        //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
+        PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -159,7 +190,7 @@ public class Gen2Hardwaremap {
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         transfer.setDirection(DcMotorSimple.Direction.REVERSE);
-        L_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        //R_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -409,7 +440,7 @@ public class Gen2Hardwaremap {
         hood.setPosition(1);
     }
 
-    public int shooterRPM() {
+    public int shooterRPM(){
 
         if (R_shooter.getPower() != 0) {
 
