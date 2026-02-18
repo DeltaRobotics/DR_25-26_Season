@@ -2,20 +2,12 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 //two face teleop
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 
 @TeleOp(name = "Gen2Teleop")
@@ -76,6 +68,8 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.hoodDown();
 
+        robot.targetRPM = 300;
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -85,6 +79,8 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
             robot.turret(telemetry);
+            robot.R_shooter.setPower(robot.setting_ShooterRPM());
+            robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
             if(gamepad1.left_bumper && buttonLB){
 
@@ -126,58 +122,23 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.right_bumper && buttonRB){
 
-                robot.teleOpShoot();
+                while(gamepad1.right_bumper && buttonRB){
+
+                    robot.teleOpShoot();
+                }
 
                 robot.transfer.setPower(1);
 
                 robot.L_feeder.setPower(1);
                 robot.R_feeder.setPower(-1);
 
-                //buttonRB = false;
+                buttonRB = false;
             }
 
-            //if(!gamepad1.right_bumper && !buttonRB){
-                //buttonRB = true;
-
-            //}
-
-            if(robot.timerInitted[0]){
-
-                robot.shoot();
-            }
-
-            //robot.R_shooter.setPower(robot.setting_ShooterRPM(1));
-            //robot.L_shooter.setPower(robot.setting_ShooterRPM(1));
-
-            if(gamepad1.y && buttonY){
-
-                robot.targetRPM = robot.targetRPM + 100;
-                robot.R_shooter.setPower(robot.targetRPM);
-                robot.L_shooter.setPower(robot.targetRPM);
-
-                buttonY = false;
+            if(!gamepad1.right_bumper && !buttonRB){
+                buttonRB = true;
 
             }
-            if(!gamepad1.y && !buttonY){
-
-                buttonY = true;
-            }
-
-
-            if(gamepad1.a && buttonA){
-
-                robot.targetRPM = robot.targetRPM - 100;
-                robot.R_shooter.setPower(robot.targetRPM);
-                robot.L_shooter.setPower(robot.targetRPM);
-
-                buttonA = true;
-            }
-
-            if(!gamepad1.a && !buttonA){
-
-                buttonA = true;
-            }
-
 
 
             if(gamepad1.dpad_up && buttonDU){
@@ -185,8 +146,6 @@ public class Gen2Teleop extends LinearOpMode {
                 //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.005);
 
                 robot.targetRPM = robot.targetRPM + 100;
-                robot.R_shooter.setPower(robot.targetRPM);
-                robot.L_shooter.setPower(robot.targetRPM);
 
                 buttonDU = false;
 
@@ -201,8 +160,6 @@ public class Gen2Teleop extends LinearOpMode {
                 //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.005);
 
                 robot.targetRPM = robot.targetRPM - 100;
-                robot.R_shooter.setPower(robot.targetRPM);
-                robot.L_shooter.setPower(robot.targetRPM);
 
                 buttonDD = false;
             }
@@ -217,7 +174,7 @@ public class Gen2Teleop extends LinearOpMode {
 
                 //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.005);
 
-                robot.hood_pos = robot.hood_pos - 0.01;
+                robot.hood_pos = robot.hood_pos - 0.05;
                 robot.hood.setPosition(robot.hood_pos);
 
                 buttonDL = false;
@@ -233,7 +190,7 @@ public class Gen2Teleop extends LinearOpMode {
 
                 //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
 
-                robot.hood_pos = robot.hood_pos + 0.01;
+                robot.hood_pos = robot.hood_pos + 0.05;
                 robot.hood.setPosition(robot.hood_pos);
 
                 buttonDR = false;
@@ -262,7 +219,7 @@ public class Gen2Teleop extends LinearOpMode {
             //shooting for driver 2
             if(gamepad2.right_trigger > 0.5 && button2RT){
 
-                robot.shoot();
+                robot.autoShoot();
                 button2RT = false;
             }
 
@@ -329,17 +286,7 @@ public class Gen2Teleop extends LinearOpMode {
                 button2B = true;
             }
 
-            //if(robot.aprilTag.getDetections().size() > 0){
-
-            //    Detection = robot.aprilTag.getDetections().get(0);
-
-            //    if(Detection != null){
-            //        telemetry.addData("bearing", Detection.ftcPose.bearing);
-            //    }
-            //}
             LLResult result = robot.limelight.getLatestResult();
-            //if (result.isValid()) {
-            // Access general information
             Pose3D botpose = result.getBotpose();
 
             /**
@@ -373,7 +320,7 @@ public class Gen2Teleop extends LinearOpMode {
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
             telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());
 
-            telemetry.addData("error ", robot.error);
+            telemetry.addData("error ", robot.PIDShooter.getPreviousError());
 
             telemetry.addData("shooter Position right ", robot.R_shooter.getCurrentPosition());
 
@@ -386,6 +333,8 @@ public class Gen2Teleop extends LinearOpMode {
             telemetry.addData("targetRPM ", robot.targetRPM);
 
             telemetry.addData("hood ", robot.hood.getPosition());
+
+            telemetry.addData("hood pos ", robot.hood_pos);
 
             telemetry.update();
 

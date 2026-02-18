@@ -98,17 +98,17 @@ public class AutoBlue9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -156,17 +156,17 @@ public class AutoBlue9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -220,17 +220,17 @@ public class AutoBlue9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }

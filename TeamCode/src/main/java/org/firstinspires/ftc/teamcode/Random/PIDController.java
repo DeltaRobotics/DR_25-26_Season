@@ -111,6 +111,8 @@ public class PIDController {
         return totalError;
     }
 
+    public double getPreviousError(){return previousError;}
+
     public void setP(double P)
     {
         this.P = P;

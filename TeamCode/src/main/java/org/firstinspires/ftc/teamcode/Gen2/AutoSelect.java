@@ -159,21 +159,21 @@ class Red9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -238,21 +238,21 @@ class Red9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -322,21 +322,21 @@ class Red9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -506,18 +506,18 @@ class Red9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -565,18 +565,18 @@ class Red9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -629,16 +629,16 @@ class Red9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -799,18 +799,18 @@ class Red6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -858,18 +858,18 @@ class Red6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -1202,21 +1202,21 @@ class Blue9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -1281,21 +1281,21 @@ class Blue9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -1365,21 +1365,21 @@ class Blue9Close extends OpMode {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -1542,18 +1542,18 @@ class Blue9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -1601,18 +1601,18 @@ class Blue9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -1657,16 +1657,16 @@ class Blue9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[10] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -1814,18 +1814,18 @@ class Blue6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     setPathState(3);
@@ -1872,18 +1872,18 @@ class Blue6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
                     }
                     setPathState(7);
                 }
@@ -2034,18 +2034,18 @@ class Blue6Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[8] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -2093,18 +2093,18 @@ class Blue6Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[9] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 

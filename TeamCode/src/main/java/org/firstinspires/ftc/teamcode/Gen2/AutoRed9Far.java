@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
@@ -101,18 +100,18 @@ public class AutoRed9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -160,18 +159,18 @@ public class AutoRed9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.R_shooter.setPower(robot.setting_ShooterRPM());
                         robot.L_shooter.setPower(robot.setting_ShooterRPM());
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -224,16 +223,16 @@ public class AutoRed9Far extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }

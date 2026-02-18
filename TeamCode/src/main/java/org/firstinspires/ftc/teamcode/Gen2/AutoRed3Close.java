@@ -64,7 +64,7 @@ public class AutoRed3Close extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
+                    robot.autoShoot();
 
                     if(robot.waiting){
                         setPathState(1);
@@ -117,7 +117,7 @@ public class AutoRed3Close extends OpMode {
 
         if(robot.timerInitted[0]){
             robot.hoodDown();
-            robot.shoot();
+            robot.autoShoot();
         }
 
         // Feedback to Driver Hub

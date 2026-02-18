@@ -78,7 +78,7 @@ public class AutoBlue9Far extends OpMode {
                 if(!follower.isBusy()) {
 
                     robot.hoodDown();
-                    robot.shoot();
+                    robot.autoShoot();
                     setPathState(3);
                 }
                 break;

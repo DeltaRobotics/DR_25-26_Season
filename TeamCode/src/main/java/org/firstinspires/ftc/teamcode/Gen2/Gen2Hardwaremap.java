@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -11,7 +10,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SampleRevBlinkinLedDriver;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -21,14 +19,10 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 //@Config //We need this for Dashboard to change variables
@@ -38,6 +32,8 @@ public class Gen2Hardwaremap {
     //drive motors
 
     public ElapsedTime currentTime = new ElapsedTime();
+
+    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     private final static int LED_PERIOD = 10;
     public AprilTagProcessor aprilTag;
@@ -81,7 +77,7 @@ public class Gen2Hardwaremap {
     public double angleError;
     ElapsedTime timerS = new ElapsedTime();
 
-    private final static int LED_PERIOD = 10;
+    //private final static int LED_PERIOD = 10;
     private static final double MIN_SAMPLE_TIME = 0.01;
 
     public final double L_swingy_Thingy_Open = 0;
@@ -96,7 +92,7 @@ public class Gen2Hardwaremap {
     public final double L_PTO_UP = 0.2;
     public final double R_PTO_UP = 0.6;
 
-    public int targetRPM = 0;
+    public double targetRPM = 0;
 
     public double hood_pos = 1;
 
@@ -113,27 +109,29 @@ public class Gen2Hardwaremap {
 
     Telemetry.Item patternName;
     Telemetry.Item display;
-    SampleRevBlinkinLedDriver.DisplayKind displayKind;
+    //SampleRevBlinkinLedDriver.DisplayKind displayKind;
     Deadline ledCycleDeadline;
     Deadline gamepadRateLimit;
     public Limelight3A limelight;
     PIDController PIDShooter;
 
+    PIDController PIDTurret;
+
 
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        displayKind = SampleRevBlinkinLedDriver.DisplayKind.AUTO;
+        //displayKind = SampleRevBlinkinLedDriver.DisplayKind.AUTO;
 
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
-        pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-        blinkinLedDriver.setPattern(pattern);
+        //blinkinLedDriver = ahwMap.get(RevBlinkinLedDriver.class, "blinkin");
+        //pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+        //blinkinLedDriver.setPattern(pattern);
 
-        display = telemetry.addData("Display Kind: ", displayKind.toString());
-        patternName = telemetry.addData("Pattern: ", pattern.toString());
+        //display = telemetry.addData("Display Kind: ", displayKind.toString());
+        //patternName = telemetry.addData("Pattern: ", pattern.toString());
 
-        ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
-        gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
+        //ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
+        //gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
 
         limelight = ahwMap.get(Limelight3A.class, "limelight");
 
@@ -143,6 +141,8 @@ public class Gen2Hardwaremap {
 
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
         PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+
+        PIDTurret = new PIDController(0.02,0,0.0000008,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -190,7 +190,9 @@ public class Gen2Hardwaremap {
         motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+
         //R_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        //L_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -214,8 +216,8 @@ public class Gen2Hardwaremap {
     public void turret(Telemetry telemetry){
 
         LLResult result = limelight.getLatestResult();
-        double ty = result.getTy();
-        double targetOffsetAngle_Vertical = ty;
+        double angle = result.getTx();
+        double targetOffsetAngle_Vertical = angle;
 
         // how many degrees back is your limelight rotated from perfectly vertical?
         double limelightMountAngleDegrees = 12.56021; //10.262226
@@ -230,12 +232,9 @@ public class Gen2Hardwaremap {
         double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
         //calculate distance
-        double range = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+        double distance = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
 
-
-        //telemetry.addData("range", range);
-        //telemetry.update();
-
+        double range = distance - 7;
 
         int id;
 
@@ -245,21 +244,20 @@ public class Gen2Hardwaremap {
         else{
             id = 24;
         }
-/**
-        if (range > 110){
+
+        if (range > 120){
             targetRPM = 5000;
             hood_pos = 0.6;
         }
         else{
-            targetRPM = (int)(908 + (105 * range) - 0.757 * Math.pow(range,2));
-            hood_pos = 1.16 + (0.0069 * range) - 0.00057 * Math.pow(range, 2) + 0.00000478 * Math.pow(range, 3);
+            targetRPM = 2826 + (11.3 * range) + 0.0236 * (range * range);
+            hood_pos = 1.05 + (0.000152 * range) - 0.000087 * (range * range) + 0.00000045 * (range * range * range);
         }
- **/
+
+        hood.setPosition(hood_pos);
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
         turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
-
-
 
         angleError = result.getTx();
         double turretPower = -angleError * turretP;
@@ -276,17 +274,27 @@ public class Gen2Hardwaremap {
 
     public void initAprilTag(HardwareMap ahwMap) {
 
-        // Create the AprilTag processor the easy way.
-        //aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+         //Create the AprilTag processor the easy way.
+        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
-        // Create the vision portal the easy way.
-        //if (USE_WEBCAM) {
-        //    visionPortal = VisionPortal.easyCreateWithDefaults(
-        //            ahwMap.get(WebcamName.class, "Webcam 1"), aprilTag);
-        //} else {
-        //    visionPortal = VisionPortal.easyCreateWithDefaults(
-        //            BuiltinCameraDirection.BACK, aprilTag);
-        //}
+         //Create the vision portal the easy way.
+        if (USE_WEBCAM) {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(ahwMap.get(WebcamName.class, "Webcam 1"))
+                    .addProcessors(aprilTag)
+                    //.enableLiveView(true)
+                    .build();
+        }
+        else{
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessors(aprilTag)
+                    //.enableLiveView(true)
+                    .build();
+
+        }
+
+
 
     }   // end method initAprilTag()
 
@@ -369,7 +377,7 @@ public class Gen2Hardwaremap {
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
     }
 
-    public void shoot (){
+    public void autoShoot(){
 
         if(!timerInitted[0]) {//very very first thing to happen
             timeArray[0] = currentTime.milliseconds();
@@ -426,18 +434,15 @@ public class Gen2Hardwaremap {
     }
 
     public void hoodUp(){
-        hood_pos = .6;
         hood.setPosition(hood_pos);
     }
 
     public void hoodMid(){
-        hood_pos = .85;
         hood.setPosition(hood_pos);
     }
 
     public void hoodDown(){
-        hood_pos = 1;
-        hood.setPosition(1);
+        hood.setPosition(hood_pos);
     }
 
     public int shooterRPM(){

@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Gen2.Gen2Hardwaremap;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
@@ -87,17 +86,17 @@ public class AutoBlue6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[11] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -145,17 +144,17 @@ public class AutoBlue6Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[12] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                     setPathState(7);

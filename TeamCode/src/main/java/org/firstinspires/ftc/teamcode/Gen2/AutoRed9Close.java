@@ -98,17 +98,17 @@ public class AutoRed9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
                 }
@@ -156,17 +156,17 @@ public class AutoRed9Close extends OpMode {
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
 
-                        robot.shoot();
+                        robot.autoShoot();
                     }
 
                     else {//Second thing to happen
                         robot.targetRPM = 3500;
-                        robot.shoot();
+                        robot.autoShoot();
 
                     }
 
@@ -220,17 +220,17 @@ public class AutoRed9Close extends OpMode {
 
                                 else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
 
-                                    robot.shoot();
+                                    robot.autoShoot();
                                 }
 
                             else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
 
-                                robot.shoot();
+                                robot.autoShoot();
                             }
 
                         else {//Second thing to happen
                             robot.targetRPM = 3500;
-                            robot.shoot();
+                            robot.autoShoot();
 
                         }
                 }
