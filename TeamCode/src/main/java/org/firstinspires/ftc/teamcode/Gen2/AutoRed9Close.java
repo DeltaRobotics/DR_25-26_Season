@@ -91,24 +91,14 @@ public class AutoRed9Close extends OpMode {
                         robot.timerInitted[4] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6100) {//Last thing to happen
+                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 1800) {//Last thing to happen
                         setPathState(2);
                         robot.timerInitted[4] = false;
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 6000) {//Last thing to happen
-
-                        robot.autoShoot();
-                    }
-
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[4] + 3000) {
-
-                        robot.autoShoot();
-                    }
-
                     else {//Second thing to happen
-                        robot.targetRPM = 3500;
                         robot.autoShoot();
+                        robot.display_state_shooting();
 
                     }
                 }
@@ -119,6 +109,7 @@ public class AutoRed9Close extends OpMode {
 
                     robot.intake();
                     follower.followPath(firstLineupPath, true);
+                    robot.display_state_RedIdle();
                     setPathState(3);
                 }
                 break;
@@ -149,28 +140,16 @@ public class AutoRed9Close extends OpMode {
                         robot.timerInitted[5] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5100) {//Last thing to happen
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 1800) {//Last thing to happen
                         setPathState(6);
                         robot.timerInitted[5] = false;
                     }
 
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 5000) {//Last thing to happen
-
-                        robot.autoShoot();
-                    }
-
-                    else if (robot.currentTime.milliseconds() > robot.timeArray[5] + 2500) {
-
-                        robot.autoShoot();
-                    }
-
                     else {//Second thing to happen
-                        robot.targetRPM = 3500;
                         robot.autoShoot();
+                        robot.display_state_shooting();
 
                     }
-
-
                 }
                 break;
             case 6:
@@ -178,6 +157,7 @@ public class AutoRed9Close extends OpMode {
                 if(!follower.isBusy()) {
                     robot.intake();
                     follower.followPath(secondLineupPath, true);
+                    robot.display_state_RedIdle();
                     setPathState(7);
                 }
                 break;
@@ -213,26 +193,16 @@ public class AutoRed9Close extends OpMode {
                         robot.timerInitted[6] = true;
                     }
 
-                                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5100) {//Last thing to happen
-                                        setPathState(-1);
-                                        robot.timerInitted[6] = false;
-                                    }
+                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 1800) {//Last thing to happen
+                        setPathState(-1);
+                        robot.timerInitted[6] = false;
+                    }
 
-                                else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 5000) {//Last thing to happen
+                    else {//Second thing to happen
+                        robot.autoShoot();
+                        robot.display_state_shooting();
 
-                                    robot.autoShoot();
-                                }
-
-                            else if (robot.currentTime.milliseconds() > robot.timeArray[6] + 2500) {
-
-                                robot.autoShoot();
-                            }
-
-                        else {//Second thing to happen
-                            robot.targetRPM = 3500;
-                            robot.autoShoot();
-
-                        }
+                    }
                 }
                 break;
             case 11:
@@ -290,6 +260,25 @@ public class AutoRed9Close extends OpMode {
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
+        robot.transfer.setPower(0);
+
+        robot.L_PTO.setPosition(robot.L_PTO_UP);
+        robot.R_PTO.setPosition(robot.R_PTO_UP);
+
+        robot.R_feeder.setPower(0);
+        robot.L_feeder.setPower(0);
+
+        robot.R_turret.setPower(0);
+        robot.L_turret.setPower(0);
+
+        robot.initAprilTag(hardwareMap);
+
+        robot.hoodDown();
+
+        robot.targetRPM = 1000;
+
+        robot.blue = false;
+
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
@@ -301,6 +290,7 @@ public class AutoRed9Close extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
+        robot.turret(telemetry);
         setPathState(0);
     }
 

@@ -68,7 +68,7 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.hoodDown();
 
-        robot.targetRPM = 300;
+        robot.targetRPM = 1000;
 
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);// CHANGE THIS LATER
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -115,7 +115,8 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.b && buttonB){
 
-                robot.stopIntake();
+                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
+                //robot.stopIntake();
 
                 buttonB = false;
             }
@@ -123,6 +124,20 @@ public class Gen2Teleop extends LinearOpMode {
             if(!gamepad1.b && !buttonB){
 
                 buttonB = true;
+
+            }
+
+            if(gamepad1.x && buttonX){
+
+                robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+                //robot.stopIntake();
+
+                buttonX = false;
+            }
+
+            if(!gamepad1.x && !buttonX){
+
+                buttonX = true;
 
             }
 
@@ -182,7 +197,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.y && buttonY){
 
-                robot.PIDTurret.setI(robot.PIDTurret.getI() + 0.0001);
+                robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0005);
 
                 //robot.targetRPM = robot.targetRPM - 100;
 
@@ -195,7 +210,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.a && buttonA){
 
-                robot.PIDTurret.setI(robot.PIDTurret.getI() - 0.0001);
+                robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0005);
 
                 //robot.targetRPM = robot.targetRPM - 100;
 
@@ -352,6 +367,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
              */
 
+
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
             telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());
 
@@ -359,13 +375,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("shooter Position right ", robot.R_shooter.getCurrentPosition());
 
-            telemetry.addData("shooterRPM ", robot.shooterRPM());
 
-            telemetry.addData("power ", robot.setting_ShooterRPM());
-
-            telemetry.addData("real shooter power ", robot.R_shooter.getPower());
-
-            telemetry.addData("targetRPM ", robot.targetRPM);
 
             telemetry.addData("hood ", robot.hood.getPosition());
 
@@ -373,15 +383,23 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("Right Turret Power", robot.R_turret.getPower());
 
-            telemetry.addData("tx", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetXDegrees());
+            //telemetry.addData("tx", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetXDegrees());
 
             telemetry.addData("turret Encoder", robot.turretEncoderCounts);
 
             telemetry.addData("turret P", String.valueOf(robot.PIDTurret.getP()));
 
-            telemetry.addData("turret I", String.valueOf(robot.PIDTurret.getI()));
-
             telemetry.addData("turret D", String.valueOf(robot.PIDTurret.getD()));
+
+            telemetry.addData("shooterRPM ", robot.shooterRPM());
+            telemetry.addData("targetRPM ", robot.targetRPM);
+
+            telemetry.addData("power ", robot.setting_ShooterRPM());
+            telemetry.addData("real shooter power ", robot.R_shooter.getPower());
+
+            telemetry.addData("Shooter P", robot.PIDShooter.getP());
+
+
 
             telemetry.update();
 

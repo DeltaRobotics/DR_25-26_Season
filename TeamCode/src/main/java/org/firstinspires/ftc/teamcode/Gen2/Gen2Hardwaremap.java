@@ -70,6 +70,8 @@ public class Gen2Hardwaremap {
 
     public Servo hood = null;
 
+    public Servo rail_cap = null;
+
     public int previousShooterEncoder = 0;
     private int prevShooterRPM = 0;
 
@@ -142,9 +144,10 @@ public class Gen2Hardwaremap {
         limelight.start();
 
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
-        PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+        PIDShooter = new PIDController(0.0015,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+        //P was 0.003
 
-        PIDTurret = new PIDController(0.05,0,0.01,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.045,0,0.0,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -247,14 +250,14 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
-        if (range > 120){
-            targetRPM = 5000;
-            hood_pos = 0.6;
-        }
-        else{
+        //if (range > 120){
+        //    targetRPM = 5000;
+        //    hood_pos = 0.6;
+        //}
+        //else{
             targetRPM = 2826 + (11.3 * range) + 0.0236 * (range * range);
             hood_pos = 1.05 + (0.000152 * range) - 0.000087 * (range * range) + 0.00000045 * (range * range * range);
-        }
+        //}
 
         hood.setPosition(hood_pos);
 
@@ -270,33 +273,21 @@ public class Gen2Hardwaremap {
             // Once we have found the correct ID, use it's target X degrees.
             if(fidRes.getFiducialId() == id)
             {
-                angleError = -fidRes.getTargetXDegrees();
+                angleError = fidRes.getTargetXDegrees();
                 break;
             }
         }
 
         double turretPower = PIDTurret.Update(angleError); // was -angleError
-        //turretAngle = (((turretEncoderCounts / 8192) * 360)* 6.25); //I think this math is wrong
-        //turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
-
-        //if (result.getTx() == 0){
-        //   turretAngle = turretCenterPosition;
-        //}
-        //else{
-        //    turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
-//
-        //}
-
-
 
         //safety check so the turret doesn't go past 90
         if((turretEncoderCounts < -12800 && turretPower < 0) || (turretEncoderCounts > 12800 && turretPower > 0)){
             turretPower = 0;
         }
 
-
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
+
 
     }
 
@@ -409,42 +400,20 @@ public class Gen2Hardwaremap {
 
     public void autoShoot(){
 
-        if(!timerInitted[0]) {//very very first thing to happen
-            timeArray[0] = currentTime.milliseconds();
-            timerInitted[0] = true;
-        }
+        L_swingythingy.setPosition(L_swingy_Thingy_Close);
+        R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-        if (currentTime.milliseconds() > timeArray[0] + 500) {//Last thing to happen
+        intake.setPower(-.75);
 
-            L_feeder.setPower(0);
-            R_feeder.setPower(0);
+        hood.setPosition(hood_pos);
 
-            transfer.setPower(0);
+        R_shooter.setPower(setting_ShooterRPM());
+        L_shooter.setPower(setting_ShooterRPM());
 
-            timerInitted[0] = false;
-        }
+        transfer.setPower(1);
 
-        else if (currentTime.milliseconds() > timeArray[0] + 250) {
-
-            L_feeder.setPower(1);
-            R_feeder.setPower(-1);
-
-            transfer.setPower(1);
-        }
-
-        else {//Second thing to happen
-
-            transfer.setPower(0);
-            intake.setPower(-.75);
-
-            L_swingythingy.setPosition(L_swingy_Thingy_Close);
-            R_swingythingy.setPosition(R_swingy_Thingy_Close);
-
-            hood.setPosition(hood_pos);
-
-            R_shooter.setPower(setting_ShooterRPM());
-            L_shooter.setPower(setting_ShooterRPM());
-        }
+        L_feeder.setPower(1);
+        R_feeder.setPower(-1);
     }
 
     public void teleOpShoot(){
