@@ -70,6 +70,9 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.targetRPM = 300;
 
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);// CHANGE THIS LATER
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -82,9 +85,11 @@ public class Gen2Teleop extends LinearOpMode {
             robot.R_shooter.setPower(robot.setting_ShooterRPM());
             robot.L_shooter.setPower(robot.setting_ShooterRPM());
 
+
             if(gamepad1.left_bumper && buttonLB){
 
                 robot.intake();
+                robot.display_state_intaking();
 
                 buttonLB = false;
             }
@@ -97,6 +102,7 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad1.left_trigger > 0.5 && buttonLT ){
 
                 robot.outTake();
+                robot.display_state_outputting();
 
                 buttonLT = false;
             }
@@ -125,6 +131,7 @@ public class Gen2Teleop extends LinearOpMode {
                 while(gamepad1.right_bumper && buttonRB){
 
                     robot.teleOpShoot();
+                    robot.display_state_shooting();
                 }
 
                 robot.transfer.setPower(1);
@@ -143,9 +150,10 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_up && buttonDU){
 
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.005);
+                robot.newTurretP = (robot.turretP + 0.005);
+                robot.set_turretP();
 
-                robot.targetRPM = robot.targetRPM + 100;
+                //robot.targetRPM = robot.targetRPM + 100;
 
                 buttonDU = false;
 
@@ -157,9 +165,10 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_down && buttonDD){
 
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.005);
+                robot.newTurretP = (robot.turretP - 0.005);
+                robot.set_turretP();
 
-                robot.targetRPM = robot.targetRPM - 100;
+                //robot.targetRPM = robot.targetRPM - 100;
 
                 buttonDD = false;
             }
@@ -202,24 +211,21 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
-
-
             /**
-             *
-             *
+             **************************************************
              *                  DRIVER 2
-             *
-             *
+             **************************************************
              */
 
             if(lifting){
                 robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
+                robot.display_state_Lifting();
             }
 
             //shooting for driver 2
             if(gamepad2.right_trigger > 0.5 && button2RT){
 
-                robot.autoShoot();
+                robot.teleOpShoot();
                 button2RT = false;
             }
 
@@ -239,7 +245,7 @@ public class Gen2Teleop extends LinearOpMode {
                 }
 
                 if (robot.currentTime.milliseconds() > robot.timeArray[15] + 350) {//Last thing to happen
-
+                    robot.display_state_liftActivated();
                     button2DU = false;
                 }
 
@@ -335,6 +341,16 @@ public class Gen2Teleop extends LinearOpMode {
             telemetry.addData("hood ", robot.hood.getPosition());
 
             telemetry.addData("hood pos ", robot.hood_pos);
+
+            telemetry.addData("RTurretPower", robot.R_turret.getPower());
+
+            telemetry.addData("tx", robot.limelight.getLatestResult().getTx());
+
+            telemetry.addData("turretAngle", robot.turretAngle);
+
+            telemetry.addData("turretEncoder", robot.turretEncoderCounts);
+
+            telemetry.addData("turretP", robot.turretP);
 
             telemetry.update();
 

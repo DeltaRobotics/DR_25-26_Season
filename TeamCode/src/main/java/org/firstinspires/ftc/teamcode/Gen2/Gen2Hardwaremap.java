@@ -53,7 +53,7 @@ public class Gen2Hardwaremap {
 
     public boolean waiting = false;
     public double shooterP = 0.001;
-    public double turretP = 0.045;
+    public double turretP = 0.025;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -100,7 +100,8 @@ public class Gen2Hardwaremap {
     public DcMotor turretEncoder = null;
     public double turretEncoderCounts = 0;
     public double turretAngle = 0;
-    private double turretCenterPosition = 147.3;
+    public double newTurretP = 0;
+    private double turretCenterPosition = 0; //147.3
     public boolean blue = false;
     private final static int GAMEPAD_LOCKOUT = 500;
 
@@ -121,9 +122,9 @@ public class Gen2Hardwaremap {
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        //displayKind = SampleRevBlinkinLedDriver.DisplayKind.AUTO;
+        //displayKind = DisplayKind.AUTO;
 
-        //blinkinLedDriver = ahwMap.get(RevBlinkinLedDriver.class, "blinkin");
+        blinkinLedDriver = ahwMap.get(RevBlinkinLedDriver.class, "blinkin");
         //pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
         //blinkinLedDriver.setPattern(pattern);
 
@@ -256,24 +257,36 @@ public class Gen2Hardwaremap {
 
         hood.setPosition(hood_pos);
 
+        //Auto-aiming
+
         turretEncoderCounts = turretEncoder.getCurrentPosition();
-        turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
         angleError = result.getTx();
-        double turretPower = -angleError * turretP;
+        double turretPower = angleError * turretP; // was -angleError
+        //turretAngle = (((turretEncoderCounts / 8192) * 360)* 6.25); //I think this math is wrong
+        //turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
+
+        //if (result.getTx() == 0){
+        //   turretAngle = turretCenterPosition;
+        //}
+        //else{
+        //    turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
+//
+        //}
+
 
         //safety check so the turret doesn't go past 90
-        if((turretAngle < -90 && turretPower < 0) || (turretAngle > 90 && turretPower > 0)){
+        if((turretEncoderCounts < -2048 && turretPower < 0) || (turretEncoderCounts > 2048 && turretPower > 0)){
             turretPower = 0;
         }
 
-        //R_turret.setPower(turretPower);
+        R_turret.setPower(turretPower);
         //L_turret.setPower(turretPower);
 
     }
 
     public void initAprilTag(HardwareMap ahwMap) {
-
+/*
          //Create the AprilTag processor the easy way.
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
@@ -295,6 +308,8 @@ public class Gen2Hardwaremap {
         }
 
 
+
+ */
 
     }   // end method initAprilTag()
 
@@ -332,7 +347,7 @@ public class Gen2Hardwaremap {
 
     public void intake (){
 
-        targetRPM = 0;
+        //targetRPM = 300;
 
         intake.setPower(1);
 
@@ -482,5 +497,43 @@ public class Gen2Hardwaremap {
 
         return PIDShooter.Update(shooterRPM());
     }
+
+    public void display_state_shooting(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_WHITE;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_intaking(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.GOLD;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_outputting(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.GRAY;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_liftActivated(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_LARSON_SCANNER;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_Lifting(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.ORANGE;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_hopperFull(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_BlueIdle(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+        blinkinLedDriver.setPattern(pattern);
+    }
+    public void display_state_RedIdle(){
+        pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+        blinkinLedDriver.setPattern(pattern);
+    }
+
+    public void set_turretP(){
+        turretP = newTurretP;
+    }
+
 
 }
