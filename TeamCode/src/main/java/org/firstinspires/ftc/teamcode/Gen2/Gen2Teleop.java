@@ -150,8 +150,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_up && buttonDU){
 
-                robot.newTurretP = (robot.turretP + 0.005);
-                robot.set_turretP();
+                robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
 
                 //robot.targetRPM = robot.targetRPM + 100;
 
@@ -165,8 +164,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_down && buttonDD){
 
-                robot.newTurretP = (robot.turretP - 0.005);
-                robot.set_turretP();
+                robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
 
                 //robot.targetRPM = robot.targetRPM - 100;
 
@@ -178,13 +176,45 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
 
+
+
+
+
+            if(gamepad1.y && buttonY){
+
+                robot.PIDTurret.setI(robot.PIDTurret.getI() + 0.0001);
+
+                //robot.targetRPM = robot.targetRPM - 100;
+
+                buttonY = false;
+            }
+
+            if(!gamepad1.y && !buttonY){
+                buttonY = true;
+            }
+
+            if(gamepad1.a && buttonA){
+
+                robot.PIDTurret.setI(robot.PIDTurret.getI() - 0.0001);
+
+                //robot.targetRPM = robot.targetRPM - 100;
+
+                buttonA = false;
+            }
+
+            if(!gamepad1.a && !buttonA){
+                buttonA = true;
+            }
+
+
+
+
             //hood moving up
             if(gamepad1.dpad_left && buttonDL){
 
                 //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.005);
 
-                robot.hood_pos = robot.hood_pos - 0.05;
-                robot.hood.setPosition(robot.hood_pos);
+                robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.0001);
 
                 buttonDL = false;
             }
@@ -199,8 +229,7 @@ public class Gen2Teleop extends LinearOpMode {
 
                 //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
 
-                robot.hood_pos = robot.hood_pos + 0.05;
-                robot.hood.setPosition(robot.hood_pos);
+                robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.0001);
 
                 buttonDR = false;
 
@@ -342,15 +371,17 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("hood pos ", robot.hood_pos);
 
-            telemetry.addData("RTurretPower", robot.R_turret.getPower());
+            telemetry.addData("Right Turret Power", robot.R_turret.getPower());
 
-            telemetry.addData("tx", robot.limelight.getLatestResult().getTx());
+            telemetry.addData("tx", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetXDegrees());
 
-            telemetry.addData("turretAngle", robot.turretAngle);
+            telemetry.addData("turret Encoder", robot.turretEncoderCounts);
 
-            telemetry.addData("turretEncoder", robot.turretEncoderCounts);
+            telemetry.addData("turret P", String.valueOf(robot.PIDTurret.getP()));
 
-            telemetry.addData("turretP", robot.turretP);
+            telemetry.addData("turret I", String.valueOf(robot.PIDTurret.getI()));
+
+            telemetry.addData("turret D", String.valueOf(robot.PIDTurret.getD()));
 
             telemetry.update();
 

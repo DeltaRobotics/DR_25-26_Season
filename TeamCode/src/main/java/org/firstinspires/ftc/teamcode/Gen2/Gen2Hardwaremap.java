@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -143,7 +144,7 @@ public class Gen2Hardwaremap {
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
         PIDShooter = new PIDController(0.003,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
 
-        PIDTurret = new PIDController(0.02,0,0.0000008,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.05,0,0.01,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -261,8 +262,20 @@ public class Gen2Hardwaremap {
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
 
-        angleError = result.getTx();
-        double turretPower = angleError * turretP; // was -angleError
+        // Default to 0.
+        angleError = 0;
+
+        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
+        {
+            // Once we have found the correct ID, use it's target X degrees.
+            if(fidRes.getFiducialId() == id)
+            {
+                angleError = -fidRes.getTargetXDegrees();
+                break;
+            }
+        }
+
+        double turretPower = PIDTurret.Update(angleError); // was -angleError
         //turretAngle = (((turretEncoderCounts / 8192) * 360)* 6.25); //I think this math is wrong
         //turretAngle = ((turretEncoderCounts / 360) * 6.25); //6.25 is gear ratio
 
@@ -275,13 +288,15 @@ public class Gen2Hardwaremap {
         //}
 
 
+
         //safety check so the turret doesn't go past 90
-        if((turretEncoderCounts < -2048 && turretPower < 0) || (turretEncoderCounts > 2048 && turretPower > 0)){
+        if((turretEncoderCounts < -12800 && turretPower < 0) || (turretEncoderCounts > 12800 && turretPower > 0)){
             turretPower = 0;
         }
 
+
         R_turret.setPower(turretPower);
-        //L_turret.setPower(turretPower);
+        L_turret.setPower(turretPower);
 
     }
 
@@ -507,7 +522,7 @@ public class Gen2Hardwaremap {
         blinkinLedDriver.setPattern(pattern);
     }
     public void display_state_outputting(){
-        pattern = RevBlinkinLedDriver.BlinkinPattern.GRAY;
+        pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET;
         blinkinLedDriver.setPattern(pattern);
     }
     public void display_state_liftActivated(){
