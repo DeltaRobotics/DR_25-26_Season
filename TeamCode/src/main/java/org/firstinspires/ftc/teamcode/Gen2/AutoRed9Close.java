@@ -22,6 +22,26 @@ public class AutoRed9Close extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *              NEW POSES
+     *
+     *              start pose X =     Y =
+     *
+     *              hitting the gate X =     Y =
+     *
+     *
+     *
+     */
+
+
+
     private final Pose startPose = new Pose(113, 114, Math.toRadians(45));
     private final Pose Shooting = new Pose(90, 92, Math.toRadians(45));
     private final Pose firstLineup = new Pose(84, 77, Math.toRadians(0));

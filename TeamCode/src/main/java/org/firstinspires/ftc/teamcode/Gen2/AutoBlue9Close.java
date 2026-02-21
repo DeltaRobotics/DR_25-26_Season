@@ -22,6 +22,23 @@ public class AutoBlue9Close extends OpMode {
 
     private int pathState;
 
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *              NEW POSES
+     *
+     *              start pose X =     Y =
+     *
+     *              hitting the gate X =     Y =
+     *
+     *
+     *
+     */
+
     private final Pose startPose = new Pose(31, 114, Math.toRadians(135));
     private final Pose Shooting = new Pose(54, 92, Math.toRadians(135));
     private final Pose firstLineup = new Pose(60, 77, Math.toRadians(180));

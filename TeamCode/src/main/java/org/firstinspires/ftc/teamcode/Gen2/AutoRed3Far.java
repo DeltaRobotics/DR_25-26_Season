@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
+import android.graphics.Point;
+
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.FuturePose;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -13,8 +18,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
-@Disabled
-@Autonomous(name = "AutoRed3Far")
+//@Disabled
+@Autonomous(name = "bezierCurveTest")
 public class AutoRed3Far extends OpMode {
     private Follower follower;
 
@@ -22,24 +27,31 @@ public class AutoRed3Far extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int pathState;
-    private final Pose startPose = new Pose(78, 0, Math.toRadians(90));
+    private final Pose startPose = new Pose(78, 0);
 
-    private final Pose Shooting = new Pose(80, 79, Math.toRadians(45));
+    private final Pose shootingPose = new Pose(80, 79, Math.toRadians(45));
 
-    private final Pose movingBack = new Pose(90, 66, Math.toRadians(45) );
+    private final Pose controlPickup = new Pose (77, 59);
 
-    private Path scorePreload, movingBackPath;
+    private final Pose pickup = new Pose(108,59, Math.toRadians(0));
+
+    private final Pose movingBack = new Pose(90, 66, Math.toRadians(45));
+
+    private PathChain movingBackPath,  shooting, testPath;
+    private Path startPath;
 
 
     public void buildPaths() {
 
-        scorePreload = new Path(new BezierLine(startPose, Shooting));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
+        startPath = new Path (new BezierLine(startPose,shootingPose));
+        startPath.setConstantHeadingInterpolation(shootingPose.getHeading());
 
-        movingBackPath = new Path (new BezierLine(Shooting,movingBack));
-        movingBackPath.setConstantHeadingInterpolation(Shooting.getHeading());
-
+         //testPath = follower.pathBuilder()
+                //.addPath(new BezierCurve(shootingPose, controlPickup, pickup)).build()
+                //.setHeadingInterpolator(pickup.getHeading())
+                //.build();
     }
+
 
     public void autonomousPathUpdate() {
         switch (pathState) {
@@ -50,9 +62,7 @@ public class AutoRed3Far extends OpMode {
                     robot.hoodUp();
                     robot.autoShoot();
 
-
-
-                    follower.followPath(scorePreload, true);
+                    follower.followPath(startPath, true);
                     setPathState(1);
                 }
 
@@ -61,9 +71,9 @@ public class AutoRed3Far extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    follower.followPath(scorePreload, true);
+                    follower.followPath(movingBackPath, true);
 
-                    setPathState(2);
+                    setPathState(-1);
                 }
                 break;
 

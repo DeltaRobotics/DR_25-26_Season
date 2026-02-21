@@ -221,7 +221,39 @@ public class Gen2Hardwaremap {
     public void turret(Telemetry telemetry){
 
         LLResult result = limelight.getLatestResult();
-        double angle = result.getTx();
+
+        int id;
+        double angle = 1;
+        // Default to 0.
+        angleError = 0;
+        
+
+        if(blue){
+            id = 20;
+        }
+        else{
+            id = 24;
+        }
+        
+        
+        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
+        {
+            // Once we have found the correct ID, use it's target Y degrees.
+            if(fidRes.getFiducialId() == id)
+            {
+                angleError = fidRes.getTargetXDegrees();
+                angle = fidRes.getTargetYDegrees();
+                break;
+            }
+            else {
+                angle = 1;
+                break;
+            }
+        }
+        
+        
+        
+        //double angle = result.getTy();
         double targetOffsetAngle_Vertical = angle;
 
         // how many degrees back is your limelight rotated from perfectly vertical?
@@ -241,42 +273,25 @@ public class Gen2Hardwaremap {
 
         double range = distance - 7;
 
-        int id;
+        
 
-        if(blue){
-            id = 20;
-        }
-        else{
-            id = 24;
-        }
-
-        //if (range > 120){
-        //    targetRPM = 5000;
-        //    hood_pos = 0.6;
+        //if (range > 110){
+            //targetRPM = 5000;
+            //hood_pos = 0.6;
         //}
         //else{
-            targetRPM = 2826 + (11.3 * range) + 0.0236 * (range * range);
-            hood_pos = 1.05 + (0.000152 * range) - 0.000087 * (range * range) + 0.00000045 * (range * range * range);
+            targetRPM = 2826 + (11.3 * range) + ((0.0236 * (range * range)));
+            hood_pos = 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
         //}
 
         hood.setPosition(hood_pos);
 
+        telemetry.addData("distance", distance);
+        telemetry.addData("range", range);
+
         //Auto-aiming
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
-
-        // Default to 0.
-        angleError = 0;
-
-        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
-        {
-            // Once we have found the correct ID, use it's target X degrees.
-            if(fidRes.getFiducialId() == id)
-            {
-                angleError = fidRes.getTargetXDegrees();
-                break;
-            }
-        }
 
         double turretPower = PIDTurret.Update(angleError); // was -angleError
 
@@ -405,7 +420,7 @@ public class Gen2Hardwaremap {
 
         intake.setPower(-.75);
 
-        hood.setPosition(hood_pos);
+        //hood.setPosition(hood_pos);
 
         R_shooter.setPower(setting_ShooterRPM());
         L_shooter.setPower(setting_ShooterRPM());
@@ -424,7 +439,7 @@ public class Gen2Hardwaremap {
         L_swingythingy.setPosition(L_swingy_Thingy_Close);
         R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-        hood.setPosition(hood_pos);
+        //hood.setPosition(hood_pos);
 
         R_shooter.setPower(setting_ShooterRPM());
         L_shooter.setPower(setting_ShooterRPM());
@@ -433,15 +448,15 @@ public class Gen2Hardwaremap {
     }
 
     public void hoodUp(){
-        hood.setPosition(hood_pos);
+        //hood.setPosition(hood_pos);
     }
 
     public void hoodMid(){
-        hood.setPosition(hood_pos);
+        //hood.setPosition(hood_pos);
     }
 
     public void hoodDown(){
-        hood.setPosition(hood_pos);
+        //hood.setPosition(hood_pos);
     }
 
     public int shooterRPM(){
