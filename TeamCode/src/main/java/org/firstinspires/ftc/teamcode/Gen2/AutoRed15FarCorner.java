@@ -68,8 +68,6 @@ public class AutoRed15FarCorner extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.hoodDown();
-
                     if(!robot.timerInitted[4]) {//very very first thing to happen
                         robot.timeArray[4] = robot.currentTime.milliseconds();
                         robot.timerInitted[4] = true;
@@ -117,8 +115,6 @@ public class AutoRed15FarCorner extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.hoodDown();
-
                     if(!robot.timerInitted[5]) {//very very first thing to happen
                         robot.timeArray[5] = robot.currentTime.milliseconds();
                         robot.timerInitted[5] = true;
@@ -162,8 +158,6 @@ public class AutoRed15FarCorner extends OpMode {
             case 10:
 
                 if(!follower.isBusy()) {
-
-                    robot.hoodDown();
 
                     if(!robot.timerInitted[5]) {//very very first thing to happen
                         robot.timeArray[5] = robot.currentTime.milliseconds();
@@ -209,8 +203,6 @@ public class AutoRed15FarCorner extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.hoodDown();
-
                     if(!robot.timerInitted[5]) {//very very first thing to happen
                         robot.timeArray[5] = robot.currentTime.milliseconds();
                         robot.timerInitted[5] = true;
@@ -254,8 +246,6 @@ public class AutoRed15FarCorner extends OpMode {
             case 18:
 
                 if(!follower.isBusy()) {
-
-                    robot.hoodDown();
 
                     if(!robot.timerInitted[5]) {//very very first thing to happen
                         robot.timeArray[5] = robot.currentTime.milliseconds();
@@ -364,10 +354,6 @@ public class AutoRed15FarCorner extends OpMode {
 
         robot.R_turret.setPower(0);
         robot.L_turret.setPower(0);
-
-        robot.initAprilTag(hardwareMap);
-
-        robot.hoodDown();
 
         robot.targetRPM = 1000;
 

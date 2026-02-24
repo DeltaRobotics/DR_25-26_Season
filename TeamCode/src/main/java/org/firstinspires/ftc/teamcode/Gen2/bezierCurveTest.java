@@ -54,7 +54,6 @@ public class bezierCurveTest extends OpMode {
 
                 if(!follower.isBusy()) {
 
-                    robot.hoodUp();
                     robot.autoShoot();
 
                     follower.followPath(startPath, true);

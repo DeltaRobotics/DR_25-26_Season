@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.pedropathing.follower.Follower;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -31,16 +32,7 @@ import java.util.List;
 //@Config //We need this for Dashboard to change variables
 public class Gen2Hardwaremap {
 
-    //FtcDashboard dashboard = FtcDashboard.getInstance();
-    //drive motors
-
     public ElapsedTime currentTime = new ElapsedTime();
-
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    private final static int LED_PERIOD = 10;
-    public AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
 
     double[] timeArray = new double[20];
 
@@ -53,10 +45,6 @@ public class Gen2Hardwaremap {
     public DcMotor R_shooter = null;
     public DcMotor L_shooter = null;
     public DcMotor transfer = null;
-
-    public boolean waiting = false;
-    public double shooterP = 0.001;
-    public double turretP = 0.025;
 
     public Servo L_swingythingy = null;
     public Servo R_swingythingy = null;
@@ -76,13 +64,8 @@ public class Gen2Hardwaremap {
 
     public int previousShooterEncoder = 0;
     private int prevShooterRPM = 0;
-
-    public int error;
-
     public double angleError;
     ElapsedTime timerS = new ElapsedTime();
-
-    //private final static int LED_PERIOD = 10;
     private static final double MIN_SAMPLE_TIME = 0.01;
 
     public final double L_swingy_Thingy_Open = 0;
@@ -104,21 +87,16 @@ public class Gen2Hardwaremap {
     private double turretDegreeRatio = 0.003703703704;
     public DcMotor turretEncoder = null;
     public double turretEncoderCounts = 0;
-    public double turretAngle = 0;
-    public double newTurretP = 0;
+
     private double turretCenterPosition = 0; //147.3
     public boolean blue = false;
-    private final static int GAMEPAD_LOCKOUT = 500;
 
     RevBlinkinLedDriver blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
-
-    Telemetry.Item patternName;
-    Telemetry.Item display;
-    //SampleRevBlinkinLedDriver.DisplayKind displayKind;
-    Deadline ledCycleDeadline;
-    Deadline gamepadRateLimit;
     public Limelight3A limelight;
+
+    public GoBildaPinpointDriver pinpoint;
+
     PIDController PIDShooter;
 
     PIDController PIDTurret;
@@ -127,17 +105,9 @@ public class Gen2Hardwaremap {
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        //displayKind = DisplayKind.AUTO;
+        //pinpoint = GoBildaPinpointDriver.class, "pinpoint";
 
         blinkinLedDriver = ahwMap.get(RevBlinkinLedDriver.class, "blinkin");
-        //pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-        //blinkinLedDriver.setPattern(pattern);
-
-        //display = telemetry.addData("Display Kind: ", displayKind.toString());
-        //patternName = telemetry.addData("Pattern: ", pattern.toString());
-
-        //ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
-        //gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
 
         limelight = ahwMap.get(Limelight3A.class, "limelight");
 
@@ -198,9 +168,6 @@ public class Gen2Hardwaremap {
 
         transfer.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //R_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
-        //L_shooter.setDirection(DcMotorSimple.Direction.REVERSE);
-
         motorRF.setPower(0);
         motorLF.setPower(0);
         motorRB.setPower(0);
@@ -237,7 +204,36 @@ public class Gen2Hardwaremap {
         else{
             id = 24;
         }
-        
+
+        //int notWhile = 1;
+
+        //while(notWhile == 1) {
+            //if (result.getFiducialResults().isEmpty()) {
+                    //angleError = pinpoint
+
+
+
+
+
+            //}
+            //else {
+                //for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
+                    // Once we have found the correct ID, use it's target Y degrees.
+                    //if (fidRes.getFiducialId() == id) {
+                    //    angleError = fidRes.getTargetXDegrees();
+                    //    angle = fidRes.getTargetYDegrees();
+                    //    break;
+                    //} else {
+                    //    angle = 1;
+                    //    break;
+                    //}
+
+                //}
+            //}
+        //}
+
+
+
 
         for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
         {
@@ -255,33 +251,11 @@ public class Gen2Hardwaremap {
         }
 
 
-        /*
-        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
-        {
+        //angle = 1;
 
-            if(!limelight.getLatestResult().getFiducialResults().isEmpty()){
-                // Once we have found the correct ID, use its target Y degrees.
-                if(fidRes.getFiducialId() == id)
-                {
-                    angleError = fidRes.getTargetXDegrees();
-                    angle = fidRes.getTargetYDegrees();
-                    break;
-                }
-                else {
-                    angle = 1;
-                    break;
-                }
-            }
-            else{
-                angleError = follower.getPose().getHeading();
-            }
-        }
-
-         */
-        
         
         //double angle = result.getTy();
-        double targetOffsetAngle_Vertical = angle;
+        double targetOffsetAngle_Vertical = result.getTy();
 
         // how many degrees back is your limelight rotated from perfectly vertical?
         double limelightMountAngleDegrees = 12.56021; //10.262226
@@ -300,16 +274,14 @@ public class Gen2Hardwaremap {
 
         double range = distance - 7;
 
-        
-
-        //if (range > 110){
-            //targetRPM = 5000;
-            //hood_pos = 0.6;
-        //}
-        //else{
+        if (range > 110){
+            targetRPM = 5000;
+            hood_pos = 0.6;
+        }
+        else{
             targetRPM = 2826 + (11.3 * range) + ((0.0236 * (range * range)));
             hood_pos = 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
-        //}
+        }
 
         hood.setPosition(hood_pos);
 
@@ -330,72 +302,9 @@ public class Gen2Hardwaremap {
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
 
-
-    }
-
-    public void initAprilTag(HardwareMap ahwMap) {
-/*
-         //Create the AprilTag processor the easy way.
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
-
-         //Create the vision portal the easy way.
-        if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(ahwMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessors(aprilTag)
-                    //.enableLiveView(true)
-                    .build();
-        }
-        else{
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessors(aprilTag)
-                    //.enableLiveView(true)
-                    .build();
-
-        }
-
-
-
- */
-
-    }   // end method initAprilTag()
-
-    public void telemetryAprilTag() {
-
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
-
-        // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-            } else {
-                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-            }
-        }   // end for() loop
-    }
-
-    public boolean boolTimer (double time){
-        return currentTime.milliseconds() > time;
-    }
-
-    public double timerInit(int t){
-
-        double ti = currentTime.milliseconds() + t;
-        //timerInitted = true;
-
-        return ti;
-
     }
 
     public void intake (){
-
-        //targetRPM = 300;
 
         intake.setPower(1);
 
@@ -460,30 +369,20 @@ public class Gen2Hardwaremap {
 
     public void teleOpShoot(){
 
-        transfer.setPower(0);
-        intake.setPower(-.75);
-
         L_swingythingy.setPosition(L_swingy_Thingy_Close);
         R_swingythingy.setPosition(R_swingy_Thingy_Close);
+
+        intake.setPower(-.75);
 
         //hood.setPosition(hood_pos);
 
         R_shooter.setPower(setting_ShooterRPM());
         L_shooter.setPower(setting_ShooterRPM());
 
+        transfer.setPower(1);
 
-    }
-
-    public void hoodUp(){
-        //hood.setPosition(hood_pos);
-    }
-
-    public void hoodMid(){
-        //hood.setPosition(hood_pos);
-    }
-
-    public void hoodDown(){
-        //hood.setPosition(hood_pos);
+        L_feeder.setPower(1);
+        R_feeder.setPower(-1);
     }
 
     public int shooterRPM(){
@@ -556,10 +455,5 @@ public class Gen2Hardwaremap {
         pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
         blinkinLedDriver.setPattern(pattern);
     }
-
-    public void set_turretP(){
-        turretP = newTurretP;
-    }
-
 
 }
