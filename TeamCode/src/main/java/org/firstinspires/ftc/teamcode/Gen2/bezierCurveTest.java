@@ -1,17 +1,12 @@
 package org.firstinspires.ftc.teamcode.Gen2;
 
-import android.graphics.Point;
-
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.FuturePose;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,7 +15,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //@Disabled
 @Autonomous(name = "bezierCurveTest")
-public class AutoRed3Far extends OpMode {
+public class bezierCurveTest extends OpMode {
     private Follower follower;
 
     Gen2Hardwaremap robot = null;

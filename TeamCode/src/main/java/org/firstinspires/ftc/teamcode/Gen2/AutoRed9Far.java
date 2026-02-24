@@ -22,44 +22,43 @@ public class AutoRed9Far extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private final Pose startPose = new Pose(80, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 10, Math.toRadians(60));
-    private final Pose firstLineup = new Pose(84, 28, Math.toRadians(0));
-    private final Pose firstPickup =  new Pose(118, 28, Math.toRadians(0));
-    private final Pose secondLineup = new Pose(84, 53, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(118, 52, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(100, 52, Math.toRadians(0));
-    private final Pose movingOffLine = new Pose(100, 10, Math.toRadians(0));
-
+    private final Pose Shooting = new Pose(80, 10, Math.toRadians(90));
+    private final Pose firstLineup = new Pose(103, 35, Math.toRadians(0));
+    private final Pose firstPickup =  new Pose(133, 35, Math.toRadians(0));
+    private final Pose secondLineup = new Pose(103, 56, Math.toRadians(0));
+    private final Pose secondPickup = new Pose(133, 56, Math.toRadians(0));
+    //private final Pose secondPickupBack = new Pose(110, 52, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(100, 10, Math.toRadians(90));
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingOffLinePath ;
 
     public void buildPaths() {
 
         scorePreload = new Path(new BezierLine(startPose, Shooting));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading()); //startPose.getHeading(), Shooting.getHeading()
 
-        firstLineupPath = new Path (new BezierLine(Shooting,firstLineup));
-        firstLineupPath.setConstantHeadingInterpolation(firstLineup.getHeading());
+        firstLineupPath = new Path(new BezierLine(Shooting, firstLineup));
+        firstLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), firstLineup.getHeading()); //firstLineup.getHeading()
 
-        firstPickupPath = new Path (new BezierLine(firstLineup,firstPickup));
-        firstPickupPath.setConstantHeadingInterpolation(firstPickup.getHeading());
+        firstPickupPath = new Path(new BezierLine(firstLineup, firstPickup));
+        firstPickupPath.setLinearHeadingInterpolation(firstLineup.getHeading(), firstPickup.getHeading()); //firstPickup.getHeading()
 
-        shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
-        shootFirstPickupPath.setConstantHeadingInterpolation(Shooting.getHeading());
+        shootFirstPickupPath = new Path(new BezierLine(firstPickup, Shooting));
+        shootFirstPickupPath.setLinearHeadingInterpolation(firstPickup.getHeading(), Shooting.getHeading()); //Shooting.getHeading()
 
-        secondLineupPath = new Path (new BezierLine(Shooting,secondLineup));
-        secondLineupPath.setConstantHeadingInterpolation(secondLineup.getHeading());
+        secondLineupPath = new Path(new BezierLine(Shooting, secondLineup));
+        secondLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), secondLineup.getHeading());//secondLineup.getHeading()
 
-        secondPickupPath = new Path (new BezierLine(secondLineup,secondPickup));
-        secondPickupPath.setConstantHeadingInterpolation(secondPickup.getHeading());
+        secondPickupPath = new Path(new BezierLine(secondLineup, secondPickup));
+        secondPickupPath.setLinearHeadingInterpolation(secondLineup.getHeading(), secondPickup.getHeading());//secondPickup.getHeading()
 
-        secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
-        secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
+        //secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
+        //secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
 
-        shootSecondLineupPath = new Path (new BezierLine(secondPickup,Shooting));
-        shootSecondLineupPath.setConstantHeadingInterpolation(Shooting.getHeading());
+        shootSecondLineupPath = new Path(new BezierLine(secondPickup, Shooting));
+        shootSecondLineupPath.setLinearHeadingInterpolation(secondPickup.getHeading(), Shooting.getHeading());//Shooting.getHeading()
 
-        movingOffLinePath = new Path (new BezierLine(Shooting,movingOffLine));
-        movingOffLinePath.setConstantHeadingInterpolation(movingOffLine.getHeading());
+        movingOffLinePath = new Path(new BezierLine(Shooting, movingOffLine));
+        movingOffLinePath.setLinearHeadingInterpolation(Shooting.getHeading(), movingOffLine.getHeading());//Shooting.getHeading()
 
 
     }
@@ -69,7 +68,7 @@ public class AutoRed9Far extends OpMode {
             case 0:
 
                 if(!follower.isBusy()) {
-
+                    robot.angleError = 45;
                     robot.intake.setPower(1);
                     robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
                     robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
@@ -170,11 +169,11 @@ public class AutoRed9Far extends OpMode {
                 break;
             case 8:
 
-                if(!follower.isBusy()) {
+                //if(!follower.isBusy()) {
 
-                    follower.followPath(secondPickupBackPath, true);
+                   // follower.followPath(secondPickupBackPath, true);
                     setPathState(9);
-                }
+               // }
                 break;
             case 9:
 
@@ -238,6 +237,7 @@ public class AutoRed9Far extends OpMode {
         // These loop the movements of the robot
         follower.update();
         autonomousPathUpdate();
+        robot.turret(telemetry);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());

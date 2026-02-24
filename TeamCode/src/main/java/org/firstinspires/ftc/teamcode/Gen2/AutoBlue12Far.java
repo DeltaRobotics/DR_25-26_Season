@@ -12,67 +12,63 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-
-
 @Disabled
-@Autonomous(name = "AutoRed12Close")
-public class AutoRed12Close extends OpMode {
+@Autonomous(name = "AutoBlue12Far")
+public class AutoBlue12Far extends OpMode {
 
     Gen2Hardwaremap robot = null;
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
+    private Timer pathTimer, opmodeTimer;
     private int pathState;
-    private final Pose startPose = new Pose(112, 130, Math.toRadians(90));
-    private final Pose Shooting = new Pose(95, 95, Math.toRadians(90));
-    private final Pose firstLineup = new Pose(103, 90, Math.toRadians(0));
-    private final Pose firstPickup = new Pose(130, 90, Math.toRadians(0));
-    private final Pose secondLineup = new Pose(103, 66, Math.toRadians(0));
-    private final Pose secondPickup = new Pose(136, 64, Math.toRadians(0));
-    private final Pose secondPickupBack = new Pose(120, 62, Math.toRadians(0));
-    private final Pose thirdLineup = new Pose(103, 40, Math.toRadians(0));
-    private final Pose thirdPickup = new Pose(136, 40, Math.toRadians(0));
-    private final Pose movingOffLine = new Pose(95, 112, Math.toRadians(30));
+    private final Pose startPose = new Pose(47, 0, Math.toRadians(90));
+    private final Pose Shooting = new Pose(43, 6, Math.toRadians(100));
+    private final Pose firstLineup = new Pose(40, 19, Math.toRadians(180));
+    private final Pose firstPickup = new Pose(14, 19, Math.toRadians(180));
+    private final Pose secondLineup = new Pose(40, 42, Math.toRadians(180));
+    private final Pose secondPickup = new Pose(14, 42, Math.toRadians(180));
+    private final Pose thirdPickup = new Pose(14, 10, Math.toRadians(180));
+    private final Pose thirdPickupMove = new Pose(16, 14, Math.toRadians(180));
+    private final Pose movingOffLine = new Pose(27, 10, Math.toRadians(90));
 
-    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, thirdLineupPath, thirdPickupPath, shootThirdPickupPath, movingBackPath ;
+    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, thirdPickupPath,thirdPickupMovePath, shootThirdPickupPath, movingOffLinePath;
 
     public void buildPaths() {
 
-
         scorePreload = new Path(new BezierLine(startPose, Shooting));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading()); //startPose.getHeading(), Shooting.getHeading()
 
-        firstLineupPath = new Path (new BezierLine(Shooting,firstLineup));
-        firstLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), firstLineup.getHeading());
+        firstLineupPath = new Path(new BezierLine(Shooting, firstLineup));
+        firstLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), firstLineup.getHeading()); //firstLineup.getHeading()
 
-        firstPickupPath = new Path (new BezierLine(firstLineup,firstPickup));
-        firstPickupPath.setLinearHeadingInterpolation(firstLineup.getHeading(), firstPickup.getHeading());
+        firstPickupPath = new Path(new BezierLine(firstLineup, firstPickup));
+        firstPickupPath.setLinearHeadingInterpolation(firstLineup.getHeading(), firstPickup.getHeading()); //firstPickup.getHeading()
 
-        shootFirstPickupPath = new Path (new BezierLine(firstPickup,Shooting));
-        shootFirstPickupPath.setLinearHeadingInterpolation(firstPickup.getHeading(), Shooting.getHeading());
+        shootFirstPickupPath = new Path(new BezierLine(firstPickup, Shooting));
+        shootFirstPickupPath.setLinearHeadingInterpolation(firstPickup.getHeading(), Shooting.getHeading()); //Shooting.getHeading()
 
-        secondLineupPath = new Path (new BezierLine(Shooting,secondLineup));
-        secondLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), secondLineup.getHeading());
+        secondLineupPath = new Path(new BezierLine(Shooting, secondLineup));
+        secondLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), secondLineup.getHeading());//secondLineup.getHeading()
 
-        secondPickupPath = new Path (new BezierLine(secondLineup,secondPickup));
-        secondPickupPath.setLinearHeadingInterpolation(secondLineup.getHeading(), secondPickup.getHeading());
+        secondPickupPath = new Path(new BezierLine(secondLineup, secondPickup));
+        secondPickupPath.setLinearHeadingInterpolation(secondLineup.getHeading(), secondPickup.getHeading());//secondPickup.getHeading()
 
-        secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
-        secondPickupBackPath.setLinearHeadingInterpolation(secondPickup.getHeading(), secondPickupBack.getHeading());
+        //secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
+        //secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
 
-        shootSecondLineupPath = new Path (new BezierLine(secondPickupBack,Shooting));
-        shootSecondLineupPath.setLinearHeadingInterpolation(secondPickupBack.getHeading(), Shooting.getHeading());
+        shootSecondLineupPath = new Path(new BezierLine(secondPickup, Shooting));
+        shootSecondLineupPath.setLinearHeadingInterpolation(secondPickup.getHeading(), Shooting.getHeading());//Shooting.getHeading()
 
-        thirdLineupPath = new Path (new BezierLine(Shooting,thirdLineup));
-        thirdLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), thirdLineup.getHeading());
+        thirdPickupPath = new Path (new BezierLine(Shooting,thirdPickup));
+        thirdPickupPath.setConstantHeadingInterpolation( thirdPickup.getHeading());//Shooting.getHeading(),
 
-        thirdPickupPath = new Path (new BezierLine(thirdLineup,thirdPickup));
-        thirdPickupPath.setLinearHeadingInterpolation(thirdLineup.getHeading(), thirdPickup.getHeading());
+        thirdPickupMovePath = new Path (new BezierLine(thirdPickup,thirdPickupMove));
+        thirdPickupMovePath.setLinearHeadingInterpolation( thirdPickup.getHeading(), thirdPickupMove.getHeading());//Shooting.getHeading(),
 
-        shootThirdPickupPath = new Path (new BezierLine(thirdPickup,movingOffLine));
-        shootThirdPickupPath.setLinearHeadingInterpolation(thirdPickup.getHeading(), movingOffLine.getHeading());
+        shootThirdPickupPath = new Path (new BezierLine(thirdPickup,Shooting));
+        shootThirdPickupPath.setLinearHeadingInterpolation(thirdPickup.getHeading(), Shooting.getHeading());
 
-        //movingBackPath = new Path (new BezierLine(Shooting, movingOffLine));
-        //movingBackPath.setConstantHeadingInterpolation(movingOffLine.getHeading());
+        movingOffLinePath = new Path(new BezierLine(Shooting, movingOffLine));
+        movingOffLinePath.setLinearHeadingInterpolation(Shooting.getHeading(), movingOffLine.getHeading());//Shooting.getHeading()
 
     }
 
@@ -85,7 +81,6 @@ public class AutoRed12Close extends OpMode {
                     robot.intake.setPower(1);
                     robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
                     robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
-
 
                     follower.followPath(scorePreload, true);
                     setPathState(1);
@@ -119,10 +114,9 @@ public class AutoRed12Close extends OpMode {
             case 2:
 
                 if(!follower.isBusy()) {
-
+                    robot.display_state_RedIdle();
                     robot.intake();
                     follower.followPath(firstLineupPath, true);
-                    robot.display_state_RedIdle();
                     setPathState(3);
                 }
                 break;
@@ -163,6 +157,7 @@ public class AutoRed12Close extends OpMode {
                         robot.display_state_shooting();
 
                     }
+
                 }
                 break;
             case 6:
@@ -183,11 +178,11 @@ public class AutoRed12Close extends OpMode {
                 break;
             case 8:
 
-                if(!follower.isBusy()) {
+                //if(!follower.isBusy()) {
 
-                    follower.followPath(secondPickupBackPath, true);
-                    setPathState(9);
-                }
+                // follower.followPath(secondPickupBackPath, true);
+                setPathState(9);
+                // }
                 break;
             case 9:
 
@@ -207,7 +202,7 @@ public class AutoRed12Close extends OpMode {
                     }
 
                     if (robot.currentTime.milliseconds() > robot.timeArray[6] + 1800) {//Last thing to happen
-                        setPathState(11);
+                        setPathState(12);
                         robot.timerInitted[6] = false;
                     }
 
@@ -218,34 +213,31 @@ public class AutoRed12Close extends OpMode {
                     }
                 }
                 break;
-
-            case 11:
-
-                if(!follower.isBusy()) {
-
-                    robot.intake();
-                    follower.followPath(thirdLineupPath, true);
-                    robot.display_state_RedIdle();
-                    setPathState(12);
-                }
-                break;
             case 12:
 
                 if(!follower.isBusy()) {
-
-                    follower.followPath(thirdPickupPath, true);
+                    robot.intake();
+                    follower.followPath(thirdPickupPath, false);
                     setPathState(13);
                 }
                 break;
             case 13:
 
                 if(!follower.isBusy()) {
-
-                    follower.followPath(shootThirdPickupPath, true);
+                    robot.intake();
+                    follower.followPath(thirdPickupMovePath, false);
                     setPathState(14);
                 }
                 break;
             case 14:
+
+                if(!follower.isBusy()) {
+
+                    follower.followPath(shootThirdPickupPath, true);
+                    setPathState(15);
+                }
+                break;
+            case 15:
 
                 if(!follower.isBusy()) {
 
@@ -257,7 +249,7 @@ public class AutoRed12Close extends OpMode {
                     }
 
                     if (robot.currentTime.milliseconds() > robot.timeArray[5] + 1800) {//Last thing to happen
-                        setPathState(-1);
+                        setPathState(16);
                         robot.timerInitted[5] = false;
                     }
 
@@ -268,11 +260,11 @@ public class AutoRed12Close extends OpMode {
                     }
                 }
                 break;
-            case 15:
+            case 16:
 
                 if(!follower.isBusy()) {
                     robot.stopIntake();
-                    follower.followPath(movingBackPath, true);
+                    follower.followPath(movingOffLinePath, true);
                     setPathState(-1);
                 }
                 break;
@@ -298,7 +290,7 @@ public class AutoRed12Close extends OpMode {
 
     @Override
     public void loop() {
-
+        // These loop the movements of the robot
         follower.update();
         autonomousPathUpdate();
         robot.turret(telemetry);
@@ -310,7 +302,8 @@ public class AutoRed12Close extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.update();
+        telemetry.addData("tx", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetXDegrees());
+        telemetry.update();;
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Gen2;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Random.PIDController;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -208,6 +210,7 @@ public class Gen2Hardwaremap {
         R_shooter.setPower(0);
         L_shooter.setPower(0);
         transfer.setPower(0);
+
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed) {
@@ -235,7 +238,7 @@ public class Gen2Hardwaremap {
             id = 24;
         }
         
-        
+
         for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
         {
             // Once we have found the correct ID, use it's target Y degrees.
@@ -250,7 +253,31 @@ public class Gen2Hardwaremap {
                 break;
             }
         }
-        
+
+
+        /*
+        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
+        {
+
+            if(!limelight.getLatestResult().getFiducialResults().isEmpty()){
+                // Once we have found the correct ID, use its target Y degrees.
+                if(fidRes.getFiducialId() == id)
+                {
+                    angleError = fidRes.getTargetXDegrees();
+                    angle = fidRes.getTargetYDegrees();
+                    break;
+                }
+                else {
+                    angle = 1;
+                    break;
+                }
+            }
+            else{
+                angleError = follower.getPose().getHeading();
+            }
+        }
+
+         */
         
         
         //double angle = result.getTy();

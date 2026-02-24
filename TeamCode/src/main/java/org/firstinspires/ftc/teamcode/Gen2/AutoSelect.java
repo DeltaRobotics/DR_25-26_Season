@@ -39,9 +39,11 @@ public class AutoSelect extends SelectableOpMode {
         super("Select an Auto Configuration", s -> {
             s.folder("Blue", z -> {
                 z.folder("Close", l -> {
+                    l.add("12", AutoBlue12Close::new);
                     l.add("9", AutoBlue9Close::new);
                 });
                 z.folder("Far", a -> {
+                    a.add("12", AutoBlue12Far::new);
                     a.add("9", AutoBlue9Far::new);
                 });
             });
@@ -51,7 +53,9 @@ public class AutoSelect extends SelectableOpMode {
                     l.add("9", AutoRed9Close::new);
                 });
                 z.folder("Far", a -> {
+                    a.add("12", AutoRed12Far::new);
                     a.add("9", AutoRed9Far::new);
+                    a.add("15 Corner", AutoRed15FarCorner::new);
                 });
             });
 
