@@ -52,7 +52,7 @@ public class Gen2Teleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Gen2Hardwaremap robot = new Gen2Hardwaremap(hardwareMap);
 
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        //pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
@@ -362,7 +362,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
              */
 
-            telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
+            //telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
 
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
             telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());

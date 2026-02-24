@@ -330,7 +330,7 @@ public class AutoBlue12Close extends OpMode {
 
         robot.targetRPM = 1000;
 
-        robot.blue = false;
+        robot.blue = true;
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

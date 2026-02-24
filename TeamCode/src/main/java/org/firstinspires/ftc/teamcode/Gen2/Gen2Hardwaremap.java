@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Random.PIDController;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -105,7 +106,7 @@ public class Gen2Hardwaremap {
 
     public Gen2Hardwaremap(HardwareMap ahwMap) {
 
-        //pinpoint = GoBildaPinpointDriver.class, "pinpoint";
+        pinpoint = ahwMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         blinkinLedDriver = ahwMap.get(RevBlinkinLedDriver.class, "blinkin");
 
@@ -205,63 +206,40 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
-        //int notWhile = 1;
 
-        //while(notWhile == 1) {
-            //if (result.getFiducialResults().isEmpty()) {
-                    //angleError = pinpoint
-
-
-
-
-
-            //}
-            //else {
-                //for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
-                    // Once we have found the correct ID, use it's target Y degrees.
-                    //if (fidRes.getFiducialId() == id) {
-                    //    angleError = fidRes.getTargetXDegrees();
-                    //    angle = fidRes.getTargetYDegrees();
-                    //    break;
-                    //} else {
-                    //    angle = 1;
-                    //    break;
-                    //}
-
-                //}
-            //}
-        //}
-
-
-
-
-        for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults())
-        {
-            // Once we have found the correct ID, use it's target Y degrees.
-            if(fidRes.getFiducialId() == id)
-            {
-                angleError = fidRes.getTargetXDegrees();
-                angle = fidRes.getTargetYDegrees();
-                break;
+        if (result.getFiducialResults().isEmpty()) {
+            if(blue){
+                //angleError = pinpoint.getHeading(AngleUnit.DEGREES) + 40;
             }
-            else {
-                angle = 1;
-                break;
+            else{
+                //angleError = pinpoint.getHeading(AngleUnit.DEGREES) + 130;
+            }
+            angleError = 0;
+        }
+        else {
+            for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
+                 //Once we have found the correct ID, use its target Y degrees.
+                if (fidRes.getFiducialId() == id) {
+                    angleError = fidRes.getTargetXDegrees();
+                    angle = fidRes.getTargetYDegrees();
+                    break;
+                } else {
+                    angle = 1;
+                    break;
+                }
+
             }
         }
-
-
-        //angle = 1;
 
         
         //double angle = result.getTy();
         double targetOffsetAngle_Vertical = result.getTy();
 
         // how many degrees back is your limelight rotated from perfectly vertical?
-        double limelightMountAngleDegrees = 12.56021; //10.262226
+        double limelightMountAngleDegrees = -1; //10.262226
 
         // distance from the center of the Limelight lens to the floor
-        double limelightLensHeightInches = 16.0;
+        double limelightLensHeightInches = 15.75;
 
         // distance from the target to the floor
         double goalHeightInches = 29.5;
@@ -272,11 +250,15 @@ public class Gen2Hardwaremap {
         //calculate distance
         double distance = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
 
-        double range = distance - 7;
+        double range = distance - 6;
 
         if (range > 110){
             targetRPM = 5000;
             hood_pos = 0.6;
+        }
+        else if(range > 200){
+            targetRPM = 3500;
+            hood_pos = 1;
         }
         else{
             targetRPM = 2826 + (11.3 * range) + ((0.0236 * (range * range)));
@@ -287,6 +269,7 @@ public class Gen2Hardwaremap {
 
         telemetry.addData("distance", distance);
         telemetry.addData("range", range);
+        telemetry.addData("heading",pinpoint.getHeading(AngleUnit.DEGREES));
 
         //Auto-aiming
 

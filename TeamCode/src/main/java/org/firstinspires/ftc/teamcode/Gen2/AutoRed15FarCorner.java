@@ -267,29 +267,6 @@ public class AutoRed15FarCorner extends OpMode {
             case 19:
 
                 if(!follower.isBusy()) {
-                    robot.intake();
-                    follower.followPath(pickupPath, true);
-                    robot.display_state_RedIdle();
-                    setPathState(20);
-                }
-                break;
-            case 20:
-
-                if(!follower.isBusy()) {
-                    follower.followPath(pickupMovePath, true);
-                    setPathState(21);
-                }
-                break;
-            case 21:
-
-                if(!follower.isBusy()) {
-                    follower.followPath(shootPickupPath, true);
-                    setPathState(22);
-                }
-                break;
-            case 22:
-
-                if(!follower.isBusy()) {
                     robot.stopIntake();
                     follower.followPath(movingOffLinePath, true);
                     setPathState(-1);
