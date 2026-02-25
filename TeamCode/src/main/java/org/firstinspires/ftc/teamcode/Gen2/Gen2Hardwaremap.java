@@ -5,13 +5,18 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -98,6 +103,8 @@ public class Gen2Hardwaremap {
 
     public GoBildaPinpointDriver pinpoint;
 
+    private DistanceSensor sensorDistance;
+
     PIDController PIDShooter;
 
     PIDController PIDTurret;
@@ -115,6 +122,14 @@ public class Gen2Hardwaremap {
         limelight.pipelineSwitch(0);
 
         limelight.start();
+
+
+        // you can use this as a regular DistanceSensor.
+        sensorDistance = ahwMap.get(DistanceSensor.class, "sensor_distance");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
 
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
         PIDShooter = new PIDController(0.0015,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
@@ -252,7 +267,7 @@ public class Gen2Hardwaremap {
 
         double range = distance - 6;
 
-        if (range > 110){
+        if (range > 110 && range < 200){
             targetRPM = 5000;
             hood_pos = 0.6;
         }
@@ -298,6 +313,8 @@ public class Gen2Hardwaremap {
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
+
+        telemetry.addData("range", String.format("%.01f in", sensorDistance.getDistance(DistanceUnit.INCH)));
 
     }
 
