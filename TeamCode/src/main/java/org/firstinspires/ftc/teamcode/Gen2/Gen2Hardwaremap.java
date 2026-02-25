@@ -132,8 +132,8 @@ public class Gen2Hardwaremap {
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
 
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
-        PIDShooter = new PIDController(0.0015,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
-        //P was 0.003
+        PIDShooter = new PIDController(0.004,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
+        //P was 0.0015
 
         PIDTurret = new PIDController(0.045,0,0.0,0, MIN_SAMPLE_TIME * 2,-1,1);
 
@@ -281,16 +281,16 @@ public class Gen2Hardwaremap {
         double range = distance - 6;
 
         if (range > 110 && range > -200){
-            targetRPM = 5000;
-            hood_pos = 0.6;
+            //targetRPM = 5000;
+            hood_pos = 0.5;
         }
         else if(range < -200){
-            targetRPM = 3500;
+            targetRPM = 3100;
             hood_pos = 1;
         }
         else{
-            targetRPM = 2826 + (11.3 * range) + ((0.0236 * (range * range)));
-            hood_pos = 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
+            targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
+            hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
         }
 
         hood.setPosition(hood_pos);

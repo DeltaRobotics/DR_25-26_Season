@@ -82,7 +82,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
 
             if(turretBool){
-                robot.turret(telemetry);
+                robot.turret(telemetry); //Disable for range tuning (taking points)
             }
             else{
                 robot.targetRPM = 0;
@@ -93,7 +93,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.b && buttonB){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() - 0.00001);
                 //robot.stopIntake();
 
                 buttonB = false;
@@ -107,8 +107,8 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.x && buttonX){
 
-                robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
-                //robot.stopIntake();
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.00001);
+                robot.stopIntake();
 
                 buttonX = false;
             }
@@ -122,9 +122,10 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_up && buttonDU){
 
-                robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
+                //robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
 
-                //robot.targetRPM = robot.targetRPM + 100;
+
+                robot.targetRPM = robot.targetRPM + 100;
 
                 buttonDU = false;
 
@@ -136,15 +137,47 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_down && buttonDD){
 
-                robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
+                //robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
 
-                //robot.targetRPM = robot.targetRPM - 100;
+                robot.targetRPM = robot.targetRPM - 100;
 
                 buttonDD = false;
             }
 
             if(!gamepad1.dpad_down && !buttonDD){
                 buttonDD = true;
+            }
+
+            //hood moving up
+            if(gamepad1.dpad_left && buttonDL){
+
+                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.005);
+
+                //robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.0001);
+                robot.hood.setPosition(robot.hood.getPosition() - 0.025);
+
+                buttonDL = false;
+            }
+
+            if(!gamepad1.dpad_left && !buttonDL){
+                buttonDL = true;
+            }
+
+
+            //hood moving down
+            if(gamepad1.dpad_right && buttonDR){
+
+                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0005);
+
+                //robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.0001);
+                robot.hood.setPosition(robot.hood.getPosition() + 0.025);
+
+                buttonDR = false;
+
+            }
+
+            if(!gamepad1.dpad_right && !buttonDR){
+                buttonDR = true;
             }
 
             if(gamepad1.y && buttonY){
@@ -173,38 +206,6 @@ public class Gen2Teleop extends LinearOpMode {
                 buttonA = true;
             }
 
-            //hood moving up
-            if(gamepad1.dpad_left && buttonDL){
-
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.005);
-
-                robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.0001);
-
-                buttonDL = false;
-            }
-
-            if(!gamepad1.dpad_left && !buttonDL){
-                buttonDL = true;
-            }
-
-
-            //hood moving down
-            if(gamepad1.dpad_right && buttonDR){
-
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.005);
-
-                robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.0001);
-
-                buttonDR = false;
-
-            }
-
-            if(!gamepad1.dpad_right && !buttonDR){
-                buttonDR = true;
-            }
-
-
-
 
 
 
@@ -214,10 +215,6 @@ public class Gen2Teleop extends LinearOpMode {
              *                  DRIVER 2
              **************************************************
              */
-
-
-
-
 
 
             if(lifting){
@@ -265,7 +262,7 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad2.left_trigger > 0.5 && button2LT ){
 
                 robot.outTake();
-                turretBool = false;
+                //turretBool = false;
                 robot.display_state_outputting();
 
                 button2LT = false;
