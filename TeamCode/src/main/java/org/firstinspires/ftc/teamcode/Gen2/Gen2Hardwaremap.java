@@ -125,7 +125,7 @@ public class Gen2Hardwaremap {
 
 
         // you can use this as a regular DistanceSensor.
-        sensorDistance = ahwMap.get(DistanceSensor.class, "sensor_distance");
+        //sensorDistance = ahwMap.get(DistanceSensor.class, "sensor_distance");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
@@ -194,6 +194,7 @@ public class Gen2Hardwaremap {
         L_shooter.setPower(0);
         transfer.setPower(0);
 
+        pinpoint.resetPosAndIMU();
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed) {
@@ -208,11 +209,23 @@ public class Gen2Hardwaremap {
 
         LLResult result = limelight.getLatestResult();
 
+        pinpoint.update();
+
+
         int id;
         double angle = 1;
         // Default to 0.
         angleError = 0;
-        
+
+        turretEncoderCounts = turretEncoder.getCurrentPosition();
+
+        double currentTurretHeading = turretEncoderCounts / 142.222222222; // in Degrees and in relation to the robot
+
+        double turretHeadingField = pinpoint.getHeading(AngleUnit.DEGREES) - currentTurretHeading;
+
+        double limit = (Math.max(Math.min((angleError + currentTurretHeading), 90), -90)) - currentTurretHeading;
+
+        double turretPower = PIDTurret.Update(limit);
 
         if(blue){
             id = 20;
@@ -221,15 +234,15 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
-
         if (result.getFiducialResults().isEmpty()) {
             if(blue){
-                //angleError = pinpoint.getHeading(AngleUnit.DEGREES) + 40;
+                angleError = turretHeadingField - 140;
             }
             else{
-                //angleError = pinpoint.getHeading(AngleUnit.DEGREES) + 130;
+               angleError = turretHeadingField - 40;
+
             }
-            angleError = 0;
+
         }
         else {
             for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
@@ -251,7 +264,7 @@ public class Gen2Hardwaremap {
         double targetOffsetAngle_Vertical = result.getTy();
 
         // how many degrees back is your limelight rotated from perfectly vertical?
-        double limelightMountAngleDegrees = -1; //10.262226
+        double limelightMountAngleDegrees = 1.6; //10.262226
 
         // distance from the center of the Limelight lens to the floor
         double limelightLensHeightInches = 15.75;
@@ -267,11 +280,11 @@ public class Gen2Hardwaremap {
 
         double range = distance - 6;
 
-        if (range > 110 && range < 200){
+        if (range > 110 && range > -200){
             targetRPM = 5000;
             hood_pos = 0.6;
         }
-        else if(range > 200){
+        else if(range < -200){
             targetRPM = 3500;
             hood_pos = 1;
         }
@@ -288,14 +301,12 @@ public class Gen2Hardwaremap {
 
         //Auto-aiming
 
-        turretEncoderCounts = turretEncoder.getCurrentPosition();
-
-        double turretPower = PIDTurret.Update(angleError); // was -angleError
+        turretPower = PIDTurret.Update(limit); // was -angleError
 
         //safety check so the turret doesn't go past 90
-        if((turretEncoderCounts < -12800 && turretPower < 0) || (turretEncoderCounts > 12800 && turretPower > 0)){
-            turretPower = 0;
-        }
+        //if((turretEncoderCounts < -12800 && turretPower < 0) || (turretEncoderCounts > 12800 && turretPower > 0)){
+        //    turretPower = 0;
+        //}
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
@@ -313,9 +324,6 @@ public class Gen2Hardwaremap {
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
-
-        telemetry.addData("range", String.format("%.01f in", sensorDistance.getDistance(DistanceUnit.INCH)));
-
     }
 
     public void outTake (){
@@ -327,7 +335,7 @@ public class Gen2Hardwaremap {
         L_feeder.setPower(1);
         R_feeder.setPower(-1);
 
-        transfer.setPower(1);
+        transfer.setPower(0);
 
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
@@ -348,6 +356,25 @@ public class Gen2Hardwaremap {
         L_swingythingy.setPosition(L_swingy_Thingy_Open);
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
     }
+
+    public void lifting(){
+
+        targetRPM = 0;
+
+        intake.setPower(0);
+
+        L_feeder.setPower(0);
+        R_feeder.setPower(0);
+
+        transfer.setPower(0);
+
+        L_turret.setPower(0);
+        R_turret.setPower(0);
+
+        L_swingythingy.setPosition(L_swingy_Thingy_Open);
+        R_swingythingy.setPosition(R_swingy_Thingy_Open);
+    }
+
 
     public void autoShoot(){
 

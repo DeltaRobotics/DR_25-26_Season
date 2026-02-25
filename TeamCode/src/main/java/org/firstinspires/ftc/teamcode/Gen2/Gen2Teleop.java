@@ -42,7 +42,7 @@ public class Gen2Teleop extends LinearOpMode {
     public boolean button2DU = true;
     public boolean button2DD = true;
 
-    public GoBildaPinpointDriver pinpoint;
+    public boolean turretBool = true;
 
     public boolean lifting = false;
 
@@ -51,8 +51,6 @@ public class Gen2Teleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Gen2Hardwaremap robot = new Gen2Hardwaremap(hardwareMap);
-
-        //pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
@@ -83,7 +81,12 @@ public class Gen2Teleop extends LinearOpMode {
                 robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, 1);
             }
 
-            robot.turret(telemetry);
+            if(turretBool){
+                robot.turret(telemetry);
+            }
+            else{
+                robot.targetRPM = 0;
+            }
 
             robot.R_shooter.setPower(robot.setting_ShooterRPM());
             robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -262,6 +265,7 @@ public class Gen2Teleop extends LinearOpMode {
             if(gamepad2.left_trigger > 0.5 && button2LT ){
 
                 robot.outTake();
+                turretBool = false;
                 robot.display_state_outputting();
 
                 button2LT = false;
@@ -276,11 +280,13 @@ public class Gen2Teleop extends LinearOpMode {
             //Lifting
             if(gamepad2.start && gamepad2.dpad_up && button2DU){
 
+                robot.lifting();
                 lifting = true;
 
                 if(!robot.timerInitted[15]) {//very very first thing to happen
                     robot.timeArray[15] = robot.currentTime.milliseconds();
                     robot.timerInitted[15] = true;
+                    turretBool = false;
                 }
 
                 if (robot.currentTime.milliseconds() > robot.timeArray[15] + 350) {//Last thing to happen
@@ -362,7 +368,7 @@ public class Gen2Teleop extends LinearOpMode {
             }
              */
 
-            //telemetry.addData("heading", pinpoint.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("heading", robot.pinpoint.getHeading(AngleUnit.DEGREES));
 
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
             telemetry.addData("R_PTO Pos ", robot.R_PTO.getPosition());
