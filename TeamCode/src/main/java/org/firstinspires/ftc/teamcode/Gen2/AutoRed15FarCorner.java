@@ -22,7 +22,7 @@ public class AutoRed15FarCorner extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private final Pose startPose = new Pose(80, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(83, 10, Math.toRadians(90));
+    private final Pose Shooting = new Pose(83, 10, Math.toRadians(69));
     private final Pose pickup = new Pose(132, 10, Math.toRadians(0));
     private final Pose pickupMove = new Pose(130, 14, Math.toRadians(0));
     private final Pose movingOffLine = new Pose(100, 10, Math.toRadians(90));

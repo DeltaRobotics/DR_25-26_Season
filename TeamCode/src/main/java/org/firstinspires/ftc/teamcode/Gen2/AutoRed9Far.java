@@ -22,7 +22,7 @@ public class AutoRed9Far extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private final Pose startPose = new Pose(80, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(80, 10, Math.toRadians(90));
+    private final Pose Shooting = new Pose(80, 10, Math.toRadians(69));
     private final Pose firstLineup = new Pose(103, 35, Math.toRadians(0));
     private final Pose firstPickup =  new Pose(133, 35, Math.toRadians(0));
     private final Pose secondLineup = new Pose(103, 56, Math.toRadians(0));

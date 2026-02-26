@@ -21,7 +21,7 @@ public class AutoBlue9Far extends OpMode {
     private Timer pathTimer, opmodeTimer;
     private int pathState;
     private final Pose startPose = new Pose(47, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(43, 6, Math.toRadians(100));
+    private final Pose Shooting = new Pose(43, 6, Math.toRadians(111));
     private final Pose firstLineup = new Pose(40, 19, Math.toRadians(180));
     private final Pose firstPickup = new Pose(14, 19, Math.toRadians(180));
     private final Pose secondLineup = new Pose(40, 42, Math.toRadians(180));

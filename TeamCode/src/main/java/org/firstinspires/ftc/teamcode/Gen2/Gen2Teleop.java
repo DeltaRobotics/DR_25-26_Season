@@ -68,7 +68,7 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.hood.setPosition(1);
 
-        robot.targetRPM = 1000;
+        robot.targetRPM = 1800;
 
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);// CHANGE THIS LATER
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -382,7 +382,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             //telemetry.addData("ty", robot.limelight.getLatestResult().getFiducialResults().);
 
-            telemetry.addData("ty", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetYDegrees());
+            //telemetry.addData("ty", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetYDegrees());
 
             telemetry.addData("turret Encoder", robot.turretEncoderCounts);
 
@@ -404,6 +404,7 @@ public class Gen2Teleop extends LinearOpMode {
 
         }
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pinpoint.resetPosAndIMU();
         //robot.limelight.stop();
     }
 }

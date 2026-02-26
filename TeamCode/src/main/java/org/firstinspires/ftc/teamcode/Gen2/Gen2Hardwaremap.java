@@ -194,7 +194,7 @@ public class Gen2Hardwaremap {
         L_shooter.setPower(0);
         transfer.setPower(0);
 
-        pinpoint.resetPosAndIMU();
+        //pinpoint.resetPosAndIMU();
     }
 
     public void mecanumDrive(double forward, double strafe, double heading, double speed) {
@@ -210,7 +210,6 @@ public class Gen2Hardwaremap {
         LLResult result = limelight.getLatestResult();
 
         pinpoint.update();
-
 
         int id;
         double angle = 1;
@@ -242,6 +241,9 @@ public class Gen2Hardwaremap {
                angleError = turretHeadingField - 40;
 
             }
+
+            targetRPM = 3100;
+            hood_pos = 1;
 
         }
         else {
@@ -281,7 +283,7 @@ public class Gen2Hardwaremap {
         double range = distance - 6;
 
         if (range > 110 && range > -200){
-            //targetRPM = 5000;
+            targetRPM = 4500;
             hood_pos = 0.5;
         }
         else if(range < -200){
@@ -298,6 +300,8 @@ public class Gen2Hardwaremap {
         telemetry.addData("distance", distance);
         telemetry.addData("range", range);
         telemetry.addData("heading",pinpoint.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("turretHeadingField", turretHeadingField);
+        telemetry.addData("currentTurretHeading", currentTurretHeading);
 
         //Auto-aiming
 
