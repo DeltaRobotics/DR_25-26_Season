@@ -282,12 +282,16 @@ public class Gen2Hardwaremap {
 
         double range = distance - 6;
 
-        if (range > 110 && range > -200){
+        if (range > 110 && range > -200 && range < 250){
             targetRPM = 4500;
             hood_pos = 0.5;
         }
-        else if(range < -200){
-            targetRPM = 3100;
+        else if(range < -200 ){
+            targetRPM = 2800;
+            hood_pos = 1;
+        }
+        else if(range > 250) {
+            targetRPM = 2800;
             hood_pos = 1;
         }
         else{
@@ -302,6 +306,8 @@ public class Gen2Hardwaremap {
         telemetry.addData("heading",pinpoint.getHeading(AngleUnit.DEGREES));
         telemetry.addData("turretHeadingField", turretHeadingField);
         telemetry.addData("currentTurretHeading", currentTurretHeading);
+        telemetry.addData("turretPower", turretPower);
+        telemetry.addData("blue?", blue);
 
         //Auto-aiming
 

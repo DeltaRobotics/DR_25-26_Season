@@ -216,6 +216,20 @@ public class Gen2Teleop extends LinearOpMode {
              **************************************************
              */
 
+            if(gamepad2.dpad_down && button2DD){
+
+                while(gamepad2.dpad_down && button2DD){
+                    robot.mecanumDrive(gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, .6);
+                }
+
+                button2DD = false;
+            }
+
+            if(!gamepad2.dpad_down && !button2DD){
+                button2DD = true;
+
+            }
+
 
             if(lifting){
                 robot.mecanumDrive(-gamepad2.right_stick_y, 0, 0, 1);
@@ -229,18 +243,36 @@ public class Gen2Teleop extends LinearOpMode {
 
                     robot.teleOpShoot();
                     robot.display_state_shooting();
+                    robot.transfer.setPower(1);
+
+                    robot.L_feeder.setPower(1);
+                    robot.R_feeder.setPower(-1);
                 }
+                robot.transfer.setPower(0);
 
-                robot.transfer.setPower(1);
-
-                robot.L_feeder.setPower(1);
-                robot.R_feeder.setPower(-1);
+                robot.L_feeder.setPower(0);
+                robot.R_feeder.setPower(0);
 
                 button2RB = false;
             }
 
             if(!gamepad2.right_bumper && !button2RB){
                 button2RB = true;
+
+            }
+
+            if(gamepad2.right_trigger > 0.5 && button2RT){
+                robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
+                robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
+                robot.transfer.setPower(-1);
+                robot.L_feeder.setPower(-1);
+                robot.R_feeder.setPower(1);
+                robot.intake.setPower(-0.75);
+
+            }
+
+            if(gamepad2.right_trigger < 0.5 && !button2RT){
+                button2RT = true;
 
             }
 

@@ -68,7 +68,6 @@ public class AutoRed9Far extends OpMode {
             case 0:
 
                 if(!follower.isBusy()) {
-                    robot.angleError = 45;
                     robot.intake.setPower(1);
                     robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
                     robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
