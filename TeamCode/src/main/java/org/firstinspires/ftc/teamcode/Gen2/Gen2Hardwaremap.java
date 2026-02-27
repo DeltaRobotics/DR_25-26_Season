@@ -88,6 +88,7 @@ public class Gen2Hardwaremap {
 
     public double targetRPM = 0;
 
+    public boolean farShoot = false;
     public double hood_pos = 1;
 
     private double turretDegreeRatio = 0.003703703704;
@@ -135,7 +136,7 @@ public class Gen2Hardwaremap {
         PIDShooter = new PIDController(0.004,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
         //P was 0.0015
 
-        PIDTurret = new PIDController(0.045,0,0.0,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.03,0.000006,0.000004,0, MIN_SAMPLE_TIME * 2,-1,1);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -218,13 +219,17 @@ public class Gen2Hardwaremap {
 
         turretEncoderCounts = turretEncoder.getCurrentPosition();
 
-        double currentTurretHeading = turretEncoderCounts / 142.222222222; // in Degrees and in relation to the robot
+        double currentTurretHeading = -turretEncoderCounts / 142.222222222; // in Degrees and in relation to the robot
+
+        double turretPower = 0;
 
         double turretHeadingField = pinpoint.getHeading(AngleUnit.DEGREES) - currentTurretHeading;
 
-        double limit = (Math.max(Math.min((angleError + currentTurretHeading), 90), -90)) - currentTurretHeading;
+        double targetHeading = pinpoint.getHeading(AngleUnit.DEGREES);// in degrees and relative to the robot
 
-        double turretPower = PIDTurret.Update(limit);
+        double currentRobotHeading = pinpoint.getHeading(AngleUnit.DEGREES);
+
+        boolean correctTag = false;
 
         if(blue){
             id = 20;
@@ -233,35 +238,45 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
-        if (result.getFiducialResults().isEmpty()) {
-            if(blue){
-                angleError = turretHeadingField - 140;
-            }
-            else{
-               angleError = turretHeadingField - 40;
-
-            }
-
-            targetRPM = 3100;
-            hood_pos = 1;
-
-        }
-        else {
+        if(!result.getFiducialResults().isEmpty()) {
             for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
                  //Once we have found the correct ID, use its target Y degrees.
                 if (fidRes.getFiducialId() == id) {
-                    angleError = fidRes.getTargetXDegrees();
+                    //angleError = fidRes.getTargetXDegrees();
+                    targetHeading = -fidRes.getTargetXDegrees() + currentTurretHeading;
+                    telemetry.addData("LLangle", fidRes.getTargetXDegrees());
                     angle = fidRes.getTargetYDegrees();
-                    break;
-                } else {
-                    angle = 1;
+                    correctTag = true;
                     break;
                 }
-
             }
         }
 
-        
+        if(result.getFiducialResults().isEmpty() || !correctTag){
+
+            if(!farShoot) {
+
+                if (blue) {
+                    targetHeading = 140 - currentRobotHeading;
+                    //angleError = targetHeading;
+                } else {
+                    targetHeading = 40 - currentRobotHeading;
+                }
+                targetRPM = 3100;
+                hood_pos = 1;
+            }
+            else{
+
+                if (blue) {
+                    targetHeading = 110 - currentRobotHeading;
+                    //angleError = targetHeading;
+                } else {
+                    targetHeading = 70 - currentRobotHeading;
+                }
+                targetRPM = 4500;
+                hood_pos = 0.5;
+            }
+        }
         //double angle = result.getTy();
         double targetOffsetAngle_Vertical = result.getTy();
 
@@ -282,44 +297,70 @@ public class Gen2Hardwaremap {
 
         double range = distance - 6;
 
-        if (range > 110 && range > -200 && range < 250){
-            targetRPM = 4500;
-            hood_pos = 0.5;
-        }
-        else if(range < -200 ){
-            targetRPM = 2800;
-            hood_pos = 1;
-        }
-        else if(range > 250) {
-            targetRPM = 2800;
-            hood_pos = 1;
-        }
-        else{
+        if(!farShoot){
+
             targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
             hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
         }
+        else{
+            targetRPM = 4500;
+            hood_pos = 0.5;
+        }
+        /**
+         *
+         *
+         * if (range > 110 && range > -200){
+         *             targetRPM = 5000;
+         *             hood_pos = 0.6;
+         *         }
+         *         else if(range < -200){
+         *             targetRPM = 3100;
+         *             hood_pos = 1;
+         *         }
+         *         else{
+         *             targetRPM = 2826 + (11.3 * range) + ((0.0236 * (range * range)));
+         *             hood_pos = 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
+         *         }
+         *
+         *
+         *
+         */
 
         hood.setPosition(hood_pos);
 
         telemetry.addData("distance", distance);
+
         telemetry.addData("range", range);
+
         telemetry.addData("heading",pinpoint.getHeading(AngleUnit.DEGREES));
+
         telemetry.addData("turretHeadingField", turretHeadingField);
+
         telemetry.addData("currentTurretHeading", currentTurretHeading);
-        telemetry.addData("turretPower", turretPower);
+
         telemetry.addData("blue?", blue);
 
-        //Auto-aiming
+        telemetry.addData("targetHeading", targetHeading);
 
-        turretPower = PIDTurret.Update(limit); // was -angleError
+        double limit = (Math.max(Math.min((targetHeading), 90), -90));
+
+        angleError = targetHeading - currentTurretHeading;
+
+        PIDTurret.setSetPoint(limit);
+
+        turretPower = PIDTurret.Update(currentTurretHeading); // was -angleError
 
         //safety check so the turret doesn't go past 90
-        //if((turretEncoderCounts < -12800 && turretPower < 0) || (turretEncoderCounts > 12800 && turretPower > 0)){
-        //    turretPower = 0;
-        //}
+        if((currentTurretHeading < -80 && turretPower < 0) || (currentTurretHeading > 80 && turretPower > 0)){
+            turretPower = 0;
+        }
+
+        telemetry.addData("turretPower", turretPower);
 
         R_turret.setPower(turretPower);
         L_turret.setPower(turretPower);
+
+        telemetry.addData("angleError", angleError);
 
     }
 

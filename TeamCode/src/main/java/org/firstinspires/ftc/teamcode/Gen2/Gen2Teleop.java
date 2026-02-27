@@ -52,6 +52,8 @@ public class Gen2Teleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Gen2Hardwaremap robot = new Gen2Hardwaremap(hardwareMap);
 
+        robot.pinpoint.resetPosAndIMU();      // TAKE OUT BEFORE STATES
+
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 
@@ -122,7 +124,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_up && buttonDU){
 
-                //robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
+                robot.PIDTurret.setP(robot.PIDTurret.getP() + 0.005);
 
 
                 robot.targetRPM = robot.targetRPM + 100;
@@ -137,7 +139,7 @@ public class Gen2Teleop extends LinearOpMode {
 
             if(gamepad1.dpad_down && buttonDD){
 
-                //robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
+                robot.PIDTurret.setP(robot.PIDTurret.getP() - 0.005);
 
                 robot.targetRPM = robot.targetRPM - 100;
 
@@ -151,10 +153,8 @@ public class Gen2Teleop extends LinearOpMode {
             //hood moving up
             if(gamepad1.dpad_left && buttonDL){
 
-                //robot.PIDShooter.setD(robot.PIDShooter.getD() + 0.005);
-
-                //robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.0001);
-                robot.hood.setPosition(robot.hood.getPosition() - 0.025);
+                robot.PIDTurret.setI(robot.PIDTurret.getI() - 0.000001);
+                //robot.PIDTurret.setD(robot.PIDTurret.getD() - 0.000001);
 
                 buttonDL = false;
             }
@@ -167,10 +167,8 @@ public class Gen2Teleop extends LinearOpMode {
             //hood moving down
             if(gamepad1.dpad_right && buttonDR){
 
-                //robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0005);
-
-                //robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.0001);
-                robot.hood.setPosition(robot.hood.getPosition() + 0.025);
+                robot.PIDTurret.setI(robot.PIDTurret.getI() + 0.000001);
+                //robot.PIDTurret.setD(robot.PIDTurret.getD() + 0.000001);
 
                 buttonDR = false;
 
@@ -179,36 +177,6 @@ public class Gen2Teleop extends LinearOpMode {
             if(!gamepad1.dpad_right && !buttonDR){
                 buttonDR = true;
             }
-
-            if(gamepad1.y && buttonY){
-
-                robot.PIDShooter.setP(robot.PIDShooter.getP() + 0.0005);
-
-                //robot.targetRPM = robot.targetRPM - 100;
-
-                buttonY = false;
-            }
-
-            if(!gamepad1.y && !buttonY){
-                buttonY = true;
-            }
-
-            if(gamepad1.a && buttonA){
-
-                robot.PIDShooter.setP(robot.PIDShooter.getP() - 0.0005);
-
-                //robot.targetRPM = robot.targetRPM - 100;
-
-                buttonA = false;
-            }
-
-            if(!gamepad1.a && !buttonA){
-                buttonA = true;
-            }
-
-
-
-
 
             /**
              **************************************************
@@ -342,6 +310,31 @@ public class Gen2Teleop extends LinearOpMode {
                 button2DU = true;
             }
 
+            if(gamepad2.a && buttonA){
+
+                robot.farShoot = false;
+
+                buttonA = false;
+            }
+
+            if(!gamepad2.a && !buttonA){
+                buttonA = true;
+            }
+
+
+            //hood moving down
+            if(gamepad2.y && buttonY){
+
+                robot.farShoot = true;
+
+                buttonY = false;
+
+            }
+
+            if(!gamepad2.y && !buttonY){
+                buttonY = true;
+            }
+
             //calling to track the blue AprilTag
             if(gamepad2.x && button2X){
                 robot.blue = true;
@@ -397,6 +390,8 @@ public class Gen2Teleop extends LinearOpMode {
             }
              */
 
+            /**
+
             telemetry.addData("heading", robot.pinpoint.getHeading(AngleUnit.DEGREES));
 
             telemetry.addData("L_PTO Pos ", robot.L_PTO.getPosition());
@@ -418,19 +413,21 @@ public class Gen2Teleop extends LinearOpMode {
 
             telemetry.addData("turret Encoder", robot.turretEncoderCounts);
 
+             */
+
             telemetry.addData("turret P", String.valueOf(robot.PIDTurret.getP()));
 
             telemetry.addData("turret D", String.valueOf(robot.PIDTurret.getD()));
 
-            telemetry.addData("shooterRPM ", robot.shooterRPM());
-            telemetry.addData("targetRPM ", robot.targetRPM);
+            telemetry.addData("turret I", String.valueOf(robot.PIDTurret.getI()));
 
-            telemetry.addData("power ", robot.setting_ShooterRPM());
-            telemetry.addData("real shooter power ", robot.R_shooter.getPower());
+            //telemetry.addData("shooterRPM ", robot.shooterRPM());
+            //telemetry.addData("targetRPM ", robot.targetRPM);
 
-            telemetry.addData("Shooter P", robot.PIDShooter.getP());
+            //telemetry.addData("power ", robot.setting_ShooterRPM());
+            //telemetry.addData("real shooter power ", robot.R_shooter.getPower());
 
-
+            //telemetry.addData("Shooter P", robot.PIDShooter.getP());
 
             telemetry.update();
 
