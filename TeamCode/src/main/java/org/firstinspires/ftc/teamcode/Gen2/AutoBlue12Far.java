@@ -322,6 +322,8 @@ public class AutoBlue12Far extends OpMode {
 
         robot.targetRPM = 1000;
 
+        robot.farShoot = true;
+
         robot.blue = true;
 
         follower = Constants.createFollower(hardwareMap);

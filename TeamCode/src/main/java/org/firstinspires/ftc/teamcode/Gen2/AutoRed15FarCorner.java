@@ -333,6 +333,8 @@ public class AutoRed15FarCorner extends OpMode {
 
         robot.targetRPM = 1000;
 
+        robot.farShoot = true;
+
         robot.blue = false;
 
         follower = Constants.createFollower(hardwareMap);
