@@ -333,7 +333,7 @@ public class AutoRed15FarCorner extends OpMode {
 
         robot.targetRPM = 1000;
 
-        robot.farShoot = true;
+        robot.autoFarShoot();
 
         robot.blue = false;
 
@@ -348,7 +348,7 @@ public class AutoRed15FarCorner extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        robot.turret(telemetry);
+        //robot.turret(telemetry);
         setPathState(0);
     }
 

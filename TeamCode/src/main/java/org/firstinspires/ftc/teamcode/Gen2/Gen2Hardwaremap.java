@@ -89,6 +89,8 @@ public class Gen2Hardwaremap {
     public double targetRPM = 0;
 
     public boolean farShoot = false;
+
+    public boolean autoFarShoot = false;
     public double hood_pos = 1;
 
     private double turretDegreeRatio = 0.003703703704;
@@ -277,6 +279,8 @@ public class Gen2Hardwaremap {
                 hood_pos = 0.5;
             }
         }
+
+
         //double angle = result.getTy();
         double targetOffsetAngle_Vertical = result.getTy();
 
@@ -461,6 +465,14 @@ public class Gen2Hardwaremap {
 
         L_feeder.setPower(1);
         R_feeder.setPower(-1);
+    }
+
+    public void autoFarShoot(){
+
+        if(farShoot){
+            targetRPM = 4500;
+            hood_pos = 0.5;
+        }
     }
 
     public int shooterRPM(){

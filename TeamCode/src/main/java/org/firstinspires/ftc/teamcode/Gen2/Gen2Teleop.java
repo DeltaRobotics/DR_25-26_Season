@@ -52,8 +52,6 @@ public class Gen2Teleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Gen2Hardwaremap robot = new Gen2Hardwaremap(hardwareMap);
 
-        robot.pinpoint.resetPosAndIMU();      // TAKE OUT BEFORE STATES
-
         robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
         robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
 

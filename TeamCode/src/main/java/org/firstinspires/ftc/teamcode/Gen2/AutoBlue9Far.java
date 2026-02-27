@@ -267,7 +267,7 @@ public class AutoBlue9Far extends OpMode {
 
         robot.targetRPM = 1000;
 
-        robot.farShoot = true;
+        robot.autoFarShoot();
 
         robot.blue = true;
 
@@ -282,7 +282,7 @@ public class AutoBlue9Far extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        robot.turret(telemetry);
+        //robot.turret(telemetry);
         setPathState(0);
     }
 
