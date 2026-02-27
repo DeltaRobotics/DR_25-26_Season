@@ -70,9 +70,6 @@ public class Gen2Teleop extends LinearOpMode {
 
         robot.targetRPM = 1800;
 
-        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);// CHANGE THIS LATER
-        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         waitForStart();
 
         while (opModeIsActive()) {

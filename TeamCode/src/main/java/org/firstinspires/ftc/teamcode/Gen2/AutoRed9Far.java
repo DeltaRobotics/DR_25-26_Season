@@ -8,6 +8,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -231,7 +232,7 @@ public class AutoRed9Far extends OpMode {
         // These loop the movements of the robot
         follower.update();
         autonomousPathUpdate();
-        robot.turret(telemetry);
+        //robot.turret(telemetry);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -240,6 +241,7 @@ public class AutoRed9Far extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("hood", robot.hood.getPosition());
         telemetry.addData("tx", robot.limelight.getLatestResult().getFiducialResults().isEmpty() ? "No Target" : robot.limelight.getLatestResult().getFiducialResults().get(0).getTargetXDegrees());
         telemetry.update();;
     }
@@ -271,6 +273,9 @@ public class AutoRed9Far extends OpMode {
         robot.autoFarShoot();
 
         robot.blue = false;
+
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

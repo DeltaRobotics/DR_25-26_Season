@@ -8,6 +8,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -288,6 +289,9 @@ public class AutoBlue9Close extends OpMode {
         robot.targetRPM = 1000;
 
         robot.blue = true;
+
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

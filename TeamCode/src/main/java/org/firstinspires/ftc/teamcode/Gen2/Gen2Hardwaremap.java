@@ -303,8 +303,15 @@ public class Gen2Hardwaremap {
 
         if(!farShoot){
 
-            targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
-            hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
+            if(range > 200){
+                targetRPM = 2500;
+                hood_pos = 1;
+            }
+            else{
+                targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
+                hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
+            }
+
         }
         else{
             targetRPM = 4500;
@@ -469,10 +476,9 @@ public class Gen2Hardwaremap {
 
     public void autoFarShoot(){
 
-        if(farShoot){
-            targetRPM = 4500;
-            hood_pos = 0.5;
-        }
+        targetRPM = 4500;
+        hood_pos = 0.5;
+        hood.setPosition(hood_pos);
     }
 
     public int shooterRPM(){

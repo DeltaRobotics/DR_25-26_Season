@@ -8,6 +8,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -89,7 +90,6 @@ public class AutoRed9Close extends OpMode {
             case 0:
 
                 if(!follower.isBusy()) {
-                    robot.angleError = 45;
                     robot.intake.setPower(1);
                     robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
                     robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
@@ -294,6 +294,9 @@ public class AutoRed9Close extends OpMode {
         robot.targetRPM = 1000;
 
         robot.blue = false;
+
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);

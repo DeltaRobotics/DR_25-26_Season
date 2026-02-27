@@ -8,6 +8,7 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -230,7 +231,7 @@ public class AutoBlue9Far extends OpMode {
         // These loop the movements of the robot
         follower.update();
         autonomousPathUpdate();
-        robot.turret(telemetry);
+        //robot.turret(telemetry);
 
         robot.R_shooter.setPower(robot.setting_ShooterRPM());
         robot.L_shooter.setPower(robot.setting_ShooterRPM());
@@ -270,6 +271,9 @@ public class AutoBlue9Far extends OpMode {
         robot.autoFarShoot();
 
         robot.blue = true;
+
+        robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
