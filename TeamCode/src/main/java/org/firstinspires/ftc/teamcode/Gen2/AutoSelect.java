@@ -56,6 +56,7 @@ public class AutoSelect extends SelectableOpMode {
                     a.add("12", AutoRed12Far::new);
                     a.add("9", AutoRed9Far::new);
                     a.add("15 Corner", AutoRed15FarCorner::new);
+                    a.add("Lion Gold", AutoRedLionGold::new);
                 });
             });
 

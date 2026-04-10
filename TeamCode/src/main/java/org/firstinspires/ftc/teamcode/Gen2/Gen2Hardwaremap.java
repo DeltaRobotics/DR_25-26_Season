@@ -98,7 +98,15 @@ public class Gen2Hardwaremap {
     public double turretEncoderCounts = 0;
 
     private double turretCenterPosition = 0; //147.3
+
     public boolean blue = false;
+
+    public boolean auto = false;
+
+    // For AprilTag tag tx hysteresis
+    private double lastGoodTx = 0;
+    private ElapsedTime aprilTagTxHysteresisTimer =
+            new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     RevBlinkinLedDriver blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -134,11 +142,12 @@ public class Gen2Hardwaremap {
         // methods associated with the Rev2mDistanceSensor class.
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
 
+
         //PIDShooter = new PIDController(0.0015,0,0,0, MIN_SAMPLE_TIME * 2,0.1,1);
         PIDShooter = new PIDController(0.004,0,0.00001,0, MIN_SAMPLE_TIME * 2,0.1,1);
         //P was 0.0015
 
-        PIDTurret = new PIDController(0.03,0.000006,0.000004,0, MIN_SAMPLE_TIME * 2,-1,1);
+        PIDTurret = new PIDController(0.03,0.000006,0.000004,0, MIN_SAMPLE_TIME * 2,-0.5,0.5);
 
         motorRF = ahwMap.dcMotor.get("motorRF");
         motorLF = ahwMap.dcMotor.get("motorLF");
@@ -240,9 +249,58 @@ public class Gen2Hardwaremap {
             id = 24;
         }
 
+          //This is the new stuff from Friday during states
+
         if(!result.getFiducialResults().isEmpty()) {
             for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
                  //Once we have found the correct ID, use its target Y degrees.
+                if (fidRes.getFiducialId() == id) {
+                    lastGoodTx = -fidRes.getTargetXDegrees();
+                    aprilTagTxHysteresisTimer.reset();
+                    targetHeading = lastGoodTx + currentTurretHeading;
+                    telemetry.addData("LLangle", lastGoodTx);
+                    angle = fidRes.getTargetYDegrees();
+                    correctTag = true;
+                    break;
+                }
+            }
+        }
+
+        if(!correctTag){
+            if(!farShoot) {
+
+                if (blue) {
+                    targetHeading = 135 - currentRobotHeading;
+                    //angleError = targetHeading;
+                } else {
+                    targetHeading = 45 - currentRobotHeading;
+                }
+                targetRPM = 3000;
+                hood_pos = 1;
+            }
+            else{
+
+                if (blue) {
+                    targetHeading = 115 - currentRobotHeading;
+                    //angleError = targetHeading;
+                } else {
+                    targetHeading = 70 - currentRobotHeading;
+                }
+
+            }
+        }
+
+        if(farShoot){
+
+            targetRPM = 4500;
+            hood_pos = 0.5;
+        }
+
+        /**
+        //Old stuff that works
+        if(!result.getFiducialResults().isEmpty()) {
+            for(LLResultTypes.FiducialResult fidRes : result.getFiducialResults()) {
+                //Once we have found the correct ID, use its target Y degrees.
                 if (fidRes.getFiducialId() == id) {
                     //angleError = fidRes.getTargetXDegrees();
                     targetHeading = -fidRes.getTargetXDegrees() + currentTurretHeading;
@@ -279,6 +337,8 @@ public class Gen2Hardwaremap {
                 hood_pos = 0.5;
             }
         }
+         */
+
 
 
         //double angle = result.getTy();
@@ -301,21 +361,12 @@ public class Gen2Hardwaremap {
 
         double range = distance - 6;
 
-        if(!farShoot){
+        if(correctTag && !farShoot) {
 
-            if(range > 200){
-                targetRPM = 2500;
-                hood_pos = 1;
-            }
-            else{
-                targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
-                hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
-            }
+            // the old starting RPM is 2755
+            targetRPM = 2755 + (3.58 * range) + (0.0838 * (range * range)); // old 2826 + (11.3 * range) + ((0.0236 * (range * range)));
+            hood_pos = 1.18 + (-0.0069 * range) + (0.0000351 * (range * range)) + (-0.0000002 * (range * range * range)); // old 1.1 - (0.00324 * range) - (0.0000279 * (range * range)) + (0.000000138 * (range * range * range));
 
-        }
-        else{
-            targetRPM = 4500;
-            hood_pos = 0.5;
         }
         /**
          *
@@ -353,9 +404,19 @@ public class Gen2Hardwaremap {
 
         telemetry.addData("targetHeading", targetHeading);
 
+        telemetry.addData("targetRPM", targetRPM);
+
+        telemetry.addData("actualRPM", setting_ShooterRPM());
+
+
         double limit = (Math.max(Math.min((targetHeading), 90), -90));
 
         angleError = targetHeading - currentTurretHeading;
+
+        if(auto && !correctTag && aprilTagTxHysteresisTimer.milliseconds() >= 1000){
+
+            limit = 0;
+        }
 
         PIDTurret.setSetPoint(limit);
 
@@ -363,6 +424,12 @@ public class Gen2Hardwaremap {
 
         //safety check so the turret doesn't go past 90
         if((currentTurretHeading < -80 && turretPower < 0) || (currentTurretHeading > 80 && turretPower > 0)){
+            turretPower = 0;
+        }
+
+        // If we did not have a good reading, but less than 1 second has elapsed since our
+        // last good reading, use the last known good reading.
+        if(!correctTag && aprilTagTxHysteresisTimer.milliseconds() < 1000 && !auto){
             turretPower = 0;
         }
 
@@ -437,13 +504,12 @@ public class Gen2Hardwaremap {
         R_swingythingy.setPosition(R_swingy_Thingy_Open);
     }
 
-
     public void autoShoot(){
 
         L_swingythingy.setPosition(L_swingy_Thingy_Close);
         R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-        intake.setPower(-.75);
+        intake.setPower(.5);
 
         //hood.setPosition(hood_pos);
 
@@ -461,7 +527,7 @@ public class Gen2Hardwaremap {
         L_swingythingy.setPosition(L_swingy_Thingy_Close);
         R_swingythingy.setPosition(R_swingy_Thingy_Close);
 
-        intake.setPower(-.75);
+        intake.setPower(0);
 
         //hood.setPosition(hood_pos);
 

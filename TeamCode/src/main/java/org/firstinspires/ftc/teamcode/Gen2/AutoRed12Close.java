@@ -24,20 +24,19 @@ public class AutoRed12Close extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private final Pose startPose = new Pose(112, 130, Math.toRadians(90));
-    private final Pose Shooting = new Pose(95, 95, Math.toRadians(90));
+    private final Pose Shooting = new Pose(95, 95, Math.toRadians(45));
     private final Pose firstLineup = new Pose(103, 90, Math.toRadians(0));
     private final Pose firstPickup = new Pose(130, 90, Math.toRadians(0));
     private final Pose secondLineup = new Pose(103, 66, Math.toRadians(0));
     private final Pose secondPickup = new Pose(136, 64, Math.toRadians(0));
     private final Pose secondPickupBack = new Pose(120, 62, Math.toRadians(0));
-    private final Pose thirdLineup = new Pose(103, 40, Math.toRadians(0));
-    private final Pose thirdPickup = new Pose(136, 40, Math.toRadians(0));
-    private final Pose movingOffLine = new Pose(95, 112, Math.toRadians(30));
+    private final Pose thirdLineup = new Pose(103, 47, Math.toRadians(0));
+    private final Pose thirdPickup = new Pose(136, 47, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(95, 115, Math.toRadians(30));
 
     private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath,secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, thirdLineupPath, thirdPickupPath, shootThirdPickupPath, movingBackPath ;
 
     public void buildPaths() {
-
 
         scorePreload = new Path(new BezierLine(startPose, Shooting));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), Shooting.getHeading());
@@ -331,6 +330,8 @@ public class AutoRed12Close extends OpMode {
         robot.targetRPM = 1000;
 
         robot.blue = false;
+
+        robot.auto = true;
 
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
