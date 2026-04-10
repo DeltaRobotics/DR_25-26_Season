@@ -13,24 +13,24 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+
 @Disabled
-@Autonomous(name = "AutoBlue9Far")
-public class AutoBlue9Far extends OpMode {
+@Autonomous(name = "AutoRedLionGold")
+public class AutoRedLionGold extends OpMode {
 
     Gen2Hardwaremap robot = null;
     private Follower follower;
-    private Timer pathTimer, opmodeTimer;
+    private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
-    private final Pose startPose = new Pose(47, 0, Math.toRadians(90));
-    private final Pose Shooting = new Pose(43, 6, Math.toRadians(111));
-    private final Pose firstLineup = new Pose(40, 19, Math.toRadians(180));
-    private final Pose firstPickup = new Pose(14, 19, Math.toRadians(180));
-    private final Pose secondLineup = new Pose(40, 42, Math.toRadians(180));
-    private final Pose secondPickup = new Pose(14, 42, Math.toRadians(180));
-    //private final Pose secondPickupBack = new Pose(30, 52, Math.toRadians(180));
-    private final Pose movingOffLine = new Pose(27, 10, Math.toRadians(90));
+    private final Pose startPose = new Pose(80, 0, Math.toRadians(90));
+    private final Pose Shooting = new Pose(83, 10, Math.toRadians(69));
 
-    private Path scorePreload, firstLineupPath, firstPickupPath, shootFirstPickupPath, secondLineupPath, secondPickupPath, secondPickupBackPath, shootSecondLineupPath, movingOffLinePath;
+    private final Pose firstLineup = new Pose(103, 35, Math.toRadians(0));
+    private final Pose firstPickup =  new Pose(133, 35, Math.toRadians(0));
+    private final Pose cornerPickup = new Pose(132, 10, Math.toRadians(0));
+    private final Pose cornerPickupMove = new Pose(130, 14, Math.toRadians(0));
+    private final Pose movingOffLine = new Pose(100, 10, Math.toRadians(90));
+    private Path scorePreload, firstLineupPath, shootFirstPickupPath, firstPickupPath, pickupPath, pickupMovePath, shootPickupPath, movingOffLinePath ;
 
     public void buildPaths() {
 
@@ -44,22 +44,20 @@ public class AutoBlue9Far extends OpMode {
         firstPickupPath.setLinearHeadingInterpolation(firstLineup.getHeading(), firstPickup.getHeading()); //firstPickup.getHeading()
 
         shootFirstPickupPath = new Path(new BezierLine(firstPickup, Shooting));
-        shootFirstPickupPath.setLinearHeadingInterpolation(firstPickup.getHeading(), Shooting.getHeading()); //Shooting.getHeading()
+        shootFirstPickupPath.setLinearHeadingInterpolation(firstPickup.getHeading(), Shooting.getHeading()); //Shooting.getHeadi
 
-        secondLineupPath = new Path(new BezierLine(Shooting, secondLineup));
-        secondLineupPath.setLinearHeadingInterpolation(Shooting.getHeading(), secondLineup.getHeading());//secondLineup.getHeading()
+        pickupPath = new Path (new BezierLine(Shooting,cornerPickup));
+        pickupPath.setConstantHeadingInterpolation( cornerPickup.getHeading());//Shooting.getHeading(),
 
-        secondPickupPath = new Path(new BezierLine(secondLineup, secondPickup));
-        secondPickupPath.setLinearHeadingInterpolation(secondLineup.getHeading(), secondPickup.getHeading());//secondPickup.getHeading()
+        pickupMovePath = new Path (new BezierLine(cornerPickup,cornerPickupMove));
+        pickupMovePath.setLinearHeadingInterpolation( cornerPickup.getHeading(), cornerPickupMove.getHeading());//Shooting.getHeading(),
 
-        //secondPickupBackPath = new Path (new BezierLine(secondPickup,secondPickupBack));
-        //secondPickupBackPath.setConstantHeadingInterpolation(secondPickupBack.getHeading());
-
-        shootSecondLineupPath = new Path(new BezierLine(secondPickup, Shooting));
-        shootSecondLineupPath.setLinearHeadingInterpolation(secondPickup.getHeading(), Shooting.getHeading());//Shooting.getHeading()
+        shootPickupPath = new Path (new BezierLine(cornerPickupMove,Shooting));
+        shootPickupPath.setLinearHeadingInterpolation(cornerPickupMove.getHeading(), Shooting.getHeading());
 
         movingOffLinePath = new Path(new BezierLine(Shooting, movingOffLine));
         movingOffLinePath.setLinearHeadingInterpolation(Shooting.getHeading(), movingOffLine.getHeading());//Shooting.getHeading()
+
 
     }
 
@@ -71,11 +69,9 @@ public class AutoBlue9Far extends OpMode {
                     robot.intake.setPower(1);
                     robot.L_swingythingy.setPosition(robot.L_swingy_Thingy_Close);
                     robot.R_swingythingy.setPosition(robot.R_swingy_Thingy_Close);
-
                     follower.followPath(scorePreload, true);
                     setPathState(1);
                 }
-
                 break;
 
             case 1:
@@ -99,6 +95,7 @@ public class AutoBlue9Far extends OpMode {
                     }
                 }
                 break;
+
             case 2:
 
                 if(!follower.isBusy()) {
@@ -124,7 +121,55 @@ public class AutoBlue9Far extends OpMode {
                     setPathState(5);
                 }
                 break;
+
             case 5:
+
+                if(!follower.isBusy()) {
+
+                    if(!robot.timerInitted[4]) {//very very first thing to happen
+                        robot.timeArray[4] = robot.currentTime.milliseconds();
+                        robot.timerInitted[4] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[4] + 1800) {//Last thing to happen
+                        setPathState(2);
+                        robot.timerInitted[4] = false;
+                    }
+
+                    else {//Second thing to happen
+                        robot.autoShoot();
+                        robot.display_state_shooting();
+
+                    }
+                }
+                break;
+            case 6:
+
+                if(!follower.isBusy()) {
+
+                    robot.intake();
+                    follower.followPath(pickupPath, true);
+                    robot.display_state_intaking();
+                    setPathState(7);
+                }
+                break;
+            case 7:
+
+                if(!follower.isBusy()) {
+
+                    follower.followPath(pickupMovePath, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+
+                if(!follower.isBusy()) {
+
+                    follower.followPath(shootPickupPath, true);
+                    setPathState(9);
+                }
+                break;
+            case 9:
 
                 if(!follower.isBusy()) {
 
@@ -134,7 +179,7 @@ public class AutoBlue9Far extends OpMode {
                     }
 
                     if (robot.currentTime.milliseconds() > robot.timeArray[5] + 1800) {//Last thing to happen
-                        setPathState(6);
+                        setPathState(10);
                         robot.timerInitted[5] = false;
                     }
 
@@ -143,52 +188,43 @@ public class AutoBlue9Far extends OpMode {
                         robot.display_state_shooting();
 
                     }
-
-                }
-                break;
-            case 6:
-
-                if(!follower.isBusy()) {
-                    robot.intake();
-                    follower.followPath(secondLineupPath, true);
-                    robot.display_state_RedIdle();
-                    setPathState(7);
-                }
-                break;
-            case 7:
-
-                if(!follower.isBusy()) {
-                    follower.followPath(secondPickupPath, true);
-                    setPathState(8);
-                }
-                break;
-            case 8:
-
-                //if(!follower.isBusy()) {
-
-                // follower.followPath(secondPickupBackPath, true);
-                setPathState(9);
-                // }
-                break;
-            case 9:
-
-                if(!follower.isBusy()) {
-                    follower.followPath(shootSecondLineupPath, true);
-                    setPathState(10);
                 }
                 break;
             case 10:
 
                 if(!follower.isBusy()) {
+                    robot.intake();
+                    follower.followPath(pickupPath, true);
+                    robot.display_state_RedIdle();
+                    setPathState(11);
+                }
+                break;
+            case 11:
 
-                    if(!robot.timerInitted[6]) {//very very first thing to happen
-                        robot.timeArray[6] = robot.currentTime.milliseconds();
-                        robot.timerInitted[6] = true;
+                if(!follower.isBusy()) {
+                    follower.followPath(pickupMovePath, true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
+
+                if(!follower.isBusy()) {
+                    follower.followPath(shootPickupPath, true);
+                    setPathState(13);
+                }
+                break;
+            case 13:
+
+                if(!follower.isBusy()) {
+
+                    if(!robot.timerInitted[5]) {//very very first thing to happen
+                        robot.timeArray[5] = robot.currentTime.milliseconds();
+                        robot.timerInitted[5] = true;
                     }
 
-                    if (robot.currentTime.milliseconds() > robot.timeArray[6] + 1800) {//Last thing to happen
-                        setPathState(11);
-                        robot.timerInitted[6] = false;
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 1800) {//Last thing to happen
+                        setPathState(14);
+                        robot.timerInitted[5] = false;
                     }
 
                     else {//Second thing to happen
@@ -198,11 +234,55 @@ public class AutoBlue9Far extends OpMode {
                     }
                 }
                 break;
-            case 11:
+            case 14:
 
                 if(!follower.isBusy()) {
-                    follower.followPath(movingOffLinePath, true);
+                    robot.intake();
+                    follower.followPath(pickupPath, true);
                     robot.display_state_RedIdle();
+                    setPathState(15);
+                }
+                break;
+            case 15:
+
+                if(!follower.isBusy()) {
+                    follower.followPath(pickupMovePath, true);
+                    setPathState(15);
+                }
+                break;
+            case 16:
+
+                if(!follower.isBusy()) {
+                    follower.followPath(shootPickupPath, true);
+                    setPathState(17);
+                }
+                break;
+            case 17:
+
+                if(!follower.isBusy()) {
+
+                    if(!robot.timerInitted[5]) {//very very first thing to happen
+                        robot.timeArray[5] = robot.currentTime.milliseconds();
+                        robot.timerInitted[5] = true;
+                    }
+
+                    if (robot.currentTime.milliseconds() > robot.timeArray[5] + 1800) {//Last thing to happen
+                        setPathState(19);
+                        robot.timerInitted[5] = false;
+                    }
+
+                    else {//Second thing to happen
+                        robot.autoShoot();
+                        robot.display_state_shooting();
+
+                    }
+                }
+                break;
+            case 19:
+
+                if(!follower.isBusy()) {
+                    robot.stopIntake();
+                    follower.followPath(movingOffLinePath, true);
                     setPathState(-1);
                 }
                 break;
@@ -270,9 +350,7 @@ public class AutoBlue9Far extends OpMode {
 
         robot.autoFarShoot();
 
-        robot.blue = true;
-
-        robot.auto = true;
+        robot.blue = false;
 
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

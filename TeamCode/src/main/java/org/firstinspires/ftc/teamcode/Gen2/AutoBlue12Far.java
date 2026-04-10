@@ -327,6 +327,8 @@ public class AutoBlue12Far extends OpMode {
 
         robot.blue = true;
 
+        robot.auto = true;
+
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

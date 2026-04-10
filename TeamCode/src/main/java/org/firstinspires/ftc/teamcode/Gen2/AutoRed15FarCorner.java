@@ -338,6 +338,8 @@ public class AutoRed15FarCorner extends OpMode {
 
         robot.blue = false;
 
+        robot.auto = true;
+
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

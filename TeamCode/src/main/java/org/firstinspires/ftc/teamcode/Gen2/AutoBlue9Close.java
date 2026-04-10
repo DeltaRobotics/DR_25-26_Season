@@ -40,8 +40,10 @@ public class AutoBlue9Close extends OpMode {
      *
      */
 
+
+
     private final Pose startPose = new Pose(24, 130, Math.toRadians(90));
-    private final Pose Shooting = new Pose(38, 87, Math.toRadians(90));
+    private final Pose Shooting = new Pose(38, 87, Math.toRadians(135));
     private final Pose firstLineup = new Pose(40, 73, Math.toRadians(180));
     private final Pose firstPickup = new Pose(18, 73, Math.toRadians(180));
     private final Pose secondLineup = new Pose(40, 50, Math.toRadians(180));
@@ -289,6 +291,8 @@ public class AutoBlue9Close extends OpMode {
         robot.targetRPM = 1000;
 
         robot.blue = true;
+
+        robot.auto = true;
 
         robot.intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
